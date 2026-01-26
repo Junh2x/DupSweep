@@ -1,0 +1,144 @@
+<UserControl x:Class="DupSweep.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:DupSweep.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewmodels:SettingsViewModel}"
+             d:DesignHeight="600" d:DesignWidth="900">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="600" Margin="0,0,0,32">
+            <!-- Header -->
+            <TextBlock Text="Settings"
+                       Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                       Margin="0,0,0,24" />
+
+            <!-- Appearance -->
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+                <StackPanel Margin="16">
+                    <TextBlock Text="Appearance"
+                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Margin="0,0,0,16" />
+
+                    <DockPanel Margin="0,0,0,8">
+                        <ToggleButton DockPanel.Dock="Right"
+                                      Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                      IsChecked="{Binding IsDarkTheme}" />
+                        <StackPanel>
+                            <TextBlock Text="Dark Theme" />
+                            <TextBlock Text="Use dark color scheme"
+                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                       Opacity="0.6" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <DockPanel>
+                        <ComboBox DockPanel.Dock="Right"
+                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                  SelectedItem="{Binding ThumbnailSize}"
+                                  Width="100">
+                            <ComboBoxItem Content="64" />
+                            <ComboBoxItem Content="128" />
+                            <ComboBoxItem Content="256" />
+                        </ComboBox>
+                        <StackPanel>
+                            <TextBlock Text="Thumbnail Size" />
+                            <TextBlock Text="Size of preview thumbnails"
+                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                       Opacity="0.6" />
+                        </StackPanel>
+                    </DockPanel>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- Deletion -->
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+                <StackPanel Margin="16">
+                    <TextBlock Text="Deletion"
+                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Margin="0,0,0,16" />
+
+                    <DockPanel Margin="0,0,0,8">
+                        <ToggleButton DockPanel.Dock="Right"
+                                      Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                      IsChecked="{Binding MoveToTrashByDefault}" />
+                        <StackPanel>
+                            <TextBlock Text="Move to Trash by Default" />
+                            <TextBlock Text="Files can be recovered from trash"
+                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                       Opacity="0.6" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <DockPanel>
+                        <ToggleButton DockPanel.Dock="Right"
+                                      Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                      IsChecked="{Binding ShowConfirmationDialog}" />
+                        <StackPanel>
+                            <TextBlock Text="Show Confirmation Dialog" />
+                            <TextBlock Text="Ask before deleting files"
+                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                       Opacity="0.6" />
+                        </StackPanel>
+                    </DockPanel>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- Performance -->
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+                <StackPanel Margin="16">
+                    <TextBlock Text="Performance"
+                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Margin="0,0,0,16" />
+
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock>
+                            <Run Text="Parallel Threads:" />
+                            <Run Text="{Binding ParallelThreads}" />
+                        </TextBlock>
+                        <Slider Minimum="1"
+                                Maximum="32"
+                                Value="{Binding ParallelThreads}"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                TickFrequency="1" />
+                        <TextBlock Text="Number of threads for parallel processing"
+                                   Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                   Opacity="0.6" />
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- FFmpeg -->
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+                <StackPanel Margin="16">
+                    <TextBlock Text="FFmpeg"
+                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Margin="0,0,0,16" />
+
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Content="Browse"
+                                Command="{Binding BrowseFFmpegPathCommand}" />
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="FFmpeg Path" />
+                            <TextBlock Text="{Binding FfmpegPath, TargetNullValue='Not configured (using bundled)'}"
+                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                       Opacity="0.6"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </DockPanel>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <!-- Reset -->
+            <Button Content="Reset to Defaults"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Command="{Binding ResetToDefaultsCommand}"
+                    HorizontalAlignment="Left" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
