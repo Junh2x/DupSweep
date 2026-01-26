@@ -47,7 +47,7 @@ Desktop.ini
 # macOS
 .DS_Store
 
-# Docs folder (user requested exclusion)
+# Docs folder
 docs/
 
 # Local development
