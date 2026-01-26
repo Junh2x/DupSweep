@@ -1,0 +1,228 @@
+<UserControl x:Class="DupSweep.App.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewmodels="clr-namespace:DupSweep.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewmodels:HomeViewModel}"
+             d:DesignHeight="600" d:DesignWidth="900">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="300" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,16">
+            <TextBlock Text="Select Folders to Scan"
+                       Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
+            <TextBlock Text="Add folders containing images, videos, or audio files to find duplicates"
+                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                       Opacity="0.6" />
+        </StackPanel>
+
+        <!-- Folder Drop Zone -->
+        <materialDesign:Card Grid.Row="1" Grid.Column="0" Margin="0,0,16,0"
+                             materialDesign:ElevationAssist.Elevation="Dp1">
+            <Grid>
+                <Border BorderThickness="2"
+                        CornerRadius="4"
+                        Margin="8"
+                        Visibility="{Binding SelectedFolders.Count, Converter={StaticResource InverseIntToVisibilityConverter}, FallbackValue=Visible}">
+                    <Border.BorderBrush>
+                        <VisualBrush>
+                            <VisualBrush.Visual>
+                                <Rectangle StrokeDashArray="4 2"
+                                           Stroke="{DynamicResource PrimaryHueMidBrush}"
+                                           StrokeThickness="2"
+                                           Width="1" Height="1" />
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Border.BorderBrush>
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <materialDesign:PackIcon Kind="FolderPlus"
+                                                 Width="64" Height="64"
+                                                 HorizontalAlignment="Center"
+                                                 Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                        <TextBlock Text="Drop folders here or click to browse"
+                                   Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,16,0,8" />
+                        <Button Content="Browse Folders"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding AddFolderCommand}"
+                                HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <DockPanel Margin="8" Visibility="{Binding SelectedFolders.Count, Converter={StaticResource IntToVisibilityConverter}, FallbackValue=Collapsed}">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="Add Folder"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding AddFolderCommand}"
+                                Margin="0,0,8,0" />
+                        <Button Content="Clear All"
+                                Style="{StaticResource MaterialDesignOutlinedSecondaryButton}"
+                                Command="{Binding ClearFoldersCommand}" />
+                    </StackPanel>
+
+                    <ListBox ItemsSource="{Binding SelectedFolders}"
+                             Style="{StaticResource MaterialDesignListBox}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right"
+                                            Style="{StaticResource MaterialDesignIconButton}"
+                                            Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="Remove folder">
+                                        <materialDesign:PackIcon Kind="Close" />
+                                    </Button>
+                                    <materialDesign:PackIcon Kind="Folder"
+                                                             VerticalAlignment="Center"
+                                                             Margin="0,0,8,0"
+                                                             Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                    <TextBlock Text="{Binding}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Grid>
+        </materialDesign:Card>
+
+        <!-- Options Panel -->
+        <materialDesign:Card Grid.Row="1" Grid.Column="1"
+                             materialDesign:ElevationAssist.Elevation="Dp1"
+                             Padding="16">
+            <StackPanel>
+                <TextBlock Text="Detection Options"
+                           Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                           Margin="0,0,0,16" />
+
+                <CheckBox Content="Hash comparison (exact duplicates)"
+                          IsChecked="{Binding UseHashComparison}"
+                          Margin="0,0,0,8" />
+
+                <CheckBox Content="Image similarity"
+                          IsChecked="{Binding UseImageSimilarity}"
+                          Margin="0,0,0,8" />
+
+                <CheckBox Content="Video similarity"
+                          IsChecked="{Binding UseVideoSimilarity}"
+                          Margin="0,0,0,8" />
+
+                <CheckBox Content="Audio similarity"
+                          IsChecked="{Binding UseAudioSimilarity}"
+                          Margin="0,0,0,8" />
+
+                <StackPanel Margin="24,0,0,16"
+                            IsEnabled="{Binding UseImageSimilarity}">
+                    <TextBlock Text="{Binding SimilarityThreshold, StringFormat=Similarity threshold: {0:0}%}"
+                               Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                               Margin="0,0,0,4" />
+                    <Slider Minimum="50" Maximum="100"
+                            Value="{Binding SimilarityThreshold}"
+                            Style="{StaticResource MaterialDesignDiscreteSlider}"
+                            TickFrequency="5" />
+                </StackPanel>
+
+                <StackPanel Margin="24,0,0,16"
+                            IsEnabled="{Binding UseVideoSimilarity}">
+                    <TextBlock Text="{Binding VideoSimilarityThreshold, StringFormat=Video similarity threshold: {0:0}%}"
+                               Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                               Margin="0,0,0,4" />
+                    <Slider Minimum="50" Maximum="100"
+                            Value="{Binding VideoSimilarityThreshold}"
+                            Style="{StaticResource MaterialDesignDiscreteSlider}"
+                            TickFrequency="5" />
+                </StackPanel>
+
+                <StackPanel Margin="24,0,0,16"
+                            IsEnabled="{Binding UseAudioSimilarity}">
+                    <TextBlock Text="{Binding AudioSimilarityThreshold, StringFormat=Audio similarity threshold: {0:0}%}"
+                               Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                               Margin="0,0,0,4" />
+                    <Slider Minimum="50" Maximum="100"
+                            Value="{Binding AudioSimilarityThreshold}"
+                            Style="{StaticResource MaterialDesignDiscreteSlider}"
+                            TickFrequency="5" />
+                </StackPanel>
+
+                <Separator Margin="0,8,0,16" />
+
+                <TextBlock Text="File Types"
+                           Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                           Margin="0,0,0,16" />
+
+                <WrapPanel>
+                    <CheckBox IsChecked="{Binding ScanImages}"
+                              Margin="0,0,16,8">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Image" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <TextBlock Text="Images" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </CheckBox>
+                    <CheckBox IsChecked="{Binding ScanVideos}"
+                              Margin="0,0,16,8">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Video" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <TextBlock Text="Videos" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </CheckBox>
+                    <CheckBox IsChecked="{Binding ScanAudio}"
+                              Margin="0,0,16,8">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="MusicNote" VerticalAlignment="Center" Margin="0,0,4,0" />
+                            <TextBlock Text="Audio" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </CheckBox>
+                </WrapPanel>
+
+                <Separator Margin="0,8,0,16" />
+
+                <TextBlock Text="Additional Filters"
+                           Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                           Margin="0,0,0,16" />
+
+                <CheckBox Content="Match created date"
+                          IsChecked="{Binding MatchCreatedDate}"
+                          Margin="0,0,0,8" />
+
+                <CheckBox Content="Match modified date"
+                          IsChecked="{Binding MatchModifiedDate}"
+                          Margin="0,0,0,8" />
+            </StackPanel>
+        </materialDesign:Card>
+
+        <!-- Start Button -->
+        <Button Grid.Row="2" Grid.ColumnSpan="2"
+                Content="Start Scan"
+                Style="{StaticResource MaterialDesignRaisedButton}"
+                Command="{Binding StartScanCommand}"
+                IsEnabled="{Binding CanStartScan}"
+                HorizontalAlignment="Right"
+                Margin="0,16,0,0"
+                Padding="32,8">
+            <Button.ContentTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Magnify" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </DataTemplate>
+            </Button.ContentTemplate>
+        </Button>
+    </Grid>
+</UserControl>
