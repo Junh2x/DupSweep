@@ -5,6 +5,7 @@ using DupSweep.Infrastructure.Caching;
 using DupSweep.Infrastructure.FileSystem;
 using DupSweep.Infrastructure.Hashing;
 using DupSweep.Infrastructure.Logging;
+using DupSweep.Infrastructure.Parallel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DupSweep.Infrastructure.DependencyInjection;
@@ -35,6 +36,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IThumbnailCache, ThumbnailCache>();
         services.AddSingleton<IHashCache, HashCache>();
 
+        // 병렬 처리 옵션 및 실행기
+        services.AddSingleton(ParallelProcessingOptions.Default);
+        services.AddSingleton<IParallelExecutor, ParallelExecutor>();
+
         return services;
     }
 
@@ -63,6 +68,10 @@ public static class ServiceCollectionExtensions
         // 캐싱 서비스
         services.AddSingleton<IThumbnailCache, ThumbnailCache>();
         services.AddSingleton<IHashCache, HashCache>();
+
+        // 병렬 처리 옵션 및 실행기
+        services.AddSingleton(ParallelProcessingOptions.Default);
+        services.AddSingleton<IParallelExecutor, ParallelExecutor>();
 
         return services;
     }
@@ -93,6 +102,10 @@ public static class ServiceCollectionExtensions
         // 캐싱 서비스
         services.AddSingleton<IThumbnailCache, ThumbnailCache>();
         services.AddSingleton<IHashCache, HashCache>();
+
+        // 병렬 처리 옵션 및 실행기
+        services.AddSingleton(ParallelProcessingOptions.Default);
+        services.AddSingleton<IParallelExecutor, ParallelExecutor>();
 
         return services;
     }
