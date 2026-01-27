@@ -6,6 +6,12 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- Custom Theme Files -->
+                <ResourceDictionary Source="Themes/Colors.xaml" />
+                <ResourceDictionary Source="Themes/Typography.xaml" />
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+
+                <!-- Material Design -->
                 <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="BlueGrey" SecondaryColor="Amber" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -21,6 +27,9 @@
             <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
             <converters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
             <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <converters:FileSizeConverter x:Key="FileSizeConverter" />
+            <converters:PathToFolderNameConverter x:Key="PathToFolderNameConverter" />
+            <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

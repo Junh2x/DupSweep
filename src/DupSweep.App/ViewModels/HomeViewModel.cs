@@ -72,11 +72,19 @@ public partial class HomeViewModel : ObservableObject
         {
             foreach (var folder in dialog.FolderNames)
             {
-                if (!SelectedFolders.Contains(folder))
-                {
-                    SelectedFolders.Add(folder);
-                }
+                AddFolder(folder);
             }
+        }
+    }
+
+    /// <summary>
+    /// 폴더를 추가합니다 (드래그 앤 드롭용).
+    /// </summary>
+    public void AddFolder(string folderPath)
+    {
+        if (!string.IsNullOrEmpty(folderPath) && !SelectedFolders.Contains(folderPath))
+        {
+            SelectedFolders.Add(folderPath);
         }
     }
 
