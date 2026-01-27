@@ -6,6 +6,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewmodels="clr-namespace:DupSweep.App.ViewModels"
         xmlns:views="clr-namespace:DupSweep.App.Views"
+        xmlns:controls="clr-namespace:DupSweep.App.Controls"
         mc:Ignorable="d"
         Title="DupSweep"
         Height="800" Width="1280"
@@ -290,8 +291,15 @@
                 <Border Grid.Row="1"
                         Background="{StaticResource BackgroundBrush}"
                         CornerRadius="0,0,12,0">
-                    <ContentControl Content="{Binding CurrentView}"
-                                    Margin="24,16,24,24" />
+                    <Grid>
+                        <ContentControl Content="{Binding CurrentView}"
+                                        Margin="24,16,24,24" />
+
+                        <!-- Notification Host - Toast notifications overlay -->
+                        <controls:NotificationHost VerticalAlignment="Bottom"
+                                                   HorizontalAlignment="Right"
+                                                   Margin="0,0,8,8" />
+                    </Grid>
                 </Border>
             </Grid>
         </Grid>

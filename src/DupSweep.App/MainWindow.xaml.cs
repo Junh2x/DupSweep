@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using DupSweep.App.Services;
 using DupSweep.App.ViewModels;
 
 namespace DupSweep.App;
@@ -12,6 +13,7 @@ namespace DupSweep.App;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel? _viewModel;
+    private readonly KeyboardShortcutService _shortcutService;
     private readonly string[] _subtitles =
     {
         "Select folders to scan for duplicate files",
@@ -25,6 +27,10 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         _viewModel = (DataContext as MainViewModel)!;
+        _shortcutService = new KeyboardShortcutService();
+
+        // 키보드 단축키 설정
+        SetupKeyboardShortcuts();
 
         // 뷰모델 변경 시 서브타이틀 업데이트
         if (_viewModel != null)
@@ -37,7 +43,91 @@ public partial class MainWindow : Window
                 }
             };
         }
+
+        // 윈도우 로드 시 단축키 서비스 연결
+        Loaded += (s, e) => _shortcutService.AttachToWindow(this);
+        Unloaded += (s, e) => _shortcutService.DetachFromWindow(this);
     }
+
+    #region Keyboard Shortcuts
+
+    private void SetupKeyboardShortcuts()
+    {
+        _shortcutService.SetupDefaultShortcuts(
+            navigateHome: () => NavigateToIndex(0),
+            navigateScan: () => NavigateToIndex(1),
+            navigateResults: () => NavigateToIndex(2),
+            navigateSettings: () => NavigateToIndex(3),
+            openHelp: ShowHelp
+        );
+
+        // ESC 키로 스캔 취소
+        _shortcutService.RegisterShortcut(Key.Escape, ModifierKeys.None, () =>
+        {
+            if (_viewModel?.CurrentView is ViewModels.ScanViewModel scanVm && scanVm.IsScanning)
+            {
+                scanVm.CancelScanCommand?.Execute(null);
+                NotificationService.Instance.ShowWarning("Scan cancelled", "Cancelled");
+            }
+        }, "Cancel Scan");
+
+        // Ctrl+Delete로 선택된 중복 파일 휴지통으로 이동
+        _shortcutService.RegisterShortcut(Key.Delete, ModifierKeys.Control, () =>
+        {
+            if (_viewModel?.CurrentView is ViewModels.ResultsViewModel resultsVm && resultsVm.SelectedFilesCount > 0)
+            {
+                resultsVm.MoveToTrashCommand?.Execute(null);
+            }
+        }, "Move Selected to Trash");
+
+        // Shift+Delete로 영구 삭제
+        _shortcutService.RegisterShortcut(Key.Delete, ModifierKeys.Shift, () =>
+        {
+            if (_viewModel?.CurrentView is ViewModels.ResultsViewModel resultsVm && resultsVm.SelectedFilesCount > 0)
+            {
+                resultsVm.DeletePermanentlyCommand?.Execute(null);
+            }
+        }, "Delete Permanently");
+    }
+
+    private void NavigateToIndex(int index)
+    {
+        _viewModel?.NavigateByIndex(index);
+        UpdateNavRadioButton(index);
+        UpdateSubtitle(index);
+    }
+
+    private void UpdateNavRadioButton(int index)
+    {
+        RadioButton? navButton = index switch
+        {
+            0 => HomeNav,
+            1 => ScanNav,
+            2 => ResultsNav,
+            3 => SettingsNav,
+            _ => null
+        };
+
+        if (navButton != null)
+        {
+            navButton.IsChecked = true;
+        }
+    }
+
+    private void ShowHelp()
+    {
+        NotificationService.Instance.ShowInfo(
+            "Ctrl+1~4: Navigate pages\n" +
+            "Ctrl+N: Go to Home\n" +
+            "Ctrl+Del: Move to trash\n" +
+            "Shift+Del: Delete permanently\n" +
+            "Esc: Cancel scan\n" +
+            "F1: This help",
+            "Keyboard Shortcuts",
+            TimeSpan.FromSeconds(8));
+    }
+
+    #endregion
 
     #region Window Controls
 
