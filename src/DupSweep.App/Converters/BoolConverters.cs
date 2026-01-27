@@ -2,6 +2,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace DupSweep.App.Converters;
@@ -140,6 +141,66 @@ public class ByteArrayToImageSourceConverter : IValueConverter
         image.EndInit();
         image.Freeze();
         return image;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class FileSizeConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is not long bytes)
+        {
+            return "0 B";
+        }
+
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        int order = 0;
+        double size = bytes;
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            size /= 1024;
+        }
+        return $"{size:0.##} {sizes[order]}";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class PathToFolderNameConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string path && !string.IsNullOrEmpty(path))
+        {
+            return Path.GetFileName(path) ?? path;
+        }
+        return value ?? string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class BoolToBackgroundConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool isChecked && isChecked)
+        {
+            return new SolidColorBrush(Color.FromRgb(0xE3, 0xF2, 0xFD)); // Light blue background
+        }
+        return new SolidColorBrush(Color.FromRgb(0xF5, 0xF7, 0xFA)); // Default background
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

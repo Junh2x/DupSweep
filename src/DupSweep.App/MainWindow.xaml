@@ -7,17 +7,14 @@
         xmlns:viewmodels="clr-namespace:DupSweep.App.ViewModels"
         xmlns:views="clr-namespace:DupSweep.App.Views"
         mc:Ignorable="d"
-        Title="DupSweep - Duplicate File Finder"
-        Height="700" Width="1100"
-        MinHeight="600" MinWidth="900"
+        Title="DupSweep"
+        Height="800" Width="1280"
+        MinHeight="700" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource MaterialDesignPaper}"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="14"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        FontFamily="{DynamicResource MaterialDesignFont}">
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResizeWithGrip">
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
@@ -32,93 +29,271 @@
         <DataTemplate DataType="{x:Type viewmodels:SettingsViewModel}">
             <views:SettingsView />
         </DataTemplate>
+
+        <!-- Navigation Button Style -->
+        <Style x:Key="NavButton" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#B0BEC5" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="20,14" />
+            <Setter Property="Margin" Value="8,2" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Left"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1A3A5F" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
-    <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
-        <materialDesign:DrawerHost.LeftDrawerContent>
-            <DockPanel MinWidth="220">
-                <StackPanel DockPanel.Dock="Top" Margin="16">
-                    <TextBlock Text="DupSweep"
-                               Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                               Foreground="{DynamicResource PrimaryHueMidBrush}" />
-                    <TextBlock Text="Duplicate File Finder"
-                               Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                               Opacity="0.6" />
-                </StackPanel>
+    <Border Background="{StaticResource BackgroundBrush}"
+            CornerRadius="12"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20"
+                              ShadowDepth="0"
+                              Color="#000000"
+                              Opacity="0.15" />
+        </Border.Effect>
 
-                <Separator DockPanel.Dock="Top" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <ListBox DockPanel.Dock="Top"
-                         Margin="0,8"
-                         SelectedIndex="{Binding SelectedNavIndex}"
-                         Style="{StaticResource MaterialDesignNavigationListBox}">
-                    <ListBoxItem>
+            <!-- Sidebar -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource SidebarGradientBrush}"
+                    CornerRadius="12,0,0,12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Window Controls (for custom title bar) -->
+                    <StackPanel Grid.Row="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                Margin="16,12">
+                        <Ellipse Width="12" Height="12" Fill="#FF5F57" Margin="0,0,8,0"
+                                 MouseLeftButtonDown="CloseButton_Click" Cursor="Hand" />
+                        <Ellipse Width="12" Height="12" Fill="#FEBC2E" Margin="0,0,8,0"
+                                 MouseLeftButtonDown="MinimizeButton_Click" Cursor="Hand" />
+                        <Ellipse Width="12" Height="12" Fill="#28C840"
+                                 MouseLeftButtonDown="MaximizeButton_Click" Cursor="Hand" />
+                    </StackPanel>
+
+                    <!-- Logo Section -->
+                    <StackPanel Grid.Row="1" Margin="24,16,24,32">
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Home" VerticalAlignment="Center" Margin="0,0,16,0" />
-                            <TextBlock Text="Home" VerticalAlignment="Center" />
+                            <Border Width="44" Height="44"
+                                    CornerRadius="10"
+                                    Background="{StaticResource AccentBrush}">
+                                <materialDesign:PackIcon Kind="ContentDuplicate"
+                                                         Width="26" Height="26"
+                                                         Foreground="White"
+                                                         HorizontalAlignment="Center"
+                                                         VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="DupSweep"
+                                           FontSize="22"
+                                           FontWeight="Bold"
+                                           Foreground="White" />
+                                <TextBlock Text="Duplicate File Finder"
+                                           FontSize="11"
+                                           Foreground="#78909C"
+                                           Margin="0,-2,0,0" />
+                            </StackPanel>
                         </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem>
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Magnify" VerticalAlignment="Center" Margin="0,0,16,0" />
-                            <TextBlock Text="Scan" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem>
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="FileMultiple" VerticalAlignment="Center" Margin="0,0,16,0" />
-                            <TextBlock Text="Results" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem>
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Cog" VerticalAlignment="Center" Margin="0,0,16,0" />
-                            <TextBlock Text="Settings" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </ListBoxItem>
-                </ListBox>
+                    </StackPanel>
 
-                <StackPanel DockPanel.Dock="Bottom" Margin="16" VerticalAlignment="Bottom">
-                    <TextBlock Text="Version 1.0.0"
-                               Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                               Opacity="0.5"
-                               HorizontalAlignment="Center" />
-                </StackPanel>
-            </DockPanel>
-        </materialDesign:DrawerHost.LeftDrawerContent>
+                    <!-- Navigation -->
+                    <StackPanel Grid.Row="2">
+                        <TextBlock Text="MAIN MENU"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="#546E7A"
+                                   Margin="24,0,0,12" />
 
-        <DockPanel>
-            <materialDesign:ColorZone DockPanel.Dock="Top"
-                                      Mode="PrimaryMid"
-                                      Padding="16"
-                                      materialDesign:ElevationAssist.Elevation="Dp4">
-                <DockPanel>
-                    <ToggleButton x:Name="MenuToggleButton"
-                                  DockPanel.Dock="Left"
-                                  Style="{StaticResource MaterialDesignHamburgerToggleButton}"
-                                  IsChecked="False" />
+                        <RadioButton x:Name="HomeNav"
+                                     Style="{StaticResource NavButton}"
+                                     IsChecked="True"
+                                     Checked="NavItem_Checked"
+                                     Tag="0">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Home" Width="22" Height="22" VerticalAlignment="Center" />
+                                <TextBlock Text="Home" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
 
-                    <TextBlock DockPanel.Dock="Left"
-                               Text="{Binding Title}"
-                               Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                               VerticalAlignment="Center"
-                               Margin="16,0,0,0" />
+                        <RadioButton x:Name="ScanNav"
+                                     Style="{StaticResource NavButton}"
+                                     Checked="NavItem_Checked"
+                                     Tag="1">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22" VerticalAlignment="Center" />
+                                <TextBlock Text="Scan" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
 
-                    <materialDesign:PopupBox DockPanel.Dock="Right"
-                                             PlacementMode="BottomAndAlignRightEdges"
-                                             StaysOpen="False">
+                        <RadioButton x:Name="ResultsNav"
+                                     Style="{StaticResource NavButton}"
+                                     Checked="NavItem_Checked"
+                                     Tag="2">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="FileMultiple" Width="22" Height="22" VerticalAlignment="Center" />
+                                <TextBlock Text="Results" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <Border x:Name="ResultsBadge"
+                                        Style="{StaticResource Badge}"
+                                        Margin="12,0,0,0"
+                                        Visibility="Collapsed">
+                                    <TextBlock x:Name="ResultsBadgeText"
+                                               Text="0"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="White" />
+                                </Border>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <Separator Margin="24,20" Background="#263850" />
+
+                        <TextBlock Text="CONFIGURATION"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="#546E7A"
+                                   Margin="24,0,0,12" />
+
+                        <RadioButton x:Name="SettingsNav"
+                                     Style="{StaticResource NavButton}"
+                                     Checked="NavItem_Checked"
+                                     Tag="3">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="CogOutline" Width="22" Height="22" VerticalAlignment="Center" />
+                                <TextBlock Text="Settings" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
+
+                    <!-- Footer -->
+                    <Border Grid.Row="3"
+                            Background="#0F1E33"
+                            CornerRadius="0,0,0,12"
+                            Padding="20,16">
                         <StackPanel>
-                            <Button Content="About" />
-                            <Button Content="Help" />
-                            <Separator />
-                            <Button Content="Exit" Click="ExitButton_Click" />
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="InformationOutline"
+                                                         Width="16" Height="16"
+                                                         Foreground="#546E7A"
+                                                         VerticalAlignment="Center" />
+                                <TextBlock Text="Version 2.0.0"
+                                           FontSize="12"
+                                           Foreground="#546E7A"
+                                           Margin="8,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
                         </StackPanel>
-                    </materialDesign:PopupBox>
-                </DockPanel>
-            </materialDesign:ColorZone>
+                    </Border>
+                </Grid>
+            </Border>
 
-            <ContentControl Content="{Binding CurrentView}"
-                            Margin="16" />
-        </DockPanel>
-    </materialDesign:DrawerHost>
+            <!-- Main Content Area -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Top Bar -->
+                <Border Grid.Row="0"
+                        Background="{StaticResource SurfaceBrush}"
+                        Padding="24,16"
+                        MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Page Title -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Title}"
+                                       Style="{StaticResource HeadlineMedium}" />
+                            <TextBlock x:Name="PageSubtitle"
+                                       Text="Select folders to scan for duplicate files"
+                                       Style="{StaticResource Caption}"
+                                       Margin="0,2,0,0" />
+                        </StackPanel>
+
+                        <!-- Actions -->
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                            <!-- Quick Actions -->
+                            <Button Style="{StaticResource IconButton}"
+                                    ToolTip="Help"
+                                    Margin="0,0,4,0">
+                                <materialDesign:PackIcon Kind="HelpCircleOutline" Width="22" Height="22" />
+                            </Button>
+                            <Button Style="{StaticResource IconButton}"
+                                    ToolTip="Notifications"
+                                    Margin="0,0,4,0">
+                                <materialDesign:PackIcon Kind="BellOutline" Width="22" Height="22" />
+                            </Button>
+
+                            <Separator Width="1" Height="28" Background="{StaticResource BorderBrush}" Margin="8,0" />
+
+                            <!-- Window Controls -->
+                            <Button Style="{StaticResource IconButton}"
+                                    Click="MinimizeButton_Click"
+                                    ToolTip="Minimize">
+                                <materialDesign:PackIcon Kind="WindowMinimize" Width="18" Height="18" />
+                            </Button>
+                            <Button Style="{StaticResource IconButton}"
+                                    Click="MaximizeButton_Click"
+                                    ToolTip="Maximize">
+                                <materialDesign:PackIcon Kind="WindowMaximize" Width="18" Height="18" />
+                            </Button>
+                            <Button Style="{StaticResource IconButton}"
+                                    Click="CloseButton_Click"
+                                    ToolTip="Close">
+                                <materialDesign:PackIcon Kind="Close" Width="18" Height="18" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Content -->
+                <Border Grid.Row="1"
+                        Background="{StaticResource BackgroundBrush}"
+                        CornerRadius="0,0,12,0">
+                    <ContentControl Content="{Binding CurrentView}"
+                                    Margin="24,16,24,24" />
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
 </Window>
