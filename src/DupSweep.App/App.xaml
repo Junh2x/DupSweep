@@ -30,6 +30,9 @@
             <converters:FileSizeConverter x:Key="FileSizeConverter" />
             <converters:PathToFolderNameConverter x:Key="PathToFolderNameConverter" />
             <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter" />
+            <converters:BoolToDriveColorConverter x:Key="BoolToDriveColorConverter" />
+            <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+            <converters:UsageToColorConverter x:Key="UsageToColorConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
