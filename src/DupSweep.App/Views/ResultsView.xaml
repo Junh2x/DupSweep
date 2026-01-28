@@ -16,183 +16,212 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Header with filters -->
-        <DockPanel Grid.Row="0" Margin="0,0,0,16">
-            <StackPanel DockPanel.Dock="Left">
-                <TextBlock Text="Duplicate Files Found"
-                           Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
-                <TextBlock Style="{StaticResource MaterialDesignCaptionTextBlock}" Opacity="0.6">
+        <!-- Auto Select Bar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource MaterialDesignToolBarBackground}"
+                Padding="8"
+                Margin="0,0,0,8"
+                Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="유지:" FontSize="12"
+                           VerticalAlignment="Center" Margin="0,0,8,0" Opacity="0.7" />
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <RadioButton Content="용량↑" GroupName="AutoSelect"
+                                 IsChecked="{Binding AutoSelectLargest}"
+                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
+                                 Margin="0,0,4,0" Padding="8,4" />
+                    <RadioButton Content="용량↓" GroupName="AutoSelect"
+                                 IsChecked="{Binding AutoSelectSmallest}"
+                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
+                                 Margin="0,0,4,0" Padding="8,4" />
+                    <RadioButton Content="최신" GroupName="AutoSelect"
+                                 IsChecked="{Binding AutoSelectNewest}"
+                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
+                                 Margin="0,0,4,0" Padding="8,4" />
+                    <RadioButton Content="오래된" GroupName="AutoSelect"
+                                 IsChecked="{Binding AutoSelectOldest}"
+                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
+                                 Margin="0,0,4,0" Padding="8,4" />
+                    <RadioButton Content="해상도↑" GroupName="AutoSelect"
+                                 IsChecked="{Binding AutoSelectHighRes}"
+                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
+                                 Margin="0,0,4,0" Padding="8,4" />
+                    <RadioButton Content="해상도↓" GroupName="AutoSelect"
+                                 IsChecked="{Binding AutoSelectLowRes}"
+                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
+                                 Padding="8,4" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="16,0,8,0"
+                           FontSize="11" Opacity="0.6">
                     <Run Text="{Binding DuplicateGroups.Count, Mode=OneWay}" />
-                    <Run Text="groups found" />
+                    <Run Text="그룹 /" />
+                    <Run Text="{Binding TotalFilesCount, Mode=OneWay}" />
+                    <Run Text="파일" />
                 </TextBlock>
-            </StackPanel>
 
-            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <ComboBox Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                          SelectedValue="{Binding FilterType}"
-                          SelectedValuePath="Content"
-                          Width="120"
-                          Margin="0,0,8,0">
-                    <ComboBoxItem Content="All" />
-                    <ComboBoxItem Content="Images" />
-                    <ComboBoxItem Content="Videos" />
-                    <ComboBoxItem Content="Audio" />
-                </ComboBox>
-
-                <materialDesign:PopupBox PlacementMode="BottomAndAlignRightEdges" StaysOpen="False">
-                    <materialDesign:PopupBox.ToggleContent>
-                        <Button Style="{StaticResource MaterialDesignOutlinedButton}" Content="Auto Select" />
-                    </materialDesign:PopupBox.ToggleContent>
-                    <StackPanel>
-                        <Button Content="Keep First" Command="{Binding SelectFirstCommand}" />
-                        <Button Content="Keep Newest" Command="{Binding SelectNewestCommand}" />
-                        <Button Content="Keep Oldest" Command="{Binding SelectOldestCommand}" />
-                    </StackPanel>
-                </materialDesign:PopupBox>
-            </StackPanel>
-        </DockPanel>
+                <Button Grid.Column="3" Content="자동 선택"
+                        Command="{Binding ApplyAutoSelectCommand}"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        Padding="12,4" Height="28" />
+            </Grid>
+        </Border>
 
         <!-- Results List -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding DuplicateGroupsView}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <materialDesign:Card Margin="0,0,0,16"
-                                             materialDesign:ElevationAssist.Elevation="Dp1">
-                            <Expander IsExpanded="True">
-                                <Expander.Header>
-                                    <DockPanel>
-                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Similarity, StringFormat={}{0:0}% similar}"
-                                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                                       VerticalAlignment="Center"
-                                                       Margin="0,0,16,0" />
-                                            <materialDesign:Chip Content="{Binding GroupType}"
-                                                                 IconBackground="{DynamicResource PrimaryHueMidBrush}"
-                                                                 IconForeground="White" />
-                                        </StackPanel>
+                        <Border Background="{DynamicResource MaterialDesignCardBackground}"
+                                Margin="0,0,0,6" Padding="8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-                                        <StackPanel>
-                                            <TextBlock Style="{StaticResource MaterialDesignSubtitle1TextBlock}">
-                                                <Run Text="{Binding FileCount, Mode=OneWay}" />
-                                                <Run Text="files" />
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </DockPanel>
-                                </Expander.Header>
+                                <!-- Group Header -->
+                                <DockPanel Grid.Row="0" Margin="0,0,0,4">
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Similarity, StringFormat={}{0:0}%}"
+                                                   FontSize="11" Margin="0,0,8,0"
+                                                   Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                        <TextBlock Text="{Binding GroupType}" FontSize="11" Opacity="0.5" />
+                                    </StackPanel>
+                                    <TextBlock FontSize="12" FontWeight="Medium">
+                                        <Run Text="{Binding FileCount, Mode=OneWay}" />
+                                        <Run Text="개 파일" />
+                                    </TextBlock>
+                                </DockPanel>
 
-                                <ItemsControl ItemsSource="{Binding Files}" Margin="16">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <materialDesign:Card Width="200" Margin="0,0,8,8"
-                                                                 materialDesign:ElevationAssist.Elevation="Dp1">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="120" />
-                                                        <RowDefinition Height="Auto" />
-                                                    </Grid.RowDefinitions>
+                                <!-- File Cards -->
+                                <ScrollViewer Grid.Row="1"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Disabled">
+                                    <ItemsControl ItemsSource="{Binding Files}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Width="140" Margin="0,0,4,0"
+                                                        CornerRadius="4" Cursor="Hand"
+                                                        BorderThickness="2"
+                                                        MouseLeftButtonDown="FileCard_Click">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}" />
+                                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                    <Setter Property="BorderBrush" Value="{DynamicResource SecondaryHueMidBrush}" />
+                                                                    <Setter Property="Background" Value="{DynamicResource SecondaryHueLightBrush}" />
+                                                                </DataTrigger>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
 
-                                                    <!-- Thumbnail -->
-                                                    <Border Grid.Row="0" Background="{DynamicResource MaterialDesignDivider}">
-                                                        <Grid>
-                                                            <Image Source="{Binding ThumbnailData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
-                                                                   Stretch="UniformToFill"
-                                                                   Visibility="{Binding ThumbnailData, Converter={StaticResource NullToVisibilityConverter}}" />
-                                                            <materialDesign:PackIcon Kind="FileImage"
-                                                                                      Width="48" Height="48"
-                                                                                      HorizontalAlignment="Center"
-                                                                                      VerticalAlignment="Center"
-                                                                                      Opacity="0.3"
-                                                                                      Visibility="{Binding ThumbnailData, Converter={StaticResource InverseNullToVisibilityConverter}}" />
-                                                        </Grid>
-                                                    </Border>
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="80" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
 
-                                                    <!-- Checkbox overlay -->
-                                                    <CheckBox Grid.Row="0"
-                                                              IsChecked="{Binding IsSelected}"
-                                                              HorizontalAlignment="Right"
-                                                              VerticalAlignment="Top"
-                                                              Margin="8" />
+                                                        <!-- Thumbnail -->
+                                                        <Border Grid.Row="0" Background="{DynamicResource MaterialDesignDivider}"
+                                                                CornerRadius="4,4,0,0">
+                                                            <Grid>
+                                                                <Image Source="{Binding ThumbnailData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                                                                       Stretch="UniformToFill"
+                                                                       Visibility="{Binding ThumbnailData, Converter={StaticResource NullToVisibilityConverter}}" />
+                                                                <materialDesign:PackIcon Kind="FileImage" Width="24" Height="24"
+                                                                                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                                          Opacity="0.3"
+                                                                                          Visibility="{Binding ThumbnailData, Converter={StaticResource InverseNullToVisibilityConverter}}" />
 
-                                                    <!-- File Info -->
-                                                    <StackPanel Grid.Row="1" Margin="8">
-                                                        <TextBlock Text="{Binding FileName}"
-                                                                   Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                                                   TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock Text="{Binding FormattedSize}"
-                                                                   Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                                                   Opacity="0.6" />
-                                                        <TextBlock Text="{Binding FilePath}"
-                                                                   Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                                                   TextTrimming="CharacterEllipsis"
-                                                                   Opacity="0.5" />
-                                                        <TextBlock Text="{Binding ModifiedDate, StringFormat={}{0:yyyy-MM-dd}}"
-                                                                   Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                                                   Opacity="0.6" />
-                                                    </StackPanel>
-                                                </Grid>
-                                            </materialDesign:Card>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Expander>
-                        </materialDesign:Card>
+                                                                <!-- Selection Check -->
+                                                                <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2"
+                                                                      Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                                    <Ellipse Width="18" Height="18" Fill="{DynamicResource SecondaryHueMidBrush}" />
+                                                                    <materialDesign:PackIcon Kind="Check" Width="12" Height="12"
+                                                                                              Foreground="White" HorizontalAlignment="Center"
+                                                                                              VerticalAlignment="Center" />
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Border>
+
+                                                        <!-- File Info -->
+                                                        <StackPanel Grid.Row="1" Margin="4,3">
+                                                            <TextBlock Text="{Binding FileName}" FontSize="10" FontWeight="Medium"
+                                                                       TextTrimming="CharacterEllipsis" ToolTip="{Binding FileName}" />
+                                                            <TextBlock FontSize="9" Opacity="0.6">
+                                                                <Run Text="{Binding FormattedSize}" />
+                                                                <Run Text="·" />
+                                                                <Run Text="{Binding ModifiedDate, StringFormat={}{0:yy-MM-dd}}" />
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- No Results Message -->
-        <StackPanel Grid.Row="1"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
+        <!-- No Results -->
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"
                     Visibility="{Binding HasResults, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue=Visible}">
-            <materialDesign:PackIcon Kind="FileSearch"
-                                     Width="64" Height="64"
-                                     HorizontalAlignment="Center"
-                                     Opacity="0.3" />
-            <TextBlock Text="No results yet"
-                       Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                       HorizontalAlignment="Center"
-                       Margin="0,16,0,8" />
-            <TextBlock Text="Run a scan to find duplicate files"
-                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                       HorizontalAlignment="Center"
-                       Opacity="0.6" />
+            <materialDesign:PackIcon Kind="FileSearch" Width="48" Height="48"
+                                     HorizontalAlignment="Center" Opacity="0.3" />
+            <TextBlock Text="스캔을 실행하여 중복 파일을 찾으세요" FontSize="12"
+                       HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.5" />
         </StackPanel>
 
         <!-- Action Bar -->
-        <materialDesign:Card Grid.Row="2"
-                             materialDesign:ElevationAssist.Elevation="Dp4"
-                             Margin="0,16,0,0"
-                             Padding="16"
-                             Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}">
+        <Border Grid.Row="2" Background="{DynamicResource MaterialDesignCardBackground}"
+                Margin="0,8,0,0" Padding="8"
+                Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}">
             <DockPanel>
-                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                    <TextBlock VerticalAlignment="Center" Margin="0,0,8,0">
-                        <Run Text="{Binding SelectedFilesCount, Mode=OneWay}" />
-                        <Run Text="files selected" />
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"
+                                              VerticalAlignment="Center" Margin="0,0,4,0" Opacity="0.6" />
+                    <TextBlock VerticalAlignment="Center" FontSize="12">
+                        <Run Text="{Binding SelectedFilesCount, Mode=OneWay}" FontWeight="Bold" />
+                        <Run Text="개 선택" />
                     </TextBlock>
-                    <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}">
+                    <TextBlock VerticalAlignment="Center" FontSize="12"
+                               Foreground="{DynamicResource SecondaryHueMidBrush}" Margin="8,0,0,0">
                         <Run Text="(" /><Run Text="{Binding FormattedPotentialSavings, Mode=OneWay}" /><Run Text=")" />
                     </TextBlock>
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button Content="Move to Trash"
-                            Style="{StaticResource MaterialDesignOutlinedButton}"
-                            Command="{Binding MoveToTrashCommand}"
-                            Margin="0,0,8,0" />
-                    <Button Content="Delete Permanently"
-                            Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
-                            Command="{Binding DeletePermanentlyCommand}" />
+                    <Button Content="휴지통" Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Command="{Binding MoveToTrashCommand}" Margin="0,0,4,0"
+                            Padding="12,4" Height="28" />
+                    <Button Content="삭제" Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
+                            Command="{Binding DeletePermanentlyCommand}"
+                            Padding="12,4" Height="28" />
                 </StackPanel>
             </DockPanel>
-        </materialDesign:Card>
+        </Border>
     </Grid>
 </UserControl>

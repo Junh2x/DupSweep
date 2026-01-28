@@ -56,32 +56,4 @@ public partial class HomeView : UserControl
     }
 
     #endregion
-
-    #region Toggle Events
-
-    private void ToggleScanImages_Click(object sender, MouseButtonEventArgs e)
-    {
-        if (ViewModel != null)
-        {
-            ViewModel.ScanImages = !ViewModel.ScanImages;
-        }
-    }
-
-    private void ToggleScanVideos_Click(object sender, MouseButtonEventArgs e)
-    {
-        if (ViewModel != null)
-        {
-            ViewModel.ScanVideos = !ViewModel.ScanVideos;
-        }
-    }
-
-    private void ToggleScanAudio_Click(object sender, MouseButtonEventArgs e)
-    {
-        if (ViewModel != null)
-        {
-            ViewModel.ScanAudio = !ViewModel.ScanAudio;
-        }
-    }
-
-    #endregion
 }
