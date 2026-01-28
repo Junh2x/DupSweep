@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -13,6 +14,7 @@ public partial class FolderTreeViewModel : ObservableObject
 {
     private const int MaxDepth = 5;
     private const double MinPercentThreshold = 1.0;
+    private const int ParallelDepthThreshold = 2; // 이 깊이까지 병렬 처리
 
     [ObservableProperty]
     private string _selectedFolderPath = string.Empty;
@@ -45,7 +47,7 @@ public partial class FolderTreeViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<BreadcrumbItem> _breadcrumbs = new();
 
-    // 현재 선택된 폴더의 파일 목록
+    // 현재 선택된 폴더의 파일/폴더 목록
     [ObservableProperty]
     private ObservableCollection<FileInfoItem> _currentFiles = new();
 
@@ -92,7 +94,7 @@ public partial class FolderTreeViewModel : ObservableObject
             if (string.IsNullOrEmpty(SelectedFolderName))
                 SelectedFolderName = folderPath;
 
-            _rootNode = await Task.Run(() => CalculateFolderSize(folderPath, 0, true));
+            _rootNode = await Task.Run(() => CalculateFolderSizeParallel(folderPath, 0));
 
             if (_rootNode == null)
             {
@@ -129,6 +131,7 @@ public partial class FolderTreeViewModel : ObservableObject
         double currentOffset = 0;
         long othersSize = 0;
         int othersCount = 0;
+        var othersNodes = new List<FolderNode>();
 
         int colorIndex = 0;
         foreach (var child in sortedChildren)
@@ -139,6 +142,7 @@ public partial class FolderTreeViewModel : ObservableObject
             {
                 othersSize += child.Size;
                 othersCount++;
+                othersNodes.Add(child);
             }
             else
             {
@@ -190,7 +194,11 @@ public partial class FolderTreeViewModel : ObservableObject
                 Depth = 0,
                 Color = "#9E9E9E",
                 IsOthers = true,
-                PercentOfTotal = TotalSize > 0 ? (double)othersSize / TotalSize * 100 : 0
+                PercentOfTotal = TotalSize > 0 ? (double)othersSize / TotalSize * 100 : 0,
+                FullPath = _rootNode.FullPath,
+                OthersNodes = othersNodes,
+                OthersIncludesFiles = _rootNode.FilesSize > 0 &&
+                    (_rootNode.Size > 0 ? (double)_rootNode.FilesSize / _rootNode.Size * 100 : 0) < MinPercentThreshold
             });
         }
 
@@ -218,8 +226,6 @@ public partial class FolderTreeViewModel : ObservableObject
 
     public void SelectItem(FolderBarItem item)
     {
-        if (item.IsOthers) return;
-
         int depth = item.Depth;
 
         // 같은 레벨의 이전 선택 해제
@@ -248,6 +254,14 @@ public partial class FolderTreeViewModel : ObservableObject
             _selectedItems.Remove(key);
         }
 
+        // 기타 항목이면 기타 목록 표시
+        if (item.IsOthers)
+        {
+            UpdateOthersFiles(item);
+            UpdateBreadcrumbs();
+            return;
+        }
+
         // 하위 레벨 생성 (드릴다운)
         if (item.Node != null && item.Node.Children.Count > 0 && depth < MaxDepth - 1)
         {
@@ -257,7 +271,7 @@ public partial class FolderTreeViewModel : ObservableObject
         // 브레드크럼 업데이트
         UpdateBreadcrumbs();
 
-        // 파일 목록 업데이트
+        // 파일/폴더 목록 업데이트
         UpdateCurrentFiles(item);
     }
 
@@ -270,6 +284,7 @@ public partial class FolderTreeViewModel : ObservableObject
         long othersSize = 0;
         int othersCount = 0;
         int colorIndex = 0;
+        var othersNodes = new List<FolderNode>();
 
         foreach (var child in sortedChildren)
         {
@@ -279,6 +294,7 @@ public partial class FolderTreeViewModel : ObservableObject
             {
                 othersSize += child.Size;
                 othersCount++;
+                othersNodes.Add(child);
             }
             else
             {
@@ -303,6 +319,7 @@ public partial class FolderTreeViewModel : ObservableObject
         }
 
         // 파일
+        bool filesIncludedInOthers = false;
         if (parentNode.FilesSize > 0)
         {
             double filesPercent = parentNode.Size > 0 ? (double)parentNode.FilesSize / parentNode.Size * 100 : 0;
@@ -328,6 +345,7 @@ public partial class FolderTreeViewModel : ObservableObject
             {
                 othersSize += parentNode.FilesSize;
                 othersCount++;
+                filesIncludedInOthers = true;
             }
         }
 
@@ -344,7 +362,10 @@ public partial class FolderTreeViewModel : ObservableObject
                 Depth = depth,
                 Color = "#9E9E9E",
                 IsOthers = true,
-                PercentOfTotal = TotalSize > 0 ? (double)othersSize / TotalSize * 100 : 0
+                PercentOfTotal = TotalSize > 0 ? (double)othersSize / TotalSize * 100 : 0,
+                FullPath = parentNode.FullPath,
+                OthersNodes = othersNodes,
+                OthersIncludesFiles = filesIncludedInOthers
             });
         }
 
@@ -395,29 +416,169 @@ public partial class FolderTreeViewModel : ObservableObject
 
         try
         {
-            var files = Directory.EnumerateFiles(folderPath)
-                .Select(f => new FileInfo(f))
-                .OrderByDescending(f => f.Length)
-                .Take(20)
-                .ToList();
-
-            foreach (var file in files)
+            var items = new List<FileInfoItem>();
+            var enumOptions = new EnumerationOptions
             {
-                CurrentFiles.Add(new FileInfoItem
+                IgnoreInaccessible = true,
+                AttributesToSkip = FileAttributes.System
+            };
+
+            // 폴더 목록 추가 (캐시된 크기 또는 실시간 계산)
+            foreach (var dir in Directory.EnumerateDirectories(folderPath, "*", enumOptions))
+            {
+                try
                 {
-                    Name = file.Name,
-                    Size = file.Length,
-                    FormattedSize = FormatSize(file.Length),
-                    Extension = file.Extension.ToUpperInvariant()
-                });
+                    var dirInfo = new DirectoryInfo(dir);
+
+                    // 해당 폴더의 크기 계산 (Node에서 가져오거나 실시간 계산)
+                    long folderSize = 0;
+                    if (item.Node != null)
+                    {
+                        // 대소문자 무시 비교
+                        var childNode = item.Node.Children.FirstOrDefault(c =>
+                            string.Equals(c.FullPath, dir, StringComparison.OrdinalIgnoreCase));
+                        if (childNode != null)
+                            folderSize = childNode.Size;
+                    }
+
+                    // Node에서 크기를 못 찾으면 빠르게 추정 (파일 크기만)
+                    if (folderSize == 0)
+                    {
+                        try
+                        {
+                            folderSize = Directory.EnumerateFiles(dir, "*", new EnumerationOptions
+                            {
+                                RecurseSubdirectories = true,
+                                IgnoreInaccessible = true,
+                                AttributesToSkip = FileAttributes.System
+                            }).Sum(f =>
+                            {
+                                try { return new FileInfo(f).Length; }
+                                catch { return 0; }
+                            });
+                        }
+                        catch { }
+                    }
+
+                    items.Add(new FileInfoItem
+                    {
+                        Name = dirInfo.Name,
+                        Size = folderSize,
+                        FormattedSize = FormatSize(folderSize),
+                        Extension = "",
+                        IsFolder = true
+                    });
+                }
+                catch { }
             }
 
-            int totalFiles = Directory.EnumerateFiles(folderPath).Count();
-            CurrentFolderFileInfo = $"{totalFiles}개 파일" + (totalFiles > 20 ? " (상위 20개 표시)" : "");
+            // 파일 목록 추가
+            foreach (var file in Directory.EnumerateFiles(folderPath, "*", enumOptions))
+            {
+                try
+                {
+                    var fileInfo = new FileInfo(file);
+                    items.Add(new FileInfoItem
+                    {
+                        Name = fileInfo.Name,
+                        Size = fileInfo.Length,
+                        FormattedSize = FormatSize(fileInfo.Length),
+                        Extension = fileInfo.Extension.ToUpperInvariant(),
+                        IsFolder = false
+                    });
+                }
+                catch { }
+            }
+
+            // 크기순 정렬 후 상위 50개만 표시
+            var sortedItems = items.OrderByDescending(i => i.Size).Take(50).ToList();
+            foreach (var fileItem in sortedItems)
+            {
+                CurrentFiles.Add(fileItem);
+            }
+
+            int totalFolders = items.Count(i => i.IsFolder);
+            int totalFiles = items.Count(i => !i.IsFolder);
+            int totalItems = totalFolders + totalFiles;
+            CurrentFolderFileInfo = $"{totalFolders}개 폴더, {totalFiles}개 파일" +
+                (totalItems > 50 ? " (상위 50개 표시)" : "");
+        }
+        catch (Exception ex)
+        {
+            CurrentFolderFileInfo = $"목록을 불러올 수 없습니다: {ex.Message}";
+        }
+    }
+
+    private void UpdateOthersFiles(FolderBarItem item)
+    {
+        CurrentFiles.Clear();
+
+        if (item.OthersNodes == null && !item.OthersIncludesFiles)
+        {
+            CurrentFolderFileInfo = "기타 항목 없음";
+            return;
+        }
+
+        try
+        {
+            var items = new List<FileInfoItem>();
+
+            // 기타에 포함된 폴더들
+            if (item.OthersNodes != null)
+            {
+                foreach (var node in item.OthersNodes)
+                {
+                    items.Add(new FileInfoItem
+                    {
+                        Name = node.Name,
+                        Size = node.Size,
+                        FormattedSize = FormatSize(node.Size),
+                        Extension = "",
+                        IsFolder = true
+                    });
+                }
+            }
+
+            // 기타에 포함된 파일들 (파일이 기타에 포함된 경우)
+            if (item.OthersIncludesFiles && !string.IsNullOrEmpty(item.FullPath))
+            {
+                try
+                {
+                    foreach (var file in Directory.EnumerateFiles(item.FullPath))
+                    {
+                        try
+                        {
+                            var fileInfo = new FileInfo(file);
+                            items.Add(new FileInfoItem
+                            {
+                                Name = fileInfo.Name,
+                                Size = fileInfo.Length,
+                                FormattedSize = FormatSize(fileInfo.Length),
+                                Extension = fileInfo.Extension.ToUpperInvariant(),
+                                IsFolder = false
+                            });
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+            }
+
+            // 크기순 정렬 후 상위 50개만 표시
+            var sortedItems = items.OrderByDescending(i => i.Size).Take(50).ToList();
+            foreach (var fileItem in sortedItems)
+            {
+                CurrentFiles.Add(fileItem);
+            }
+
+            int folderCount = item.OthersNodes?.Count ?? 0;
+            int fileCount = items.Count - folderCount;
+            CurrentFolderFileInfo = $"기타: {folderCount}개 폴더, {fileCount}개 파일" +
+                (items.Count > 50 ? " (상위 50개 표시)" : "");
         }
         catch
         {
-            CurrentFolderFileInfo = "파일 목록을 불러올 수 없습니다";
+            CurrentFolderFileInfo = "기타 목록을 불러올 수 없습니다";
         }
     }
 
@@ -459,7 +620,10 @@ public partial class FolderTreeViewModel : ObservableObject
         }
     }
 
-    private FolderNode? CalculateFolderSize(string path, int depth, bool updateUI = false)
+    /// <summary>
+    /// 병렬 처리를 사용하여 폴더 크기 계산 (속도 대폭 향상)
+    /// </summary>
+    private FolderNode? CalculateFolderSizeParallel(string path, int depth)
     {
         try
         {
@@ -473,60 +637,137 @@ public partial class FolderTreeViewModel : ObservableObject
             if (string.IsNullOrEmpty(node.Name))
                 node.Name = path;
 
-            if (updateUI)
+            // 폴더 카운터 증가 및 UI 업데이트
+            var count = Interlocked.Increment(ref _folderCounter);
+            if (count % 500 == 0)
             {
-                _folderCounter++;
-                if (_folderCounter % 100 == 0)
+                System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        AnalyzedFolderCount = _folderCounter;
-                    });
-                }
+                    AnalyzedFolderCount = count;
+                });
             }
 
+            // 파일 크기 계산 (병렬)
             try
             {
-                foreach (var file in Directory.EnumerateFiles(path))
+                var fileEntries = Directory.EnumerateFiles(path).ToArray();
+                if (fileEntries.Length > 0)
                 {
-                    try
+                    long filesSize = 0;
+                    int fileCount = 0;
+
+                    if (fileEntries.Length > 100)
                     {
-                        var fileInfo = new FileInfo(file);
-                        node.FilesSize += fileInfo.Length;
-                        node.FileCount++;
+                        // 파일이 많으면 병렬 처리
+                        var localSize = 0L;
+                        var localCount = 0;
+                        Parallel.ForEach(fileEntries,
+                            () => (size: 0L, count: 0),
+                            (file, state, local) =>
+                            {
+                                try
+                                {
+                                    var fi = new FileInfo(file);
+                                    return (local.size + fi.Length, local.count + 1);
+                                }
+                                catch
+                                {
+                                    return local;
+                                }
+                            },
+                            local =>
+                            {
+                                Interlocked.Add(ref localSize, local.size);
+                                Interlocked.Add(ref localCount, local.count);
+                            });
+                        filesSize = localSize;
+                        fileCount = localCount;
                     }
-                    catch { }
+                    else
+                    {
+                        // 파일이 적으면 순차 처리
+                        foreach (var file in fileEntries)
+                        {
+                            try
+                            {
+                                var fi = new FileInfo(file);
+                                filesSize += fi.Length;
+                                fileCount++;
+                            }
+                            catch { }
+                        }
+                    }
+
+                    node.FilesSize = filesSize;
+                    node.FileCount = fileCount;
                 }
             }
             catch { }
 
+            // 하위 폴더 처리
             if (depth < MaxDepth)
             {
                 try
                 {
-                    foreach (var dir in Directory.EnumerateDirectories(path))
-                    {
-                        try
-                        {
-                            var dirInfo = new DirectoryInfo(dir);
-                            if ((dirInfo.Attributes & FileAttributes.System) == FileAttributes.System)
-                                continue;
+                    var directories = Directory.EnumerateDirectories(path).ToArray();
 
-                            var childNode = CalculateFolderSize(dir, depth + 1, updateUI);
-                            if (childNode != null)
+                    if (depth < ParallelDepthThreshold && directories.Length > 1)
+                    {
+                        // 상위 레벨에서는 병렬로 하위 폴더 처리
+                        var childNodes = new ConcurrentBag<FolderNode>();
+
+                        Parallel.ForEach(directories, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+                            dir =>
                             {
-                                node.Children.Add(childNode);
-                                node.FolderCount++;
-                            }
+                                try
+                                {
+                                    var dirInfo = new DirectoryInfo(dir);
+                                    if ((dirInfo.Attributes & FileAttributes.System) == FileAttributes.System)
+                                        return;
+
+                                    var childNode = CalculateFolderSizeParallel(dir, depth + 1);
+                                    if (childNode != null)
+                                    {
+                                        childNodes.Add(childNode);
+                                    }
+                                }
+                                catch { }
+                            });
+
+                        foreach (var childNode in childNodes)
+                        {
+                            node.Children.Add(childNode);
+                            node.FolderCount++;
                         }
-                        catch { }
+                    }
+                    else
+                    {
+                        // 하위 레벨에서는 순차 처리
+                        foreach (var dir in directories)
+                        {
+                            try
+                            {
+                                var dirInfo = new DirectoryInfo(dir);
+                                if ((dirInfo.Attributes & FileAttributes.System) == FileAttributes.System)
+                                    continue;
+
+                                var childNode = CalculateFolderSizeParallel(dir, depth + 1);
+                                if (childNode != null)
+                                {
+                                    node.Children.Add(childNode);
+                                    node.FolderCount++;
+                                }
+                            }
+                            catch { }
+                        }
                     }
                 }
                 catch { }
             }
             else
             {
-                node.FilesSize += CalculateTotalSizeRecursive(path);
+                // MaxDepth 초과 시 빠른 크기 계산
+                node.FilesSize += CalculateTotalSizeParallel(path);
             }
 
             node.Size = node.FilesSize + node.Children.Sum(c => c.Size);
@@ -538,25 +779,39 @@ public partial class FolderTreeViewModel : ObservableObject
         }
     }
 
-    private long CalculateTotalSizeRecursive(string path)
+    /// <summary>
+    /// 병렬 처리를 사용하여 총 크기 계산
+    /// </summary>
+    private long CalculateTotalSizeParallel(string path)
     {
         long total = 0;
         try
         {
-            foreach (var file in Directory.EnumerateFiles(path))
+            // 모든 파일을 재귀적으로 열거하고 병렬로 크기 합산
+            var files = Directory.EnumerateFiles(path, "*", new EnumerationOptions
             {
-                try { total += new FileInfo(file).Length; } catch { }
-            }
-            foreach (var dir in Directory.EnumerateDirectories(path))
-            {
-                try
+                RecurseSubdirectories = true,
+                IgnoreInaccessible = true,
+                AttributesToSkip = FileAttributes.System
+            });
+
+            var localTotal = 0L;
+            Parallel.ForEach(files,
+                () => 0L,
+                (file, state, local) =>
                 {
-                    var dirInfo = new DirectoryInfo(dir);
-                    if ((dirInfo.Attributes & FileAttributes.System) != FileAttributes.System)
-                        total += CalculateTotalSizeRecursive(dir);
-                }
-                catch { }
-            }
+                    try
+                    {
+                        return local + new FileInfo(file).Length;
+                    }
+                    catch
+                    {
+                        return local;
+                    }
+                },
+                local => Interlocked.Add(ref localTotal, local));
+
+            total = localTotal;
         }
         catch { }
         return total;
@@ -665,6 +920,12 @@ public partial class FolderBarItem : ObservableObject
 
     public FolderTreeViewModel.FolderNode? Node { get; set; }
 
+    // 기타 항목에 포함된 노드들
+    public List<FolderTreeViewModel.FolderNode>? OthersNodes { get; set; }
+
+    // 기타 항목에 파일이 포함되어 있는지
+    public bool OthersIncludesFiles { get; set; }
+
     public string FormattedPercent => $"{PercentOfTotal:0.0}%";
 
     // 툴팁용 정보
@@ -687,7 +948,7 @@ public partial class BreadcrumbItem : ObservableObject
 }
 
 /// <summary>
-/// 파일 정보 항목 (폴더 내 파일 목록용)
+/// 파일/폴더 정보 항목 (폴더 내 목록용)
 /// </summary>
 public partial class FileInfoItem : ObservableObject
 {
@@ -702,4 +963,7 @@ public partial class FileInfoItem : ObservableObject
 
     [ObservableProperty]
     private string _extension = string.Empty;
+
+    [ObservableProperty]
+    private bool _isFolder;
 }
