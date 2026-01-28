@@ -47,6 +47,7 @@ public class FileScannerTests : IDisposable
         var config = new ScanConfig
         {
             Directories = new List<string> { _fileGenerator.TestRootPath },
+            ScanAllFiles = false, // 확장자 필터링 활성화
             ScanImages = true,
             ScanVideos = false
         };

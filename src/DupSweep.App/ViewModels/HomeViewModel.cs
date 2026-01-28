@@ -50,10 +50,13 @@ public partial class HomeViewModel : ObservableObject
 
     // 파일 타입
     [ObservableProperty]
-    private bool _scanImages = true;
+    private bool _scanAllFiles = true;  // 모든 파일 대상 (해시 기반)
 
     [ObservableProperty]
-    private bool _scanVideos = true;
+    private bool _scanImages = true;    // 이미지 유사도 비교
+
+    [ObservableProperty]
+    private bool _scanVideos = true;    // 비디오 유사도 비교
 
     [ObservableProperty]
     private bool _canStartScan;
@@ -135,6 +138,7 @@ public partial class HomeViewModel : ObservableObject
             MatchModifiedDate = MatchModifiedDate,
             ImageSimilarityThreshold = SimilarityThreshold,
             VideoSimilarityThreshold = VideoSimilarityThreshold,
+            ScanAllFiles = ScanAllFiles,
             ScanImages = ScanImages,
             ScanVideos = ScanVideos
         };
