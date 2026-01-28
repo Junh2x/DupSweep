@@ -7,85 +7,7 @@
              xmlns:viewmodels="clr-namespace:DupSweep.App.ViewModels"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewmodels:FolderTreeViewModel}"
-             d:DesignHeight="500" d:DesignWidth="350">
-
-    <UserControl.Resources>
-        <!-- Folder Node Template -->
-        <HierarchicalDataTemplate x:Key="FolderNodeTemplate"
-                                  DataType="{x:Type viewmodels:FolderNodeViewModel}"
-                                  ItemsSource="{Binding Children}">
-            <Border Padding="4,6" Cursor="Hand">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Icon -->
-                    <materialDesign:PackIcon Grid.Column="0"
-                                             Kind="{Binding IconKind}"
-                                             Width="20" Height="20"
-                                             VerticalAlignment="Center"
-                                             Foreground="{Binding IsDrive, Converter={StaticResource BoolToDriveColorConverter}, FallbackValue={StaticResource AccentBrush}}" />
-
-                    <!-- Name and Info -->
-                    <StackPanel Grid.Column="1" Margin="10,0,8,0" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding DisplayName}"
-                                   Style="{StaticResource BodyMedium}"
-                                   TextTrimming="CharacterEllipsis"
-                                   Opacity="{Binding IsHidden, Converter={StaticResource BoolToOpacityConverter}, FallbackValue=1}" />
-
-                        <!-- Drive Info -->
-                        <StackPanel Visibility="{Binding IsDrive, Converter={StaticResource BoolToVisibilityConverter}}"
-                                    Margin="0,2,0,0">
-                            <Grid>
-                                <ProgressBar Value="{Binding UsagePercent}"
-                                             Maximum="100"
-                                             Height="4"
-                                             Foreground="{Binding UsagePercent, Converter={StaticResource UsageToColorConverter}}"
-                                             Background="{StaticResource DividerBrush}" />
-                            </Grid>
-                            <TextBlock Style="{StaticResource Caption}" Margin="0,2,0,0">
-                                <Run Text="{Binding FormattedFreeSpace, Mode=OneWay}" />
-                                <Run Text="free of" />
-                                <Run Text="{Binding FormattedTotalSize, Mode=OneWay}" />
-                            </TextBlock>
-                        </StackPanel>
-
-                        <!-- Folder Size (when calculated) -->
-                        <TextBlock Visibility="{Binding IsSizeCalculated, Converter={StaticResource BoolToVisibilityConverter}}"
-                                   Style="{StaticResource Caption}"
-                                   Margin="0,2,0,0">
-                            <Run Text="{Binding FormattedSize, Mode=OneWay}" />
-                            <Run Text="(" /><Run Text="{Binding FileCount, Mode=OneWay}" /><Run Text=" files)" />
-                        </TextBlock>
-                    </StackPanel>
-
-                    <!-- Loading Indicator -->
-                    <ProgressBar Grid.Column="2"
-                                 Style="{StaticResource MaterialDesignCircularProgressBar}"
-                                 Width="16" Height="16"
-                                 IsIndeterminate="True"
-                                 Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" />
-
-                    <!-- Size Calculating Indicator -->
-                    <ProgressBar Grid.Column="2"
-                                 Style="{StaticResource MaterialDesignCircularProgressBar}"
-                                 Width="16" Height="16"
-                                 IsIndeterminate="True"
-                                 Visibility="{Binding IsSizeCalculating, Converter={StaticResource BoolToVisibilityConverter}}" />
-                </Grid>
-            </Border>
-        </HierarchicalDataTemplate>
-
-        <!-- TreeView Item Container Style -->
-        <Style x:Key="FolderTreeViewItemStyle" TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
-            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
-    </UserControl.Resources>
+             d:DesignHeight="600" d:DesignWidth="900">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -94,58 +16,279 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0"
-                Background="{StaticResource BackgroundBrush}"
-                CornerRadius="8"
-                Padding="12"
-                Margin="0,0,0,12">
-            <DockPanel>
-                <Button DockPanel.Dock="Right"
-                        Style="{StaticResource IconButton}"
-                        ToolTip="Refresh"
-                        Click="RefreshButton_Click">
-                    <materialDesign:PackIcon Kind="Refresh" Width="18" Height="18" />
-                </Button>
-                <StackPanel>
-                    <TextBlock Text="Folder Browser"
-                               Style="{StaticResource TitleSmall}" />
-                    <TextBlock Text="Select folders to scan"
-                               Style="{StaticResource Caption}" />
-                </StackPanel>
-            </DockPanel>
-        </Border>
-
-        <!-- Tree View -->
-        <Border Grid.Row="1"
-                Style="{StaticResource Card}"
-                Padding="8">
+        <Border Grid.Row="0" Background="{DynamicResource MaterialDesignCardBackground}"
+                Padding="8" Margin="0,0,0,4">
             <Grid>
-                <!-- Loading State -->
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
-                                 Width="40" Height="40"
-                                 IsIndeterminate="True"
-                                 HorizontalAlignment="Center" />
-                    <TextBlock Text="{Binding LoadingMessage}"
-                               Style="{StaticResource Caption}"
-                               HorizontalAlignment="Center"
-                               Margin="0,12,0,0" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Kind="Folder" Width="18" Height="18"
+                                             VerticalAlignment="Center" Margin="0,0,6,0"
+                                             Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                    <TextBlock Text="{Binding SelectedFolderName}" FontWeight="Medium" FontSize="13"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text=" - " Opacity="0.5" VerticalAlignment="Center"
+                               Visibility="{Binding HasData, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <TextBlock Text="{Binding FormattedTotalSize}" FontSize="13"
+                               Foreground="{DynamicResource PrimaryHueMidBrush}"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding HasData, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
 
-                <!-- Tree View -->
-                <TreeView x:Name="FolderTree"
-                          ItemsSource="{Binding RootNodes}"
-                          ItemTemplate="{StaticResource FolderNodeTemplate}"
-                          ItemContainerStyle="{StaticResource FolderTreeViewItemStyle}"
-                          VirtualizingStackPanel.IsVirtualizing="True"
-                          VirtualizingStackPanel.VirtualizationMode="Recycling"
-                          Visibility="{Binding IsLoading, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                          TreeViewItem.Expanded="TreeViewItem_Expanded"
-                          SelectedItemChanged="FolderTree_SelectedItemChanged">
-                </TreeView>
+                <Button Grid.Column="1" Content="폴더 선택"
+                        Command="{Binding SelectFolderCommand}"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Height="28" Padding="12,0"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBooleanConverter}}" />
             </Grid>
         </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <!-- Empty State -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding HasData}" Value="False" />
+                                    <Condition Binding="{Binding IsLoading}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <materialDesign:PackIcon Kind="ChartBar" Width="48" Height="48"
+                                          HorizontalAlignment="Center" Opacity="0.3" />
+                <TextBlock Text="폴더를 선택하세요" HorizontalAlignment="Center"
+                           Margin="0,8,0,0" Opacity="0.5" />
+            </StackPanel>
+
+            <!-- Loading -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             Width="32" Height="32" IsIndeterminate="True" />
+                <TextBlock Text="{Binding LoadingMessage}" Margin="0,8,0,0" Opacity="0.7"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="{Binding AnalyzedFolderCount, StringFormat={}{0:N0}개 폴더 분석됨}"
+                           Margin="0,4,0,0" FontSize="11" Opacity="0.5" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Data View -->
+            <Grid Visibility="{Binding HasData, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Breadcrumb -->
+                <Border Grid.Row="0" Background="{DynamicResource MaterialDesignToolBarBackground}"
+                        Padding="6,4" Margin="0,0,0,4">
+                    <ItemsControl ItemsSource="{Binding Breadcrumbs}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text=">" Opacity="0.4" Margin="4,0"
+                                               VerticalAlignment="Center"
+                                               Visibility="{Binding Depth, Converter={StaticResource IntToVisibilityConverter}}" />
+                                    <Button Content="{Binding Name}"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            Height="22" Padding="6,0" FontSize="11"
+                                            Click="Breadcrumb_Click"
+                                            ToolTip="{Binding FullPath}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <!-- Bar Charts -->
+                <Border Grid.Row="1" Background="{DynamicResource MaterialDesignCardBackground}" Padding="8,4">
+                    <ItemsControl ItemsSource="{Binding BarLevels}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2" Height="32">
+                                    <TextBlock Text="{Binding Depth, StringFormat=L{0}}"
+                                               Width="22" FontSize="10" Opacity="0.4"
+                                               VerticalAlignment="Center" />
+
+                                    <Border Margin="26,0,0,0" Background="{DynamicResource MaterialDesignDivider}"
+                                            CornerRadius="2">
+                                        <ItemsControl ItemsSource="{Binding Items}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <Canvas />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Height="32" CornerRadius="2"
+                                                            Cursor="Hand"
+                                                            MouseLeftButtonDown="BarSegment_Click"
+                                                            ToolTipService.InitialShowDelay="0"
+                                                            ToolTipService.BetweenShowDelay="0">
+                                                        <Border.ToolTip>
+                                                            <ToolTip>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                                                    <TextBlock>
+                                                                        <Run Text="{Binding FormattedSize}" />
+                                                                        <Run Text=" (" /><Run Text="{Binding PercentOfTotal, StringFormat={}{0:0.1}%}" /><Run Text=")" />
+                                                                    </TextBlock>
+                                                                </StackPanel>
+                                                            </ToolTip>
+                                                        </Border.ToolTip>
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background">
+                                                                    <Setter.Value>
+                                                                        <SolidColorBrush Color="{Binding Color}" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                                <Setter Property="Opacity" Value="0.85" />
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter Property="Opacity" Value="1" />
+                                                                    </Trigger>
+                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                        <Setter Property="Opacity" Value="1" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+
+                                                        <Grid>
+                                                            <!-- Selection indicator -->
+                                                            <Border CornerRadius="2"
+                                                                    BorderThickness="0,3,0,0"
+                                                                    BorderBrush="#FFEB3B"
+                                                                    Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                                                            <TextBlock Text="{Binding Name}"
+                                                                       FontSize="10" Foreground="White"
+                                                                       VerticalAlignment="Center"
+                                                                       Margin="6,0" TextTrimming="CharacterEllipsis">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding WidthPercent, Converter={StaticResource LessThanConverter}, ConverterParameter=8}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                            <ItemsControl.ItemContainerStyle>
+                                                <Style TargetType="ContentPresenter">
+                                                    <Setter Property="Canvas.Left">
+                                                        <Setter.Value>
+                                                            <MultiBinding Converter="{StaticResource PercentToCanvasLeftConverter}">
+                                                                <Binding Path="OffsetPercent" />
+                                                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                            </MultiBinding>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Setter Property="Width">
+                                                        <Setter.Value>
+                                                            <MultiBinding Converter="{StaticResource PercentToWidthMultiConverter}">
+                                                                <Binding Path="WidthPercent" />
+                                                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                                            </MultiBinding>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ItemsControl.ItemContainerStyle>
+                                        </ItemsControl>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <!-- Separator -->
+                <GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch"
+                              Background="Transparent" />
+
+                <!-- File List -->
+                <Border Grid.Row="3" Background="{DynamicResource MaterialDesignCardBackground}"
+                        Padding="8" Margin="0,4,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
+                            <materialDesign:PackIcon Kind="File" Width="14" Height="14"
+                                                      VerticalAlignment="Center" Margin="0,0,4,0" Opacity="0.6" />
+                            <TextBlock Text="파일 목록" FontSize="11" FontWeight="Medium" Opacity="0.7" />
+                            <TextBlock Text="{Binding CurrentFolderFileInfo}" FontSize="10"
+                                       Margin="8,0,0,0" Opacity="0.5" VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding CurrentFiles}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="4,2" Margin="0,1"
+                                                Background="{DynamicResource MaterialDesignToolBarBackground}"
+                                                CornerRadius="2">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="70" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                           FontSize="11" TextTrimming="CharacterEllipsis"
+                                                           ToolTip="{Binding Name}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding FormattedSize}"
+                                                           FontSize="10" Opacity="0.6"
+                                                           HorizontalAlignment="Right" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <!-- Empty file list -->
+                        <TextBlock Grid.Row="1" Text="폴더를 선택하면 파일 목록이 표시됩니다"
+                                   FontSize="11" Opacity="0.4" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CurrentFiles.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

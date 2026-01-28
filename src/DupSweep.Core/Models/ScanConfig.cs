@@ -6,21 +6,20 @@ public class ScanConfig
 
     // Detection methods
     public bool UseHashComparison { get; set; } = true;
+    public bool UseSizeComparison { get; set; } = true;
+    public bool UseResolutionComparison { get; set; } = false;
     public bool UseImageSimilarity { get; set; } = true;
     public bool UseVideoSimilarity { get; set; } = true;
-    public bool UseAudioSimilarity { get; set; } = true;
     public bool MatchCreatedDate { get; set; } = false;
     public bool MatchModifiedDate { get; set; } = false;
 
     // File types to scan
     public bool ScanImages { get; set; } = true;
     public bool ScanVideos { get; set; } = true;
-    public bool ScanAudio { get; set; } = true;
 
     // Thresholds
     public double ImageSimilarityThreshold { get; set; } = 85;
     public double VideoSimilarityThreshold { get; set; } = 85;
-    public double AudioSimilarityThreshold { get; set; } = 85;
 
     public int ThumbnailSize { get; set; } = 128;
     public string? FfmpegPath { get; set; }
@@ -48,11 +47,6 @@ public class ScanConfig
         if (ScanVideos)
         {
             extensions.AddRange(new[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".3gp" });
-        }
-
-        if (ScanAudio)
-        {
-            extensions.AddRange(new[] { ".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", ".m4a", ".opus" });
         }
 
         return extensions;

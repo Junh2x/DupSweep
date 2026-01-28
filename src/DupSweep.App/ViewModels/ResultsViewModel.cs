@@ -25,7 +25,28 @@ public partial class ResultsViewModel : ObservableObject
     [ObservableProperty]
     private bool _hasResults;
 
+    // Auto Select Radio Button States
+    [ObservableProperty]
+    private bool _autoSelectLargest = true;
+
+    [ObservableProperty]
+    private bool _autoSelectSmallest;
+
+    [ObservableProperty]
+    private bool _autoSelectNewest;
+
+    [ObservableProperty]
+    private bool _autoSelectOldest;
+
+    [ObservableProperty]
+    private bool _autoSelectHighRes;
+
+    [ObservableProperty]
+    private bool _autoSelectLowRes;
+
     public string FormattedPotentialSavings => FormatFileSize(PotentialSavings);
+
+    public int TotalFilesCount => DuplicateGroups.Sum(g => g.FileCount);
 
     public ResultsViewModel()
     {
@@ -34,6 +55,7 @@ public partial class ResultsViewModel : ObservableObject
         DuplicateGroups.CollectionChanged += (_, _) =>
         {
             HasResults = DuplicateGroups.Count > 0;
+            OnPropertyChanged(nameof(TotalFilesCount));
             DuplicateGroupsView.Refresh();
         };
     }
@@ -71,7 +93,9 @@ public partial class ResultsViewModel : ObservableObject
                     Size = file.Size,
                     ModifiedDate = file.ModifiedDate,
                     ThumbnailPath = file.ThumbnailPath,
-                    ThumbnailData = file.ThumbnailData
+                    ThumbnailData = file.ThumbnailData,
+                    Width = file.Width,
+                    Height = file.Height
                 };
                 fileVm.PropertyChanged += (_, args) =>
                 {
@@ -118,6 +142,63 @@ public partial class ResultsViewModel : ObservableObject
             group.SelectOldest();
         }
         UpdateSelectionStats();
+    }
+
+    [RelayCommand]
+    private void SelectLargest()
+    {
+        foreach (var group in DuplicateGroups)
+        {
+            group.SelectLargest();
+        }
+        UpdateSelectionStats();
+    }
+
+    [RelayCommand]
+    private void SelectSmallest()
+    {
+        foreach (var group in DuplicateGroups)
+        {
+            group.SelectSmallest();
+        }
+        UpdateSelectionStats();
+    }
+
+    [RelayCommand]
+    private void SelectHighestResolution()
+    {
+        foreach (var group in DuplicateGroups)
+        {
+            group.SelectHighestResolution();
+        }
+        UpdateSelectionStats();
+    }
+
+    [RelayCommand]
+    private void SelectLowestResolution()
+    {
+        foreach (var group in DuplicateGroups)
+        {
+            group.SelectLowestResolution();
+        }
+        UpdateSelectionStats();
+    }
+
+    [RelayCommand]
+    private void ApplyAutoSelect()
+    {
+        if (AutoSelectLargest)
+            SelectLargest();
+        else if (AutoSelectSmallest)
+            SelectSmallest();
+        else if (AutoSelectNewest)
+            SelectNewest();
+        else if (AutoSelectOldest)
+            SelectOldest();
+        else if (AutoSelectHighRes)
+            SelectHighestResolution();
+        else if (AutoSelectLowRes)
+            SelectLowestResolution();
     }
 
     [RelayCommand]
@@ -329,6 +410,72 @@ public partial class DuplicateGroupViewModel : ObservableObject
             file.IsSelected = file != oldest;
         }
     }
+
+    public void SelectLargest()
+    {
+        if (Files.Count == 0)
+        {
+            return;
+        }
+
+        var largest = Files.OrderByDescending(f => f.Size).First();
+        foreach (var file in Files)
+        {
+            file.IsSelected = file != largest;
+        }
+    }
+
+    public void SelectSmallest()
+    {
+        if (Files.Count == 0)
+        {
+            return;
+        }
+
+        var smallest = Files.OrderBy(f => f.Size).First();
+        foreach (var file in Files)
+        {
+            file.IsSelected = file != smallest;
+        }
+    }
+
+    public void SelectHighestResolution()
+    {
+        if (Files.Count == 0)
+        {
+            return;
+        }
+
+        var highest = Files.OrderByDescending(f => f.Width * f.Height).First();
+        foreach (var file in Files)
+        {
+            file.IsSelected = file != highest;
+        }
+    }
+
+    public void SelectLowestResolution()
+    {
+        if (Files.Count == 0)
+        {
+            return;
+        }
+
+        var lowest = Files.Where(f => f.Width > 0 && f.Height > 0)
+                          .OrderBy(f => f.Width * f.Height)
+                          .FirstOrDefault();
+
+        // 해상도 정보가 없는 경우 첫 번째 파일 선택
+        if (lowest == null)
+        {
+            SelectFirst();
+            return;
+        }
+
+        foreach (var file in Files)
+        {
+            file.IsSelected = file != lowest;
+        }
+    }
 }
 
 public partial class FileItemViewModel : ObservableObject
@@ -353,6 +500,12 @@ public partial class FileItemViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isSelected;
+
+    [ObservableProperty]
+    private int _width;
+
+    [ObservableProperty]
+    private int _height;
 
     public string FormattedSize => FormatFileSize(Size);
 

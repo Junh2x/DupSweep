@@ -33,6 +33,11 @@
             <converters:BoolToDriveColorConverter x:Key="BoolToDriveColorConverter" />
             <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
             <converters:UsageToColorConverter x:Key="UsageToColorConverter" />
+            <converters:PercentToWidthConverter x:Key="PercentToWidthConverter" />
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <converters:PercentToCanvasLeftConverter x:Key="PercentToCanvasLeftConverter" />
+            <converters:PercentToWidthMultiConverter x:Key="PercentToWidthMultiConverter" />
+            <converters:LessThanConverter x:Key="LessThanConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

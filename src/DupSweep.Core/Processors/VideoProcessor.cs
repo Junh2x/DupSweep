@@ -11,6 +11,13 @@ public class VideoProcessor : IVideoProcessor
     {
         try
         {
+            // FFmpeg가 없으면 건너뛰기
+            var ffmpeg = ResolveFfmpegPath(config);
+            if (!File.Exists(ffmpeg) && !IsToolInPath(ffmpeg))
+            {
+                return null;
+            }
+
             var duration = GetDuration(filePath, config);
             var positions = GetFramePositions(duration);
             if (positions.Count == 0)
@@ -208,44 +215,79 @@ public class VideoProcessor : IVideoProcessor
         return fallbackName;
     }
 
-    private static int RunProcessForExit(string fileName, string arguments)
+    private static int RunProcessForExit(string fileName, string arguments, int timeoutMs = 30000)
     {
-        using var process = new Process
+        try
         {
-            StartInfo = new ProcessStartInfo
+            using var process = new Process
             {
-                FileName = fileName,
-                Arguments = arguments,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
-            }
-        };
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true
+                }
+            };
 
-        process.Start();
-        process.WaitForExit();
-        return process.ExitCode;
+            process.Start();
+            if (!process.WaitForExit(timeoutMs))
+            {
+                try { process.Kill(); } catch { }
+                return -1;
+            }
+            return process.ExitCode;
+        }
+        catch
+        {
+            return -1;
+        }
     }
 
-    private static string? RunProcess(string fileName, string arguments)
+    private static string? RunProcess(string fileName, string arguments, int timeoutMs = 10000)
     {
-        using var process = new Process
+        try
         {
-            StartInfo = new ProcessStartInfo
+            using var process = new Process
             {
-                FileName = fileName,
-                Arguments = arguments,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            }
-        };
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                }
+            };
 
-        process.Start();
-        var output = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
-        return output;
+            process.Start();
+            var output = process.StandardOutput.ReadToEnd();
+            if (!process.WaitForExit(timeoutMs))
+            {
+                try { process.Kill(); } catch { }
+                return null;
+            }
+            return output;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static bool IsToolInPath(string toolName)
+    {
+        try
+        {
+            var result = RunProcess(toolName, "-version", 5000);
+            return result != null;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
