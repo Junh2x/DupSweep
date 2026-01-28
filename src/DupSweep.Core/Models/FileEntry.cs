@@ -11,6 +11,10 @@ public class FileEntry
     public DateTime ModifiedDate { get; set; }
     public FileType FileType { get; set; }
 
+    // Resolution (for images/videos)
+    public int Width { get; set; }
+    public int Height { get; set; }
+
     // Hash values (computed on demand)
     public string? QuickHash { get; set; }
     public string? FullHash { get; set; }

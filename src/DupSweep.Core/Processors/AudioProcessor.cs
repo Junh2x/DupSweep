@@ -14,6 +14,13 @@ public class AudioProcessor : IAudioProcessor
 
     public async Task<ulong?> ComputeFingerprintAsync(string filePath, ScanConfig config, CancellationToken cancellationToken)
     {
+        // FFmpeg가 없으면 건너뛰기
+        var ffmpeg = ResolveFfmpegPath(config);
+        if (!File.Exists(ffmpeg) && !IsToolInPath(ffmpeg))
+        {
+            return null;
+        }
+
         var tempDir = CreateTempDirectory();
         var pcmPath = Path.Combine(tempDir, "audio.pcm");
 
@@ -120,23 +127,60 @@ public class AudioProcessor : IAudioProcessor
         return fallbackName;
     }
 
-    private static int RunProcessForExit(string fileName, string arguments)
+    private static int RunProcessForExit(string fileName, string arguments, int timeoutMs = 60000)
     {
-        using var process = new Process
+        try
         {
-            StartInfo = new ProcessStartInfo
+            using var process = new Process
             {
-                FileName = fileName,
-                Arguments = arguments,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
-            }
-        };
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true
+                }
+            };
 
-        process.Start();
-        process.WaitForExit();
-        return process.ExitCode;
+            process.Start();
+            if (!process.WaitForExit(timeoutMs))
+            {
+                try { process.Kill(); } catch { }
+                return -1;
+            }
+            return process.ExitCode;
+        }
+        catch
+        {
+            return -1;
+        }
+    }
+
+    private static bool IsToolInPath(string toolName)
+    {
+        try
+        {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = toolName,
+                    Arguments = "-version",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                }
+            };
+
+            process.Start();
+            return process.WaitForExit(5000);
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

@@ -75,17 +75,17 @@ public partial class App : Application
         // Infrastructure services (로깅 포함)
         services.AddDupSweepInfrastructure(loggingConfig);
 
-        // ViewModels
+        // ViewModels - 모든 ViewModel은 Singleton이어야 상태가 유지됨
         services.AddSingleton<MainViewModel>();
-        services.AddTransient<HomeViewModel>();
-        services.AddTransient<ScanViewModel>();
-        services.AddTransient<ResultsViewModel>();
+        services.AddSingleton<HomeViewModel>();
+        services.AddSingleton<ScanViewModel>();
+        services.AddSingleton<ResultsViewModel>();
         services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<FolderTreeViewModel>();
 
         // Core services
         services.AddSingleton<IScanService, ScanService>();
         services.AddSingleton<IImageProcessor, ImageProcessor>();
         services.AddSingleton<IVideoProcessor, VideoProcessor>();
-        services.AddSingleton<IAudioProcessor, AudioProcessor>();
     }
 }

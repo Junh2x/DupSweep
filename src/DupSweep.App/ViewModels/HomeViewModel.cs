@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -10,8 +12,15 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<string> _selectedFolders = new();
 
+    // 감지 조건
     [ObservableProperty]
     private bool _useHashComparison = true;
+
+    [ObservableProperty]
+    private bool _useSizeComparison = true;
+
+    [ObservableProperty]
+    private bool _useResolutionComparison;
 
     [ObservableProperty]
     private bool _useImageSimilarity = true;
@@ -20,31 +29,24 @@ public partial class HomeViewModel : ObservableObject
     private bool _useVideoSimilarity = true;
 
     [ObservableProperty]
-    private bool _useAudioSimilarity = true;
+    private bool _matchCreatedDate;
 
+    [ObservableProperty]
+    private bool _matchModifiedDate;
+
+    // 유사도 임계값
     [ObservableProperty]
     private double _similarityThreshold = 85;
 
     [ObservableProperty]
     private double _videoSimilarityThreshold = 85;
 
-    [ObservableProperty]
-    private double _audioSimilarityThreshold = 85;
-
-    [ObservableProperty]
-    private bool _matchCreatedDate;
-
-    [ObservableProperty]
-    private bool _matchModifiedDate;
-
+    // 파일 타입
     [ObservableProperty]
     private bool _scanImages = true;
 
     [ObservableProperty]
     private bool _scanVideos = true;
-
-    [ObservableProperty]
-    private bool _scanAudio = true;
 
     [ObservableProperty]
     private bool _canStartScan;
@@ -103,26 +105,31 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     private async Task StartScan()
     {
+        Console.WriteLine($"[StartScan] Called. CanStartScan={CanStartScan}, FolderCount={SelectedFolders.Count}");
+        Debug.WriteLine($"[StartScan] Called. CanStartScan={CanStartScan}, FolderCount={SelectedFolders.Count}");
+
         if (!CanStartScan)
         {
+            Console.WriteLine("[StartScan] CanStartScan is false, returning");
             return;
         }
+
+        Console.WriteLine($"[StartScan] Starting scan with folders: {string.Join(", ", SelectedFolders)}");
 
         var config = new DupSweep.Core.Models.ScanConfig
         {
             Directories = SelectedFolders.ToList(),
             UseHashComparison = UseHashComparison,
+            UseSizeComparison = UseSizeComparison,
+            UseResolutionComparison = UseResolutionComparison,
             UseImageSimilarity = UseImageSimilarity,
             UseVideoSimilarity = UseVideoSimilarity,
-            UseAudioSimilarity = UseAudioSimilarity,
             MatchCreatedDate = MatchCreatedDate,
             MatchModifiedDate = MatchModifiedDate,
             ImageSimilarityThreshold = SimilarityThreshold,
             VideoSimilarityThreshold = VideoSimilarityThreshold,
-            AudioSimilarityThreshold = AudioSimilarityThreshold,
             ScanImages = ScanImages,
-            ScanVideos = ScanVideos,
-            ScanAudio = ScanAudio
+            ScanVideos = ScanVideos
         };
 
         var settingsVm = App.Services.GetService(typeof(SettingsViewModel)) as SettingsViewModel;
@@ -141,6 +148,26 @@ public partial class HomeViewModel : ObservableObject
             }
         }
 
+        // FFmpeg 필요 여부 확인
+        bool needsFfmpeg = UseVideoSimilarity && ScanVideos;
+        bool hasFfmpeg = !string.IsNullOrWhiteSpace(config.FfmpegPath) && File.Exists(config.FfmpegPath);
+
+        if (needsFfmpeg && !hasFfmpeg)
+        {
+            var result = MessageBox.Show(
+                "FFmpeg 경로가 설정되지 않았습니다.\n비디오 유사도 검사가 건너뛰어집니다.\n\n이대로 실행하시겠습니까?",
+                "FFmpeg 미설정",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                Console.WriteLine("[StartScan] User cancelled due to missing FFmpeg");
+                return;
+            }
+            Console.WriteLine("[StartScan] User confirmed to proceed without FFmpeg");
+        }
+
         var mainVm = App.Services.GetService(typeof(MainViewModel)) as MainViewModel;
         var scanVm = App.Services.GetService(typeof(ScanViewModel)) as ScanViewModel;
         var resultsVm = App.Services.GetService(typeof(ResultsViewModel)) as ResultsViewModel;
@@ -148,21 +175,33 @@ public partial class HomeViewModel : ObservableObject
 
         if (scanVm == null || resultsVm == null || scanService == null || mainVm == null)
         {
+            Console.WriteLine($"[StartScan] Service null check failed: scanVm={scanVm != null}, resultsVm={resultsVm != null}, scanService={scanService != null}, mainVm={mainVm != null}");
             return;
         }
+
+        Console.WriteLine("[StartScan] All services resolved successfully");
 
         scanVm.Reset();
         mainVm.NavigateToScanCommand.Execute(null);
 
-        var progress = new Progress<DupSweep.Core.Models.ScanProgress>(scanVm.ApplyProgress);
+        var progress = new Progress<DupSweep.Core.Models.ScanProgress>(p =>
+        {
+            Console.WriteLine($"[StartScan] Progress: Phase={p.Phase}, Processed={p.ProcessedFiles}/{p.TotalFiles}");
+            scanVm.ApplyProgress(p);
+        });
+
         try
         {
+            Console.WriteLine("[StartScan] Calling scanService.StartScanAsync...");
             var result = await scanService.StartScanAsync(config, progress);
+            Console.WriteLine($"[StartScan] Scan completed. Groups found: {result?.DuplicateGroups?.Count ?? 0}");
             resultsVm.LoadResults(result);
             mainVm.NavigateToResultsCommand.Execute(null);
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"[StartScan] ERROR: {ex.GetType().Name}: {ex.Message}");
+            Console.WriteLine($"[StartScan] StackTrace: {ex.StackTrace}");
             scanVm.ApplyProgress(new DupSweep.Core.Models.ScanProgress
             {
                 Phase = DupSweep.Core.Models.ScanPhase.Error,

@@ -30,6 +30,9 @@
         <DataTemplate DataType="{x:Type viewmodels:SettingsViewModel}">
             <views:SettingsView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:FolderTreeViewModel}">
+            <controls:FolderTreeView />
+        </DataTemplate>
 
         <!-- Navigation Button Style -->
         <Style x:Key="NavButton" TargetType="RadioButton">
@@ -93,18 +96,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!-- Window Controls (for custom title bar) -->
-                    <StackPanel Grid.Row="0"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Left"
-                                Margin="16,12">
-                        <Ellipse Width="12" Height="12" Fill="#FF5F57" Margin="0,0,8,0"
-                                 MouseLeftButtonDown="CloseButton_Click" Cursor="Hand" />
-                        <Ellipse Width="12" Height="12" Fill="#FEBC2E" Margin="0,0,8,0"
-                                 MouseLeftButtonDown="MinimizeButton_Click" Cursor="Hand" />
-                        <Ellipse Width="12" Height="12" Fill="#28C840"
-                                 MouseLeftButtonDown="MaximizeButton_Click" Cursor="Hand" />
-                    </StackPanel>
+                    <!-- Intentionally empty: Windows-style controls are in the top-right bar -->
 
                     <!-- Logo Section -->
                     <StackPanel Grid.Row="1" Margin="24,16,24,32">
@@ -123,7 +115,7 @@
                                            FontSize="22"
                                            FontWeight="Bold"
                                            Foreground="White" />
-                                <TextBlock Text="Duplicate File Finder"
+                                <TextBlock Text="중복 파일 찾기"
                                            FontSize="11"
                                            Foreground="#78909C"
                                            Margin="0,-2,0,0" />
@@ -133,7 +125,7 @@
 
                     <!-- Navigation -->
                     <StackPanel Grid.Row="2">
-                        <TextBlock Text="MAIN MENU"
+                        <TextBlock Text="메인 메뉴"
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="#546E7A"
@@ -146,7 +138,7 @@
                                      Tag="0">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Home" Width="22" Height="22" VerticalAlignment="Center" />
-                                <TextBlock Text="Home" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock Text="홈" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </RadioButton>
 
@@ -156,7 +148,7 @@
                                      Tag="1">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22" VerticalAlignment="Center" />
-                                <TextBlock Text="Scan" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock Text="스캔" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </RadioButton>
 
@@ -166,7 +158,7 @@
                                      Tag="2">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="FileMultiple" Width="22" Height="22" VerticalAlignment="Center" />
-                                <TextBlock Text="Results" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock Text="결과" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
                                 <Border x:Name="ResultsBadge"
                                         Style="{StaticResource Badge}"
                                         Margin="12,0,0,0"
@@ -182,7 +174,25 @@
 
                         <Separator Margin="24,20" Background="#263850" />
 
-                        <TextBlock Text="CONFIGURATION"
+                        <TextBlock Text="도구"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="#546E7A"
+                                   Margin="24,0,0,12" />
+
+                        <RadioButton x:Name="FolderTreeNav"
+                                     Style="{StaticResource NavButton}"
+                                     Checked="NavItem_Checked"
+                                     Tag="4">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="FileTree" Width="22" Height="22" VerticalAlignment="Center" />
+                                <TextBlock Text="폴더 트리" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </RadioButton>
+
+                        <Separator Margin="24,20" Background="#263850" />
+
+                        <TextBlock Text="설정"
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="#546E7A"
@@ -194,7 +204,7 @@
                                      Tag="3">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="CogOutline" Width="22" Height="22" VerticalAlignment="Center" />
-                                <TextBlock Text="Settings" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock Text="환경설정" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </RadioButton>
                     </StackPanel>
@@ -244,7 +254,7 @@
                             <TextBlock Text="{Binding Title}"
                                        Style="{StaticResource HeadlineMedium}" />
                             <TextBlock x:Name="PageSubtitle"
-                                       Text="Select folders to scan for duplicate files"
+                                       Text="중복 파일을 검색할 폴더를 선택하세요"
                                        Style="{StaticResource Caption}"
                                        Margin="0,2,0,0" />
                         </StackPanel>
@@ -255,12 +265,12 @@
                                     VerticalAlignment="Center">
                             <!-- Quick Actions -->
                             <Button Style="{StaticResource IconButton}"
-                                    ToolTip="Help"
+                                    ToolTip="도움말 (F1)"
                                     Margin="0,0,4,0">
                                 <materialDesign:PackIcon Kind="HelpCircleOutline" Width="22" Height="22" />
                             </Button>
                             <Button Style="{StaticResource IconButton}"
-                                    ToolTip="Notifications"
+                                    ToolTip="알림"
                                     Margin="0,0,4,0">
                                 <materialDesign:PackIcon Kind="BellOutline" Width="22" Height="22" />
                             </Button>
@@ -270,17 +280,17 @@
                             <!-- Window Controls -->
                             <Button Style="{StaticResource IconButton}"
                                     Click="MinimizeButton_Click"
-                                    ToolTip="Minimize">
+                                    ToolTip="최소화">
                                 <materialDesign:PackIcon Kind="WindowMinimize" Width="18" Height="18" />
                             </Button>
                             <Button Style="{StaticResource IconButton}"
                                     Click="MaximizeButton_Click"
-                                    ToolTip="Maximize">
+                                    ToolTip="최대화">
                                 <materialDesign:PackIcon Kind="WindowMaximize" Width="18" Height="18" />
                             </Button>
                             <Button Style="{StaticResource IconButton}"
                                     Click="CloseButton_Click"
-                                    ToolTip="Close">
+                                    ToolTip="닫기">
                                 <materialDesign:PackIcon Kind="Close" Width="18" Height="18" />
                             </Button>
                         </StackPanel>

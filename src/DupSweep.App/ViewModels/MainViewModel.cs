@@ -17,13 +17,13 @@ public partial class MainViewModel : ObservableObject
     private int _selectedNavIndex;
 
     [ObservableProperty]
-    private string _title = "Home";
+    private string _title = "홈";
 
-    private readonly string[] _titles = { "Home", "Scan", "Results", "Settings" };
+    private readonly string[] _titles = { "홈", "스캔", "결과", "설정", "폴더 트리" };
 
     public MainViewModel()
     {
-        // Start with Home view
+        // 홈 뷰로 시작
         NavigateToHome();
     }
 
@@ -45,6 +45,9 @@ public partial class MainViewModel : ObservableObject
                 break;
             case 3:
                 NavigateToSettings();
+                break;
+            case 4:
+                NavigateToFolderTree();
                 break;
         }
     }
@@ -79,6 +82,14 @@ public partial class MainViewModel : ObservableObject
         CurrentView = App.Services.GetRequiredService<SettingsViewModel>();
         SelectedNavIndex = 3;
         Title = _titles[3];
+    }
+
+    [RelayCommand]
+    private void NavigateToFolderTree()
+    {
+        CurrentView = App.Services.GetRequiredService<FolderTreeViewModel>();
+        SelectedNavIndex = 4;
+        Title = _titles[4];
     }
 
     partial void OnSelectedNavIndexChanged(int value)

@@ -6,6 +6,7 @@ public interface IImageProcessor
 {
     Task<ulong?> ComputePerceptualHashAsync(string filePath, ScanConfig config, CancellationToken cancellationToken);
     Task<byte[]?> CreateThumbnailAsync(string filePath, ScanConfig config, CancellationToken cancellationToken);
+    Task<(int Width, int Height)> GetImageResolutionAsync(string filePath, CancellationToken cancellationToken);
 }
 
 public interface IVideoProcessor

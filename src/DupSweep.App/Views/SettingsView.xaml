@@ -12,14 +12,14 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel MaxWidth="600" Margin="0,0,0,32">
             <!-- Header -->
-            <TextBlock Text="Settings"
+            <TextBlock Text="환경설정"
                        Style="{StaticResource MaterialDesignHeadline5TextBlock}"
                        Margin="0,0,0,24" />
 
             <!-- Appearance -->
             <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
                 <StackPanel Margin="16">
-                    <TextBlock Text="Appearance"
+                    <TextBlock Text="외관"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
                                Margin="0,0,0,16" />
 
@@ -28,8 +28,8 @@
                                       Style="{StaticResource MaterialDesignSwitchToggleButton}"
                                       IsChecked="{Binding IsDarkTheme}" />
                         <StackPanel>
-                            <TextBlock Text="Dark Theme" />
-                            <TextBlock Text="Use dark color scheme"
+                            <TextBlock Text="다크 테마" />
+                            <TextBlock Text="어두운 색상 테마 사용"
                                        Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                        Opacity="0.6" />
                         </StackPanel>
@@ -45,8 +45,8 @@
                             <ComboBoxItem Content="256" />
                         </ComboBox>
                         <StackPanel>
-                            <TextBlock Text="Thumbnail Size" />
-                            <TextBlock Text="Size of preview thumbnails"
+                            <TextBlock Text="썸네일 크기" />
+                            <TextBlock Text="미리보기 썸네일 크기"
                                        Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                        Opacity="0.6" />
                         </StackPanel>
@@ -57,7 +57,7 @@
             <!-- Deletion -->
             <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
                 <StackPanel Margin="16">
-                    <TextBlock Text="Deletion"
+                    <TextBlock Text="삭제"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
                                Margin="0,0,0,16" />
 
@@ -66,8 +66,8 @@
                                       Style="{StaticResource MaterialDesignSwitchToggleButton}"
                                       IsChecked="{Binding MoveToTrashByDefault}" />
                         <StackPanel>
-                            <TextBlock Text="Move to Trash by Default" />
-                            <TextBlock Text="Files can be recovered from trash"
+                            <TextBlock Text="기본적으로 휴지통으로 이동" />
+                            <TextBlock Text="휴지통에서 파일을 복구할 수 있습니다"
                                        Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                        Opacity="0.6" />
                         </StackPanel>
@@ -78,8 +78,8 @@
                                       Style="{StaticResource MaterialDesignSwitchToggleButton}"
                                       IsChecked="{Binding ShowConfirmationDialog}" />
                         <StackPanel>
-                            <TextBlock Text="Show Confirmation Dialog" />
-                            <TextBlock Text="Ask before deleting files"
+                            <TextBlock Text="확인 대화 상자 표시" />
+                            <TextBlock Text="파일 삭제 전 확인"
                                        Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                        Opacity="0.6" />
                         </StackPanel>
@@ -90,13 +90,13 @@
             <!-- Performance -->
             <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
                 <StackPanel Margin="16">
-                    <TextBlock Text="Performance"
+                    <TextBlock Text="성능"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
                                Margin="0,0,0,16" />
 
                     <StackPanel Margin="0,0,0,8">
                         <TextBlock>
-                            <Run Text="Parallel Threads:" />
+                            <Run Text="병렬 스레드:" />
                             <Run Text="{Binding ParallelThreads}" />
                         </TextBlock>
                         <Slider Minimum="1"
@@ -104,7 +104,7 @@
                                 Value="{Binding ParallelThreads}"
                                 Style="{StaticResource MaterialDesignDiscreteSlider}"
                                 TickFrequency="1" />
-                        <TextBlock Text="Number of threads for parallel processing"
+                        <TextBlock Text="병렬 처리를 위한 스레드 수"
                                    Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                    Opacity="0.6" />
                     </StackPanel>
@@ -121,11 +121,11 @@
                     <DockPanel>
                         <Button DockPanel.Dock="Right"
                                 Style="{StaticResource MaterialDesignOutlinedButton}"
-                                Content="Browse"
+                                Content="찾아보기"
                                 Command="{Binding BrowseFFmpegPathCommand}" />
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="FFmpeg Path" />
-                            <TextBlock Text="{Binding FfmpegPath, TargetNullValue='Not configured (using bundled)'}"
+                            <TextBlock Text="FFmpeg 경로" />
+                            <TextBlock Text="{Binding FfmpegPath, TargetNullValue='설정되지 않음'}"
                                        Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                        Opacity="0.6"
                                        TextTrimming="CharacterEllipsis" />
@@ -135,7 +135,7 @@
             </materialDesign:Card>
 
             <!-- Reset -->
-            <Button Content="Reset to Defaults"
+            <Button Content="기본값으로 초기화"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
                     Command="{Binding ResetToDefaultsCommand}"
                     HorizontalAlignment="Left" />

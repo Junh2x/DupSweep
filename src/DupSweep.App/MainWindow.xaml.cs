@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -7,42 +8,30 @@ using DupSweep.App.ViewModels;
 namespace DupSweep.App;
 
 /// <summary>
-/// MainWindow의 코드 비하인드.
-/// 커스텀 윈도우 컨트롤 및 네비게이션을 처리합니다.
+/// MainWindow 코드 비하인드.
+/// 커스텀 윈도우 컨트롤과 네비게이션을 처리합니다.
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly MainViewModel? _viewModel;
     private readonly KeyboardShortcutService _shortcutService;
     private readonly string[] _subtitles =
     {
-        "Select folders to scan for duplicate files",
-        "Scanning for duplicate files...",
-        "Review and manage duplicate files",
-        "Configure application settings"
+        "중복 파일을 검색할 폴더를 선택하세요",
+        "중복 파일을 검색 중...",
+        "중복 파일을 검토하고 관리하세요",
+        "애플리케이션 설정",
+        "폴더 구조를 탐색하고 용량을 확인하세요"
     };
 
-    public MainWindow()
+        public MainWindow()
     {
         InitializeComponent();
 
-        _viewModel = (DataContext as MainViewModel)!;
         _shortcutService = new KeyboardShortcutService();
+        DataContextChanged += MainWindow_DataContextChanged;
 
         // 키보드 단축키 설정
         SetupKeyboardShortcuts();
-
-        // 뷰모델 변경 시 서브타이틀 업데이트
-        if (_viewModel != null)
-        {
-            _viewModel.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(MainViewModel.CurrentView))
-                {
-                    UpdateSubtitle();
-                }
-            };
-        }
 
         // 윈도우 로드 시 단축키 서비스 연결
         Loaded += (s, e) => _shortcutService.AttachToWindow(this);
@@ -61,38 +50,38 @@ public partial class MainWindow : Window
             openHelp: ShowHelp
         );
 
-        // ESC 키로 스캔 취소
+        // ESC로 스캔 취소
         _shortcutService.RegisterShortcut(Key.Escape, ModifierKeys.None, () =>
         {
-            if (_viewModel?.CurrentView is ViewModels.ScanViewModel scanVm && scanVm.IsScanning)
+            if (ViewModel?.CurrentView is ViewModels.ScanViewModel scanVm && scanVm.IsScanning)
             {
                 scanVm.CancelScanCommand?.Execute(null);
-                NotificationService.Instance.ShowWarning("Scan cancelled", "Cancelled");
+                NotificationService.Instance.ShowWarning("스캔이 취소되었습니다", "취소됨");
             }
-        }, "Cancel Scan");
+        }, "스캔 취소");
 
-        // Ctrl+Delete로 선택된 중복 파일 휴지통으로 이동
+        // Ctrl+Delete로 선택한 중복 파일 휴지통으로 이동
         _shortcutService.RegisterShortcut(Key.Delete, ModifierKeys.Control, () =>
         {
-            if (_viewModel?.CurrentView is ViewModels.ResultsViewModel resultsVm && resultsVm.SelectedFilesCount > 0)
+            if (ViewModel?.CurrentView is ViewModels.ResultsViewModel resultsVm && resultsVm.SelectedFilesCount > 0)
             {
                 resultsVm.MoveToTrashCommand?.Execute(null);
             }
-        }, "Move Selected to Trash");
+        }, "휴지통으로 이동");
 
         // Shift+Delete로 영구 삭제
         _shortcutService.RegisterShortcut(Key.Delete, ModifierKeys.Shift, () =>
         {
-            if (_viewModel?.CurrentView is ViewModels.ResultsViewModel resultsVm && resultsVm.SelectedFilesCount > 0)
+            if (ViewModel?.CurrentView is ViewModels.ResultsViewModel resultsVm && resultsVm.SelectedFilesCount > 0)
             {
                 resultsVm.DeletePermanentlyCommand?.Execute(null);
             }
-        }, "Delete Permanently");
+        }, "영구 삭제");
     }
 
     private void NavigateToIndex(int index)
     {
-        _viewModel?.NavigateByIndex(index);
+        ViewModel?.NavigateByIndex(index);
         UpdateNavRadioButton(index);
         UpdateSubtitle(index);
     }
@@ -105,6 +94,7 @@ public partial class MainWindow : Window
             1 => ScanNav,
             2 => ResultsNav,
             3 => SettingsNav,
+            4 => FolderTreeNav,
             _ => null
         };
 
@@ -117,13 +107,13 @@ public partial class MainWindow : Window
     private void ShowHelp()
     {
         NotificationService.Instance.ShowInfo(
-            "Ctrl+1~4: Navigate pages\n" +
-            "Ctrl+N: Go to Home\n" +
-            "Ctrl+Del: Move to trash\n" +
-            "Shift+Del: Delete permanently\n" +
-            "Esc: Cancel scan\n" +
-            "F1: This help",
-            "Keyboard Shortcuts",
+            "Ctrl+1~5: 페이지 이동\n" +
+            "Ctrl+N: 홈으로 이동\n" +
+            "Ctrl+Del: 휴지통으로 이동\n" +
+            "Shift+Del: 영구 삭제\n" +
+            "Esc: 스캔 취소\n" +
+            "F1: 도움말",
+            "키보드 단축키",
             TimeSpan.FromSeconds(8));
     }
 
@@ -148,27 +138,12 @@ public partial class MainWindow : Window
         Application.Current.Shutdown();
     }
 
-    private void CloseButton_Click(object sender, MouseButtonEventArgs e)
-    {
-        Application.Current.Shutdown();
-    }
-
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
     }
 
-    private void MinimizeButton_Click(object sender, MouseButtonEventArgs e)
-    {
-        WindowState = WindowState.Minimized;
-    }
-
     private void MaximizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        MaximizeRestore();
-    }
-
-    private void MaximizeButton_Click(object sender, MouseButtonEventArgs e)
     {
         MaximizeRestore();
     }
@@ -190,7 +165,7 @@ public partial class MainWindow : Window
         {
             if (int.TryParse(tagStr, out int index))
             {
-                _viewModel?.NavigateByIndex(index);
+                ViewModel?.NavigateByIndex(index);
                 UpdateSubtitle(index);
             }
         }
@@ -200,7 +175,7 @@ public partial class MainWindow : Window
     {
         if (index == null)
         {
-            index = _viewModel?.SelectedNavIndex ?? 0;
+            index = ViewModel?.SelectedNavIndex ?? 0;
         }
 
         if (index >= 0 && index < _subtitles.Length)
@@ -209,6 +184,36 @@ public partial class MainWindow : Window
         }
     }
 
+    private MainViewModel? ViewModel => DataContext as MainViewModel;
+
+    private void MainWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.OldValue is MainViewModel oldVm)
+        {
+            oldVm.PropertyChanged -= ViewModel_PropertyChanged;
+        }
+
+        if (e.NewValue is MainViewModel newVm)
+        {
+            newVm.PropertyChanged += ViewModel_PropertyChanged;
+        }
+
+        UpdateSubtitle();
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.CurrentView))
+        {
+            UpdateSubtitle();
+        }
+        else if (e.PropertyName == nameof(MainViewModel.SelectedNavIndex))
+        {
+            // 메뉴 탭 동기화: ViewModel에서 SelectedNavIndex가 변경되면 RadioButton 업데이트
+            UpdateNavRadioButton(ViewModel?.SelectedNavIndex ?? 0);
+            UpdateSubtitle(ViewModel?.SelectedNavIndex);
+        }
+    }
     #endregion
 
     #region Results Badge
