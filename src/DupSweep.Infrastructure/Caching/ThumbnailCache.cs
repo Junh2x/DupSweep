@@ -76,6 +76,40 @@ public class ThumbnailCache : IThumbnailCache
     }
 
     /// <summary>
+    /// 캐시 파일 크기 조회 (바이트)
+    /// </summary>
+    public long GetCacheSize()
+    {
+        try
+        {
+            if (File.Exists(_dbPath))
+            {
+                return new FileInfo(_dbPath).Length;
+            }
+        }
+        catch { }
+        return 0;
+    }
+
+    /// <summary>
+    /// 캐시 전체 삭제
+    /// </summary>
+    public void ClearCache()
+    {
+        lock (_lock)
+        {
+            try
+            {
+                if (File.Exists(_dbPath))
+                {
+                    File.Delete(_dbPath);
+                }
+            }
+            catch { }
+        }
+    }
+
+    /// <summary>
     /// 썸네일 캐시 레코드
     /// </summary>
     private sealed class ThumbnailRecord
