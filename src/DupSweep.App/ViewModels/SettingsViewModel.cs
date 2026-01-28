@@ -4,6 +4,10 @@ using MaterialDesignThemes.Wpf;
 
 namespace DupSweep.App.ViewModels;
 
+/// <summary>
+/// 설정 화면 ViewModel
+/// 테마, FFmpeg 경로, 병렬 처리 스레드 수 등 설정 관리
+/// </summary>
 public partial class SettingsViewModel : ObservableObject
 {
     [ObservableProperty]

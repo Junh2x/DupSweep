@@ -10,6 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DupSweep.Infrastructure.DependencyInjection;
 
+/// <summary>
+/// DI 컨테이너 확장 메서드
+/// Infrastructure 레이어의 모든 서비스를 등록
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>

@@ -3,15 +3,23 @@ using DupSweep.Core.Models;
 
 namespace DupSweep.Core.Processors;
 
+/// <summary>
+/// 비디오 처리기
+/// FFmpeg를 사용하여 키프레임 추출 및 분석
+/// </summary>
 public class VideoProcessor : IVideoProcessor
 {
     private readonly ImageProcessor _imageProcessor = new();
 
+    /// <summary>
+    /// 비디오 지각 해시 계산
+    /// 여러 위치에서 키프레임을 추출하여 이미지 해시 후 병합
+    /// </summary>
     public async Task<ulong?> ComputePerceptualHashAsync(string filePath, ScanConfig config, CancellationToken cancellationToken)
     {
         try
         {
-            // FFmpeg가 없으면 건너뛰기
+            // FFmpeg 존재 확인
             var ffmpeg = ResolveFfmpegPath(config);
             if (!File.Exists(ffmpeg) && !IsToolInPath(ffmpeg))
             {
@@ -30,6 +38,7 @@ public class VideoProcessor : IVideoProcessor
 
             try
             {
+                // 각 위치에서 프레임 추출 및 해시 계산
                 for (int i = 0; i < positions.Count; i++)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -56,6 +65,7 @@ public class VideoProcessor : IVideoProcessor
                 return null;
             }
 
+            // 여러 해시를 병합하여 최종 해시 생성
             return MergeHashes(hashes);
         }
         catch
@@ -64,6 +74,10 @@ public class VideoProcessor : IVideoProcessor
         }
     }
 
+    /// <summary>
+    /// 비디오 썸네일 생성
+    /// 중간 지점에서 프레임 추출
+    /// </summary>
     public async Task<byte[]?> CreateThumbnailAsync(string filePath, ScanConfig config, CancellationToken cancellationToken)
     {
         var tempDir = CreateTempDirectory();
@@ -88,6 +102,9 @@ public class VideoProcessor : IVideoProcessor
         }
     }
 
+    /// <summary>
+    /// FFprobe로 비디오 길이 추출
+    /// </summary>
     private static TimeSpan? GetDuration(string filePath, ScanConfig config)
     {
         var ffprobe = ResolveFfprobePath(config);
@@ -106,6 +123,9 @@ public class VideoProcessor : IVideoProcessor
         return null;
     }
 
+    /// <summary>
+    /// 프레임 추출 위치 계산 (25%, 50%, 75%)
+    /// </summary>
     private static List<TimeSpan> GetFramePositions(TimeSpan? duration)
     {
         if (duration == null || duration.Value.TotalSeconds <= 0)
@@ -124,6 +144,9 @@ public class VideoProcessor : IVideoProcessor
         return positions;
     }
 
+    /// <summary>
+    /// FFmpeg로 특정 위치의 프레임 추출
+    /// </summary>
     private static bool ExtractFrame(string filePath, string outputPath, TimeSpan position, ScanConfig config)
     {
         var ffmpeg = ResolveFfmpegPath(config);
@@ -137,6 +160,9 @@ public class VideoProcessor : IVideoProcessor
         return exitCode == 0 && File.Exists(outputPath);
     }
 
+    /// <summary>
+    /// 여러 해시를 다수결 방식으로 병합
+    /// </summary>
     private static ulong MergeHashes(IReadOnlyList<ulong> hashes)
     {
         ulong merged = 0;
@@ -151,6 +177,7 @@ public class VideoProcessor : IVideoProcessor
                 }
             }
 
+            // 과반수 이상이면 해당 비트를 1로 설정
             if (setBits >= (hashes.Count + 1) / 2)
             {
                 merged |= 1UL << bit;
@@ -176,10 +203,7 @@ public class VideoProcessor : IVideoProcessor
                 Directory.Delete(tempDir, true);
             }
         }
-        catch
-        {
-            // ignore cleanup failures
-        }
+        catch { }
     }
 
     private static string ResolveFfmpegPath(ScanConfig config)
@@ -192,6 +216,9 @@ public class VideoProcessor : IVideoProcessor
         return ResolveToolPath(config.FfprobePath, "ffprobe.exe", "ffprobe");
     }
 
+    /// <summary>
+    /// 외부 도구 경로 해석 (설정 > 번들 > PATH)
+    /// </summary>
     private static string ResolveToolPath(string? overridePath, string exeName, string fallbackName)
     {
         if (!string.IsNullOrWhiteSpace(overridePath) && File.Exists(overridePath))

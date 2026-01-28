@@ -11,8 +11,15 @@ using DupSweep.Infrastructure.Logging;
 
 namespace DupSweep.App;
 
+/// <summary>
+/// WPF 애플리케이션 진입점
+/// DI 컨테이너 구성 및 서비스 등록을 담당
+/// </summary>
 public partial class App : Application
 {
+    /// <summary>
+    /// 전역 서비스 프로바이더 (DI 컨테이너)
+    /// </summary>
     public static IServiceProvider Services { get; private set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)

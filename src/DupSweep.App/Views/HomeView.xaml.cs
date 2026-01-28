@@ -7,8 +7,8 @@ using DupSweep.App.ViewModels;
 namespace DupSweep.App.Views;
 
 /// <summary>
-/// HomeView의 코드 비하인드.
-/// 드래그 앤 드롭 및 UI 이벤트를 처리합니다.
+/// 홈 화면 코드비하인드
+/// 폴더 드래그 앤 드롭 처리
 /// </summary>
 public partial class HomeView : UserControl
 {

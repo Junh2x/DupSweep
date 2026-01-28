@@ -7,8 +7,15 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace DupSweep.App.ViewModels;
 
+/// <summary>
+/// 홈 화면 ViewModel
+/// 스캔 대상 폴더 선택 및 중복 감지 옵션 설정
+/// </summary>
 public partial class HomeViewModel : ObservableObject
 {
+    /// <summary>
+    /// 스캔할 폴더 목록
+    /// </summary>
     [ObservableProperty]
     private ObservableCollection<string> _selectedFolders = new();
 
