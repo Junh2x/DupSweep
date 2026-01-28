@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DupSweep.Core.Services.Interfaces;
 
 namespace DupSweep.App.ViewModels;
 
@@ -9,6 +10,8 @@ namespace DupSweep.App.ViewModels;
 /// </summary>
 public partial class SettingsViewModel : ObservableObject
 {
+    private readonly IThumbnailCache _thumbnailCache;
+
     [ObservableProperty]
     private bool _showConfirmationDialog = true;
 
@@ -21,9 +24,14 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _ffmpegPath = string.Empty;
 
-    public SettingsViewModel()
+    [ObservableProperty]
+    private string _cacheSize = "계산 중...";
+
+    public SettingsViewModel(IThumbnailCache thumbnailCache)
     {
+        _thumbnailCache = thumbnailCache;
         ParallelThreads = Environment.ProcessorCount;
+        RefreshCacheSize();
     }
 
     [RelayCommand]
@@ -48,5 +56,35 @@ public partial class SettingsViewModel : ObservableObject
         ThumbnailSize = 128;
         ParallelThreads = Environment.ProcessorCount;
         FfmpegPath = string.Empty;
+    }
+
+    [RelayCommand]
+    private void ClearCache()
+    {
+        _thumbnailCache.ClearCache();
+        RefreshCacheSize();
+    }
+
+    public void RefreshCacheSize()
+    {
+        var size = _thumbnailCache.GetCacheSize();
+        CacheSize = FormatFileSize(size);
+    }
+
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes == 0) return "0 B";
+
+        string[] sizes = ["B", "KB", "MB", "GB", "TB"];
+        int order = 0;
+        double size = bytes;
+
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            size /= 1024;
+        }
+
+        return $"{size:0.##} {sizes[order]}";
     }
 }
