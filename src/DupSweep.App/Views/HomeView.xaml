@@ -191,13 +191,34 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="4">
 
-                    <!-- 파일 유형 -->
-                    <TextBlock Text="파일 유형"
+                    <!-- 스캔 대상 -->
+                    <TextBlock Text="스캔 대상"
                                Style="{StaticResource TitleSmall}"
                                Foreground="{StaticResource TextSecondaryBrush}"
                                Margin="0,0,0,12" />
 
                     <StackPanel Margin="0,0,0,20">
+                        <CheckBox IsChecked="{Binding ScanAllFiles}"
+                                  Margin="0,0,0,12">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="FileMultiple" Width="18" Height="18"
+                                                             VerticalAlignment="Center" Margin="0,0,8,0"
+                                                             Foreground="{StaticResource AccentBrush}" />
+                                    <TextBlock Text="모든 파일" VerticalAlignment="Center" FontWeight="SemiBold" />
+                                </StackPanel>
+                                <TextBlock Text="확장자 무관하게 모든 파일의 중복 탐지 (해시 기반)"
+                                           Style="{StaticResource Caption}" Margin="26,2,0,0" />
+                            </StackPanel>
+                        </CheckBox>
+
+                        <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,12" />
+
+                        <TextBlock Text="유사도 비교 대상"
+                                   Style="{StaticResource Caption}"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,8" />
+
                         <CheckBox IsChecked="{Binding ScanImages}"
                                   Margin="0,0,0,8">
                             <StackPanel Orientation="Horizontal">

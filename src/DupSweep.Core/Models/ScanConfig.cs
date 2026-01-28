@@ -19,8 +19,9 @@ public class ScanConfig
     public bool MatchModifiedDate { get; set; } = false;       // 수정일 일치 필요
 
     // 스캔 대상 파일 유형
-    public bool ScanImages { get; set; } = true;  // 이미지 스캔
-    public bool ScanVideos { get; set; } = true;  // 비디오 스캔
+    public bool ScanAllFiles { get; set; } = true;  // 모든 파일 스캔 (해시 기반 중복 탐지)
+    public bool ScanImages { get; set; } = true;    // 이미지 스캔 (유사도 비교용)
+    public bool ScanVideos { get; set; } = true;    // 비디오 스캔 (유사도 비교용)
 
     // 유사도 임계값 (0-100)
     public double ImageSimilarityThreshold { get; set; } = 85;
@@ -43,9 +44,16 @@ public class ScanConfig
 
     /// <summary>
     /// 현재 설정에서 지원하는 파일 확장자 목록 반환
+    /// ScanAllFiles가 true면 빈 리스트 반환 (모든 파일 스캔)
     /// </summary>
     public IEnumerable<string> GetSupportedExtensions()
     {
+        // 모든 파일 스캔 시 빈 리스트 반환 (FileScanner에서 확장자 필터 건너뜀)
+        if (ScanAllFiles)
+        {
+            return Enumerable.Empty<string>();
+        }
+
         var extensions = new List<string>();
 
         if (ScanImages)
@@ -60,4 +68,20 @@ public class ScanConfig
 
         return extensions;
     }
+
+    /// <summary>
+    /// 이미지 확장자 목록 (유사도 비교용)
+    /// </summary>
+    public static IReadOnlyList<string> ImageExtensions { get; } = new[]
+    {
+        ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".tiff", ".ico", ".heic", ".heif"
+    };
+
+    /// <summary>
+    /// 비디오 확장자 목록 (유사도 비교용)
+    /// </summary>
+    public static IReadOnlyList<string> VideoExtensions { get; } = new[]
+    {
+        ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".3gp"
+    };
 }

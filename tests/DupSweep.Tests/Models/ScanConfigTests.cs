@@ -19,6 +19,7 @@ public class ScanConfigTests
         Assert.True(config.UseVideoSimilarity);
         Assert.False(config.MatchCreatedDate);
         Assert.False(config.MatchModifiedDate);
+        Assert.True(config.ScanAllFiles); // 기본값: 모든 파일 스캔
         Assert.True(config.ScanImages);
         Assert.True(config.ScanVideos);
         Assert.Equal(85, config.ImageSimilarityThreshold);
@@ -38,6 +39,7 @@ public class ScanConfigTests
         // Arrange
         var config = new ScanConfig
         {
+            ScanAllFiles = false, // 확장자 필터링 활성화
             ScanImages = true,
             ScanVideos = true
         };
@@ -61,6 +63,7 @@ public class ScanConfigTests
         // Arrange
         var config = new ScanConfig
         {
+            ScanAllFiles = false, // 확장자 필터링 활성화
             ScanImages = true,
             ScanVideos = false
         };
@@ -81,6 +84,7 @@ public class ScanConfigTests
         // Arrange
         var config = new ScanConfig
         {
+            ScanAllFiles = false, // 확장자 필터링 활성화
             ScanImages = false,
             ScanVideos = true
         };
@@ -101,6 +105,7 @@ public class ScanConfigTests
         // Arrange
         var config = new ScanConfig
         {
+            ScanAllFiles = false, // 확장자 필터링 활성화
             ScanImages = false,
             ScanVideos = false
         };
@@ -116,7 +121,7 @@ public class ScanConfigTests
     public void GetSupportedExtensions_IncludesAllImageFormats()
     {
         // Arrange
-        var config = new ScanConfig { ScanImages = true, ScanVideos = false };
+        var config = new ScanConfig { ScanAllFiles = false, ScanImages = true, ScanVideos = false };
         var expectedFormats = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".tiff", ".ico", ".heic", ".heif" };
 
         // Act
@@ -133,7 +138,7 @@ public class ScanConfigTests
     public void GetSupportedExtensions_IncludesAllVideoFormats()
     {
         // Arrange
-        var config = new ScanConfig { ScanImages = false, ScanVideos = true };
+        var config = new ScanConfig { ScanAllFiles = false, ScanImages = false, ScanVideos = true };
         var expectedFormats = new[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".3gp" };
 
         // Act
