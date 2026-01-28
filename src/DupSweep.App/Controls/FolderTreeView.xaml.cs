@@ -5,6 +5,10 @@ using DupSweep.App.ViewModels;
 
 namespace DupSweep.App.Controls;
 
+/// <summary>
+/// 폴더 트리 시각화 컨트롤 코드비하인드
+/// 바 세그먼트 클릭 및 브레드크럼 네비게이션 처리
+/// </summary>
 public partial class FolderTreeView : UserControl
 {
     public FolderTreeView()

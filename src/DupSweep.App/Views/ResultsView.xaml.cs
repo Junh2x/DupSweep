@@ -5,6 +5,10 @@ using DupSweep.App.ViewModels;
 
 namespace DupSweep.App.Views;
 
+/// <summary>
+/// 결과 화면 코드비하인드
+/// 파일 카드 클릭 이벤트 처리
+/// </summary>
 public partial class ResultsView : UserControl
 {
     public ResultsView()

@@ -4,11 +4,19 @@ using DupSweep.Core.Services.Interfaces;
 
 namespace DupSweep.Infrastructure.Hashing;
 
+/// <summary>
+/// 해시 계산 서비스 구현
+/// XxHash64 (빠른 해시) 및 BLAKE3 (전체 해시) 알고리즘 사용
+/// </summary>
 public class HashService : IHashService
 {
-    private const int QuickHashSize = 64 * 1024;
-    private const int BufferSize = 16 * 1024;
+    private const int QuickHashSize = 64 * 1024;  // 빠른 해시용 64KB
+    private const int BufferSize = 16 * 1024;     // 읽기 버퍼 16KB
 
+    /// <summary>
+    /// 빠른 해시 계산 (파일 앞부분 64KB만 사용)
+    /// XxHash64 알고리즘으로 빠른 비교용 해시 생성
+    /// </summary>
     public async Task<string> ComputeQuickHashAsync(string filePath, CancellationToken cancellationToken)
     {
         await using var stream = new FileStream(
@@ -27,6 +35,10 @@ public class HashService : IHashService
         return Convert.ToHexString(hasher.GetCurrentHash());
     }
 
+    /// <summary>
+    /// 전체 해시 계산 (파일 전체 사용)
+    /// BLAKE3 알고리즘으로 정확한 비교용 해시 생성
+    /// </summary>
     public async Task<string> ComputeFullHashAsync(string filePath, CancellationToken cancellationToken)
     {
         await using var stream = new FileStream(

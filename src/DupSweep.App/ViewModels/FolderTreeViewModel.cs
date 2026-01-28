@@ -5,6 +5,10 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace DupSweep.App.ViewModels;
 
+/// <summary>
+/// 폴더 트리 분석 ViewModel
+/// 폴더 용량을 계층적 바 차트로 시각화 (드릴다운 지원)
+/// </summary>
 public partial class FolderTreeViewModel : ObservableObject
 {
     private const int MaxDepth = 5;
@@ -600,6 +604,9 @@ public partial class FolderTreeViewModel : ObservableObject
     }
 }
 
+/// <summary>
+/// 바 차트 레벨 (폴더 깊이별 바 집합)
+/// </summary>
 public partial class BarLevel : ObservableObject
 {
     [ObservableProperty]
@@ -609,6 +616,9 @@ public partial class BarLevel : ObservableObject
     private ObservableCollection<FolderBarItem> _items = new();
 }
 
+/// <summary>
+/// 폴더 바 항목 (개별 폴더의 시각화 데이터)
+/// </summary>
 public partial class FolderBarItem : ObservableObject
 {
     [ObservableProperty]
@@ -661,6 +671,9 @@ public partial class FolderBarItem : ObservableObject
     public string TooltipText => $"{Name}\n{FormattedSize} ({PercentOfTotal:0.1}%)";
 }
 
+/// <summary>
+/// 브레드크럼 항목 (현재 탐색 경로 표시)
+/// </summary>
 public partial class BreadcrumbItem : ObservableObject
 {
     [ObservableProperty]
@@ -673,6 +686,9 @@ public partial class BreadcrumbItem : ObservableObject
     private int _depth;
 }
 
+/// <summary>
+/// 파일 정보 항목 (폴더 내 파일 목록용)
+/// </summary>
 public partial class FileInfoItem : ObservableObject
 {
     [ObservableProperty]

@@ -6,6 +6,10 @@ using DupSweep.Core.Services.Interfaces;
 
 namespace DupSweep.Core.Services;
 
+/// <summary>
+/// 중복 파일 스캔 서비스
+/// 파일 탐색, 해시 계산, 중복 탐지, 썸네일 생성 등 전체 스캔 프로세스 관리
+/// </summary>
 public class ScanService : IScanService
 {
     private readonly IHashService _hashService;
@@ -16,6 +20,7 @@ public class ScanService : IScanService
     private readonly DuplicateDetector _duplicateDetector = new();
     private readonly object _stateLock = new();
 
+    // 스캔 상태 관리
     private CancellationTokenSource? _cts;
     private ManualResetEventSlim _pauseEvent = new(true);
     private IProgress<ScanProgress>? _progress;
@@ -33,6 +38,9 @@ public class ScanService : IScanService
     public bool IsRunning => _isRunning;
     public bool IsPaused => _isPaused;
 
+    /// <summary>
+    /// 스캔 시작 (비동기)
+    /// </summary>
     public Task<ScanResult> StartScanAsync(ScanConfig config, IProgress<ScanProgress> progress)
     {
         lock (_stateLock)
@@ -52,6 +60,9 @@ public class ScanService : IScanService
         return Task.Run(() => RunScanAsync(config, _cts.Token));
     }
 
+    /// <summary>
+    /// 스캔 일시 정지
+    /// </summary>
     public void Pause()
     {
         if (!_isRunning)
@@ -63,6 +74,9 @@ public class ScanService : IScanService
         _pauseEvent.Reset();
     }
 
+    /// <summary>
+    /// 스캔 재개
+    /// </summary>
     public void Resume()
     {
         if (!_isRunning)
@@ -74,6 +88,9 @@ public class ScanService : IScanService
         _pauseEvent.Set();
     }
 
+    /// <summary>
+    /// 스캔 취소
+    /// </summary>
     public void Cancel()
     {
         if (!_isRunning)
@@ -84,6 +101,9 @@ public class ScanService : IScanService
         _cts?.Cancel();
     }
 
+    /// <summary>
+    /// 실제 스캔 실행 로직
+    /// </summary>
     private async Task<ScanResult> RunScanAsync(ScanConfig config, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -97,6 +117,7 @@ public class ScanService : IScanService
         {
             ReportProgress(ScanPhase.Initializing, 0, 0, string.Empty, 0, 0, stopwatch);
 
+            // 1단계: 파일 스캔
             var scannedFiles = new List<FileEntry>();
             int scannedCount = 0;
 
@@ -143,24 +164,22 @@ public class ScanService : IScanService
                 Console.WriteLine($"[ScanService] Resolution extraction done for {mediaFiles.Count} files");
             }
 
-            // 용량 또는 해시 기반 중복 탐지
+            // 2단계: 용량 또는 해시 기반 중복 탐지
             if (config.UseSizeComparison || config.UseHashComparison)
             {
                 ReportProgress(ScanPhase.Hashing, 0, scannedFiles.Count, string.Empty, 0, 0, stopwatch);
 
-                // 1단계: 용량으로 그룹화
+                // 용량/해상도로 후보 그룹화
                 IEnumerable<IGrouping<object, FileEntry>> candidateGroups;
 
                 if (config.UseResolutionComparison)
                 {
-                    // 용량 + 해상도로 그룹화
                     candidateGroups = scannedFiles
                         .GroupBy(f => (object)(f.Size, f.Width, f.Height))
                         .Where(g => g.Count() > 1);
                 }
                 else
                 {
-                    // 용량으로만 그룹화
                     candidateGroups = scannedFiles
                         .GroupBy(f => (object)f.Size)
                         .Where(g => g.Count() > 1);
@@ -188,12 +207,13 @@ public class ScanService : IScanService
                         .ToList();
                 }
 
-                // 해시 비교가 활성화된 경우에만 해시 계산
+                // 해시 비교 수행
                 if (config.UseHashComparison && candidates.Count > 0)
                 {
                     Console.WriteLine($"[ScanService] Computing hashes for {candidates.Count} candidates");
                     int processed = 0;
 
+                    // 빠른 해시(QuickHash) 계산
                     await Parallel.ForEachAsync(
                         candidates,
                         new ParallelOptions { MaxDegreeOfParallelism = parallelism, CancellationToken = cancellationToken },
@@ -217,6 +237,7 @@ public class ScanService : IScanService
                             }
                         });
 
+                    // 빠른 해시가 일치하는 후보 추출
                     var quickGroups = candidates
                         .Where(f => !string.IsNullOrWhiteSpace(f.QuickHash))
                         .GroupBy(f => (f.Size, f.QuickHash))
@@ -224,6 +245,7 @@ public class ScanService : IScanService
                         .SelectMany(g => g)
                         .ToList();
 
+                    // 전체 해시(FullHash) 계산
                     processed = 0;
                     await Parallel.ForEachAsync(
                         quickGroups,
@@ -284,6 +306,7 @@ public class ScanService : IScanService
                 }
             }
 
+            // 3단계: 이미지 유사도 비교
             if (config.UseImageSimilarity && config.ScanImages)
             {
                 Console.WriteLine("[ScanService] Starting image similarity comparison...");
@@ -311,9 +334,9 @@ public class ScanService : IScanService
                 Console.WriteLine("[ScanService] Image similarity done");
             }
 
+            // 4단계: 비디오 유사도 비교
             if (config.UseVideoSimilarity && config.ScanVideos)
             {
-                // FFmpeg 존재 여부 확인
                 bool hasFfmpeg = !string.IsNullOrWhiteSpace(config.FfmpegPath) && File.Exists(config.FfmpegPath);
                 if (!hasFfmpeg)
                 {
@@ -348,6 +371,7 @@ public class ScanService : IScanService
                 }
             }
 
+            // 5단계: 썸네일 생성
             Console.WriteLine($"[ScanService] All comparisons done. Groups found: {duplicateGroups.Count}");
             Console.WriteLine($"[ScanService] Starting thumbnail generation for {duplicateGroups.Count} groups");
             await GenerateThumbnailsAsync(duplicateGroups, config, cancellationToken, stopwatch);
@@ -391,6 +415,9 @@ public class ScanService : IScanService
         return result;
     }
 
+    /// <summary>
+    /// 진행 상황 보고
+    /// </summary>
     private void ReportProgress(ScanPhase phase, int processedFiles, int totalFiles, string currentFile, int duplicateGroups, long potentialSavings, Stopwatch stopwatch)
     {
         _progress?.Report(new ScanProgress
@@ -407,6 +434,9 @@ public class ScanService : IScanService
         });
     }
 
+    /// <summary>
+    /// 중복 그룹 파일들의 썸네일 생성
+    /// </summary>
     private async Task GenerateThumbnailsAsync(IEnumerable<DuplicateGroup> groups, ScanConfig config, CancellationToken cancellationToken, Stopwatch stopwatch)
     {
         var files = groups.SelectMany(g => g.Files)
@@ -439,11 +469,13 @@ public class ScanService : IScanService
             byte[]? thumbnail = null;
             try
             {
+                // 캐시에서 먼저 확인
                 if (_thumbnailCache != null)
                 {
                     thumbnail = await _thumbnailCache.TryGetAsync(file.FilePath, file.Size, file.ModifiedDate, cancellationToken);
                 }
 
+                // 캐시에 없으면 새로 생성
                 if (thumbnail == null)
                 {
                     if (file.FileType == FileType.Image)
@@ -455,6 +487,7 @@ public class ScanService : IScanService
                         thumbnail = await _videoProcessor.CreateThumbnailAsync(file.FilePath, config, cancellationToken);
                     }
 
+                    // 생성된 썸네일을 캐시에 저장
                     if (thumbnail != null && _thumbnailCache != null)
                     {
                         await _thumbnailCache.SaveAsync(file.FilePath, file.Size, file.ModifiedDate, thumbnail, cancellationToken);

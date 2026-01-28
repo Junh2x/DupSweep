@@ -3,6 +3,10 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace DupSweep.App.ViewModels;
 
+/// <summary>
+/// 스캔 진행 화면 ViewModel
+/// 스캔 진행률, 상태 메시지, 일시정지/취소 기능 제공
+/// </summary>
 public partial class ScanViewModel : ObservableObject
 {
     [ObservableProperty]

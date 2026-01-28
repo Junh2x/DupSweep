@@ -7,6 +7,14 @@ using System.Windows.Media.Imaging;
 
 namespace DupSweep.App.Converters;
 
+/// <summary>
+/// XAML 바인딩용 값 변환기 모음
+/// Bool, Int, 바이트배열 등을 Visibility, ImageSource 등으로 변환
+/// </summary>
+
+/// <summary>
+/// bool을 Visibility로 변환 (true → Visible)
+/// </summary>
 public class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -20,6 +28,9 @@ public class BoolToVisibilityConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// bool을 Visibility로 변환 (false → Visible)
+/// </summary>
 public class InverseBoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -33,6 +44,9 @@ public class InverseBoolToVisibilityConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// bool 값 반전
+/// </summary>
 public class InverseBoolConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -46,6 +60,9 @@ public class InverseBoolConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// int를 Visibility로 변환 (0보다 크면 Visible)
+/// </summary>
 public class IntToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -124,6 +141,9 @@ public class InverseNullToVisibilityConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// 바이트 배열을 BitmapImage로 변환 (썸네일 표시용)
+/// </summary>
 public class ByteArrayToImageSourceConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -149,6 +169,9 @@ public class ByteArrayToImageSourceConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// 파일 크기(바이트)를 읽기 쉬운 문자열로 변환 (KB, MB, GB 등)
+/// </summary>
 public class FileSizeConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -175,6 +198,9 @@ public class FileSizeConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// 전체 경로에서 폴더명만 추출
+/// </summary>
 public class PathToFolderNameConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -243,6 +269,9 @@ public class BoolToOpacityConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// 사용량 비율을 색상으로 변환 (정상/경고/위험)
+/// </summary>
 public class UsageToColorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -294,6 +323,9 @@ public class InverseBooleanConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// 퍼센트를 Canvas.Left 위치로 변환 (바 차트용)
+/// </summary>
 public class PercentToCanvasLeftConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -311,6 +343,9 @@ public class PercentToCanvasLeftConverter : IMultiValueConverter
     }
 }
 
+/// <summary>
+/// 퍼센트를 너비로 변환 (바 차트용)
+/// </summary>
 public class PercentToWidthMultiConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

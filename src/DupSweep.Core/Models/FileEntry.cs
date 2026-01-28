@@ -1,7 +1,12 @@
 namespace DupSweep.Core.Models;
 
+/// <summary>
+/// 스캔된 파일 정보를 담는 모델 클래스
+/// 파일 경로, 크기, 해시값, 썸네일 등 중복 탐지에 필요한 모든 정보 포함
+/// </summary>
 public class FileEntry
 {
+    // 기본 파일 정보
     public string FilePath { get; set; } = string.Empty;
     public string FileName { get; set; } = string.Empty;
     public string Directory { get; set; } = string.Empty;
@@ -11,20 +16,23 @@ public class FileEntry
     public DateTime ModifiedDate { get; set; }
     public FileType FileType { get; set; }
 
-    // Resolution (for images/videos)
+    // 이미지/비디오 해상도
     public int Width { get; set; }
     public int Height { get; set; }
 
-    // Hash values (computed on demand)
-    public string? QuickHash { get; set; }
-    public string? FullHash { get; set; }
-    public ulong? PerceptualHash { get; set; }
-    public ulong? AudioFingerprint { get; set; }
+    // 해시값 (필요 시 계산)
+    public string? QuickHash { get; set; }      // 빠른 비교용 부분 해시
+    public string? FullHash { get; set; }       // 정확한 비교용 전체 해시
+    public ulong? PerceptualHash { get; set; }  // 이미지/비디오 유사도 비교용 지각 해시
+    public ulong? AudioFingerprint { get; set; } // 오디오 유사도 비교용 핑거프린트
 
-    // Thumbnail
+    // 썸네일 정보
     public string? ThumbnailPath { get; set; }
     public byte[]? ThumbnailData { get; set; }
 
+    /// <summary>
+    /// 파일 경로로부터 FileEntry 객체 생성
+    /// </summary>
     public static FileEntry FromPath(string path)
     {
         var fileInfo = new FileInfo(path);
@@ -41,6 +49,9 @@ public class FileEntry
         };
     }
 
+    /// <summary>
+    /// 확장자로 파일 유형 판별
+    /// </summary>
     private static FileType GetFileType(string extension)
     {
         return extension.ToLowerInvariant() switch
@@ -53,10 +64,13 @@ public class FileEntry
     }
 }
 
+/// <summary>
+/// 파일 유형 열거형
+/// </summary>
 public enum FileType
 {
-    Image,
-    Video,
-    Audio,
-    Other
+    Image,  // 이미지 파일
+    Video,  // 비디오 파일
+    Audio,  // 오디오 파일
+    Other   // 기타 파일
 }
