@@ -15,4 +15,14 @@ public interface IThumbnailCache
     /// 캐시에 썸네일 저장
     /// </summary>
     Task SaveAsync(string filePath, long fileSize, DateTime lastWriteTime, byte[] data, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// 캐시 파일 크기 조회 (바이트)
+    /// </summary>
+    long GetCacheSize();
+
+    /// <summary>
+    /// 캐시 전체 삭제
+    /// </summary>
+    void ClearCache();
 }

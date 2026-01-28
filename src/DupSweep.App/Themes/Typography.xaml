@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Font Family -->
-    <FontFamily x:Key="PrimaryFont">Segoe UI, Microsoft Sans Serif, Arial</FontFamily>
+    <FontFamily x:Key="PrimaryFont">pack://application:,,,/Fonts/#Pretendard</FontFamily>
     <FontFamily x:Key="MonospaceFont">Cascadia Code, Consolas, Courier New</FontFamily>
 
     <!-- Headline Styles -->
