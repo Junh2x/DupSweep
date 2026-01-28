@@ -110,6 +110,29 @@
                 </StackPanel>
             </materialDesign:Card>
 
+            <!-- Cache Management -->
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+                <StackPanel Margin="16">
+                    <TextBlock Text="캐시 관리"
+                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Margin="0,0,0,16" />
+
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Content="캐시 삭제"
+                                Command="{Binding ClearCacheCommand}"
+                                Foreground="{StaticResource ErrorBrush}" />
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="썸네일 캐시 크기" />
+                            <TextBlock Text="{Binding CacheSize}"
+                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                       Opacity="0.6" />
+                        </StackPanel>
+                    </DockPanel>
+                </StackPanel>
+            </materialDesign:Card>
+
             <!-- Reset -->
             <Button Content="기본값으로 초기화"
                     Style="{StaticResource MaterialDesignOutlinedButton}"

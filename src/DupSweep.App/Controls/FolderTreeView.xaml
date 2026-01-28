@@ -146,8 +146,8 @@
                                                                 <StackPanel>
                                                                     <TextBlock Text="{Binding Name}" FontWeight="Bold" />
                                                                     <TextBlock>
-                                                                        <Run Text="{Binding FormattedSize}" />
-                                                                        <Run Text=" (" /><Run Text="{Binding PercentOfTotal, StringFormat={}{0:0.1}%}" /><Run Text=")" />
+                                                                        <Run Text="{Binding FormattedSize, Mode=OneWay}" />
+                                                                        <Run Text=" (" /><Run Text="{Binding PercentOfTotal, StringFormat={}{0:0.1}%, Mode=OneWay}" /><Run Text=")" />
                                                                     </TextBlock>
                                                                 </StackPanel>
                                                             </ToolTip>

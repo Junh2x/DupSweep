@@ -168,9 +168,9 @@
                                                             <TextBlock Text="{Binding FileName}" FontSize="10" FontWeight="Medium"
                                                                        TextTrimming="CharacterEllipsis" ToolTip="{Binding FileName}" />
                                                             <TextBlock FontSize="9" Opacity="0.6">
-                                                                <Run Text="{Binding FormattedSize}" />
+                                                                <Run Text="{Binding FormattedSize, Mode=OneWay}" />
                                                                 <Run Text="·" />
-                                                                <Run Text="{Binding ModifiedDate, StringFormat={}{0:yy-MM-dd}}" />
+                                                                <Run Text="{Binding ModifiedDate, StringFormat={}{0:yy-MM-dd}, Mode=OneWay}" />
                                                             </TextBlock>
                                                         </StackPanel>
                                                     </Grid>
