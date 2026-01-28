@@ -7,11 +7,15 @@ using DupSweep.Core.Models;
 
 namespace DupSweep.Core.Processors;
 
+/// <summary>
+/// 이미지 처리기
+/// ImageSharp 라이브러리를 사용하여 이미지 분석 및 처리
+/// </summary>
 public class ImageProcessor : IImageProcessor
 {
     /// <summary>
-    /// dHash(Difference Hash) 알고리즘으로 이미지 해시를 계산합니다.
-    /// aHash보다 구조적 차이 감지에 우수하며, 색상만 비슷한 이미지의 오탐을 줄입니다.
+    /// dHash(Difference Hash) 알고리즘으로 이미지 지각 해시 계산
+    /// aHash보다 구조적 차이 감지에 우수하며, 색상만 비슷한 이미지의 오탐을 줄임
     /// </summary>
     public async Task<ulong?> ComputePerceptualHashAsync(string filePath, ScanConfig config, CancellationToken cancellationToken)
     {
@@ -49,6 +53,9 @@ public class ImageProcessor : IImageProcessor
         }
     }
 
+    /// <summary>
+    /// 이미지 썸네일 생성
+    /// </summary>
     public async Task<byte[]?> CreateThumbnailAsync(string filePath, ScanConfig config, CancellationToken cancellationToken)
     {
         try
@@ -71,6 +78,9 @@ public class ImageProcessor : IImageProcessor
         }
     }
 
+    /// <summary>
+    /// 이미지 해상도(너비, 높이) 추출
+    /// </summary>
     public async Task<(int Width, int Height)> GetImageResolutionAsync(string filePath, CancellationToken cancellationToken)
     {
         try

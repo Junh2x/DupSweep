@@ -6,6 +6,10 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace DupSweep.App.ViewModels;
 
+/// <summary>
+/// 스캔 결과 화면 ViewModel
+/// 중복 파일 그룹 표시, 파일 선택, 삭제 기능 제공
+/// </summary>
 public partial class ResultsViewModel : ObservableObject
 {
     [ObservableProperty]
@@ -347,6 +351,10 @@ public partial class ResultsViewModel : ObservableObject
     }
 }
 
+/// <summary>
+/// 중복 파일 그룹 ViewModel
+/// 동일/유사 파일 그룹의 표시 및 선택 로직 담당
+/// </summary>
 public partial class DuplicateGroupViewModel : ObservableObject
 {
     [ObservableProperty]
@@ -478,6 +486,10 @@ public partial class DuplicateGroupViewModel : ObservableObject
     }
 }
 
+/// <summary>
+/// 파일 항목 ViewModel
+/// 개별 파일의 정보 및 선택 상태 관리
+/// </summary>
 public partial class FileItemViewModel : ObservableObject
 {
     [ObservableProperty]

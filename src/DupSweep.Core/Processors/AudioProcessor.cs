@@ -4,17 +4,26 @@ using DupSweep.Core.Models;
 
 namespace DupSweep.Core.Processors;
 
+/// <summary>
+/// 오디오 처리기
+/// FFmpeg를 사용하여 PCM 추출 후 XxHash64로 핑거프린트 생성
+/// </summary>
 public class AudioProcessor : IAudioProcessor
 {
-    private const int SampleRate = 8000;
-    private const int Channels = 1;
-    private const int BytesPerSample = 2;
-    private const int SegmentSeconds = 1;
-    private const int MaxSeconds = 60;
+    // PCM 변환 설정
+    private const int SampleRate = 8000;    // 샘플레이트 (Hz)
+    private const int Channels = 1;          // 모노 채널
+    private const int BytesPerSample = 2;    // 16비트 샘플
+    private const int SegmentSeconds = 1;    // 세그먼트 단위 (초)
+    private const int MaxSeconds = 60;       // 최대 분석 길이 (초)
 
+    /// <summary>
+    /// 오디오 핑거프린트 계산
+    /// 오디오를 PCM으로 변환 후 XxHash64로 해시
+    /// </summary>
     public async Task<ulong?> ComputeFingerprintAsync(string filePath, ScanConfig config, CancellationToken cancellationToken)
     {
-        // FFmpeg가 없으면 건너뛰기
+        // FFmpeg 존재 확인
         var ffmpeg = ResolveFfmpegPath(config);
         if (!File.Exists(ffmpeg) && !IsToolInPath(ffmpeg))
         {
@@ -26,11 +35,13 @@ public class AudioProcessor : IAudioProcessor
 
         try
         {
+            // 오디오를 PCM으로 변환
             if (!ExtractPcm(filePath, pcmPath, config))
             {
                 return null;
             }
 
+            // PCM 데이터 해싱
             await using var stream = new FileStream(pcmPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var segmentBytes = SampleRate * Channels * BytesPerSample * SegmentSeconds;
             var buffer = new byte[segmentBytes];
@@ -64,6 +75,9 @@ public class AudioProcessor : IAudioProcessor
         }
     }
 
+    /// <summary>
+    /// FFmpeg로 오디오를 PCM으로 변환
+    /// </summary>
     private static bool ExtractPcm(string filePath, string outputPath, ScanConfig config)
     {
         var ffmpeg = ResolveFfmpegPath(config);
@@ -93,10 +107,7 @@ public class AudioProcessor : IAudioProcessor
                 Directory.Delete(tempDir, true);
             }
         }
-        catch
-        {
-            // ignore cleanup failures
-        }
+        catch { }
     }
 
     private static string ResolveFfmpegPath(ScanConfig config)
@@ -104,6 +115,9 @@ public class AudioProcessor : IAudioProcessor
         return ResolveToolPath(config.FfmpegPath, "ffmpeg.exe", "ffmpeg");
     }
 
+    /// <summary>
+    /// 외부 도구 경로 해석 (설정 > 번들 > PATH)
+    /// </summary>
     private static string ResolveToolPath(string? overridePath, string exeName, string fallbackName)
     {
         if (!string.IsNullOrWhiteSpace(overridePath) && File.Exists(overridePath))
