@@ -38,6 +38,7 @@
             <converters:PercentToCanvasLeftConverter x:Key="PercentToCanvasLeftConverter" />
             <converters:PercentToWidthMultiConverter x:Key="PercentToWidthMultiConverter" />
             <converters:LessThanConverter x:Key="LessThanConverter" />
+            <converters:FilePathToThumbnailConverter x:Key="FilePathToThumbnailConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -20,6 +20,24 @@ public class FileEntry
     public int Width { get; set; }
     public int Height { get; set; }
 
+    // 계산된 프로퍼티
+    public string Resolution => Width > 0 && Height > 0 ? $"{Width}×{Height}" : "-";
+    public string FormattedSize
+    {
+        get
+        {
+            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            int order = 0;
+            double size = Size;
+            while (size >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                size /= 1024;
+            }
+            return $"{size:0.##} {sizes[order]}";
+        }
+    }
+
     // 해시값 (필요 시 계산)
     public string? QuickHash { get; set; }      // 빠른 비교용 부분 해시
     public string? FullHash { get; set; }       // 정확한 비교용 전체 해시

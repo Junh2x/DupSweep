@@ -1,9 +1,12 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Interop;
 
 namespace DupSweep.App.Converters;
 
@@ -378,4 +381,101 @@ public class LessThanConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
+}
+
+/// <summary>
+/// 파일 경로에서 Windows Shell 썸네일을 가져오는 변환기
+/// Windows 탐색기가 캐시한 썸네일을 직접 사용하여 빠름
+/// </summary>
+public class FilePathToThumbnailConverter : IValueConverter
+{
+    private static readonly ConcurrentDictionary<string, BitmapSource?> _cache = new();
+    private const int ThumbnailSize = 96;
+
+    public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is not string filePath || string.IsNullOrEmpty(filePath))
+            return null;
+
+        // 캐시 확인
+        if (_cache.TryGetValue(filePath, out var cached))
+            return cached;
+
+        // Shell 썸네일 가져오기
+        var thumbnail = GetShellThumbnail(filePath, ThumbnailSize);
+        _cache.TryAdd(filePath, thumbnail);
+        return thumbnail;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static BitmapSource? GetShellThumbnail(string filePath, int size)
+    {
+        IntPtr hBitmap = IntPtr.Zero;
+        try
+        {
+            var hr = SHCreateItemFromParsingName(filePath, IntPtr.Zero, typeof(IShellItemImageFactory).GUID, out var shellItem);
+            if (hr != 0 || shellItem == null)
+                return null;
+
+            var imageFactory = (IShellItemImageFactory)shellItem;
+            var requestedSize = new SIZE { cx = size, cy = size };
+
+            // SIIGBF_THUMBNAILONLY (0x01) | SIIGBF_BIGGERSIZEOK (0x08)
+            hr = imageFactory.GetImage(requestedSize, 0x01 | 0x08, out hBitmap);
+            if (hr != 0 || hBitmap == IntPtr.Zero)
+                return null;
+
+            var bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
+                hBitmap,
+                IntPtr.Zero,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+            bitmapSource.Freeze();
+            return bitmapSource;
+        }
+        catch
+        {
+            return null;
+        }
+        finally
+        {
+            if (hBitmap != IntPtr.Zero)
+                DeleteObject(hBitmap);
+        }
+    }
+
+    #region Native Methods
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = true)]
+    private static extern int SHCreateItemFromParsingName(
+        [MarshalAs(UnmanagedType.LPWStr)] string pszPath,
+        IntPtr pbc,
+        [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+        [MarshalAs(UnmanagedType.Interface)] out object ppv);
+
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool DeleteObject(IntPtr hObject);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct SIZE
+    {
+        public int cx;
+        public int cy;
+    }
+
+    [ComImport]
+    [Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IShellItemImageFactory
+    {
+        [PreserveSig]
+        int GetImage([In] SIZE size, [In] int flags, out IntPtr phbm);
+    }
+
+    #endregion
 }
