@@ -96,6 +96,7 @@ public partial class ResultsViewModel : ObservableObject
                     FilePath = file.FilePath,
                     Size = file.Size,
                     ModifiedDate = file.ModifiedDate,
+                    CreatedDate = file.CreatedDate,
                     ThumbnailPath = file.ThumbnailPath,
                     ThumbnailData = file.ThumbnailData,
                     Width = file.Width,
@@ -203,6 +204,19 @@ public partial class ResultsViewModel : ObservableObject
             SelectHighestResolution();
         else if (AutoSelectLowRes)
             SelectLowestResolution();
+    }
+
+    [RelayCommand]
+    private void ClearSelection()
+    {
+        foreach (var group in DuplicateGroups)
+        {
+            foreach (var file in group.Files)
+            {
+                file.IsSelected = false;
+            }
+        }
+        UpdateSelectionStats();
     }
 
     [RelayCommand]
@@ -519,7 +533,11 @@ public partial class FileItemViewModel : ObservableObject
     [ObservableProperty]
     private int _height;
 
+    [ObservableProperty]
+    private DateTime _createdDate;
+
     public string FormattedSize => FormatFileSize(Size);
+    public string Resolution => Width > 0 && Height > 0 ? $"{Width}×{Height}" : "-";
 
     private static string FormatFileSize(long bytes)
     {

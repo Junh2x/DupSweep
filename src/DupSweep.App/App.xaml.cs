@@ -8,6 +8,7 @@ using DupSweep.Core.Services;
 using DupSweep.Core.Services.Interfaces;
 using DupSweep.Infrastructure.DependencyInjection;
 using DupSweep.Infrastructure.Logging;
+using DupSweep.Infrastructure.Processors;
 
 namespace DupSweep.App;
 
@@ -92,7 +93,7 @@ public partial class App : Application
 
         // Core services
         services.AddSingleton<IScanService, ScanService>();
-        services.AddSingleton<IImageProcessor, ImageProcessor>();
+        services.AddSingleton<IImageProcessor, ShellImageProcessor>();
         services.AddSingleton<IVideoProcessor, VideoProcessor>();
     }
 }

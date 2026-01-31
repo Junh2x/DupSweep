@@ -270,7 +270,9 @@ public class ScanService : IScanService
                             }
                         });
 
+                    Console.WriteLine("[ScanService] Hashing complete, finding exact matches...");
                     duplicateGroups.AddRange(_duplicateDetector.FindExactMatches(quickGroups, config));
+                    Console.WriteLine($"[ScanService] Exact matches found: {duplicateGroups.Count} groups");
                 }
                 else if (!config.UseHashComparison && candidates.Count > 0)
                 {
@@ -307,6 +309,7 @@ public class ScanService : IScanService
             }
 
             // 3단계: 이미지 유사도 비교
+            Console.WriteLine($"[ScanService] Step 3: UseImageSimilarity={config.UseImageSimilarity}, ScanImages={config.ScanImages}");
             if (config.UseImageSimilarity && config.ScanImages)
             {
                 Console.WriteLine("[ScanService] Starting image similarity comparison...");
@@ -335,6 +338,7 @@ public class ScanService : IScanService
             }
 
             // 4단계: 비디오 유사도 비교
+            Console.WriteLine($"[ScanService] Step 4: UseVideoSimilarity={config.UseVideoSimilarity}, ScanVideos={config.ScanVideos}");
             if (config.UseVideoSimilarity && config.ScanVideos)
             {
                 bool hasFfmpeg = !string.IsNullOrWhiteSpace(config.FfmpegPath) && File.Exists(config.FfmpegPath);
@@ -371,11 +375,8 @@ public class ScanService : IScanService
                 }
             }
 
-            // 5단계: 썸네일 생성
+            // 썸네일은 UI에서 필요할 때 Windows Shell에서 직접 가져옴
             Console.WriteLine($"[ScanService] All comparisons done. Groups found: {duplicateGroups.Count}");
-            Console.WriteLine($"[ScanService] Starting thumbnail generation for {duplicateGroups.Count} groups");
-            await GenerateThumbnailsAsync(duplicateGroups, config, cancellationToken, stopwatch);
-            Console.WriteLine("[ScanService] Thumbnail generation completed");
 
             var potentialSavings = duplicateGroups.Sum(g => g.PotentialSavings);
             ReportProgress(ScanPhase.Comparing, scannedFiles.Count, scannedFiles.Count, string.Empty, duplicateGroups.Count, potentialSavings, stopwatch);
