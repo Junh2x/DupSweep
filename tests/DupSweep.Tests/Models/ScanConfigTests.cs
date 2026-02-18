@@ -12,11 +12,11 @@ public class ScanConfigTests
 
         // Assert
         Assert.Empty(config.Directories);
-        Assert.True(config.UseHashComparison);
-        Assert.True(config.UseSizeComparison);
+        Assert.False(config.UseHashComparison);
+        Assert.False(config.UseSizeComparison);
         Assert.False(config.UseResolutionComparison);
-        Assert.True(config.UseImageSimilarity);
-        Assert.True(config.UseVideoSimilarity);
+        Assert.False(config.UseImageSimilarity);
+        Assert.False(config.UseVideoSimilarity);
         Assert.False(config.MatchCreatedDate);
         Assert.False(config.MatchModifiedDate);
         Assert.True(config.ScanAllFiles); // 기본값: 모든 파일 스캔

@@ -1,9 +1,12 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using DupSweep.App.Messages;
+using DupSweep.Core.Logging;
+using DupSweep.Core.Services.Interfaces;
 
 namespace DupSweep.App.ViewModels;
 
@@ -13,6 +16,13 @@ namespace DupSweep.App.ViewModels;
 /// </summary>
 public partial class HomeViewModel : ObservableObject
 {
+    private readonly IScanService _scanService;
+    private readonly ScanViewModel _scanViewModel;
+    private readonly ResultsViewModel _resultsViewModel;
+    private readonly SettingsViewModel _settingsViewModel;
+    private readonly IAppLogger _logger;
+    private readonly IMessenger _messenger;
+
     /// <summary>
     /// 스캔할 폴더 목록
     /// </summary>
@@ -21,19 +31,19 @@ public partial class HomeViewModel : ObservableObject
 
     // 감지 조건
     [ObservableProperty]
-    private bool _useHashComparison = true;
+    private bool _useHashComparison;
 
     [ObservableProperty]
-    private bool _useSizeComparison = true;
+    private bool _useSizeComparison;
 
     [ObservableProperty]
     private bool _useResolutionComparison;
 
     [ObservableProperty]
-    private bool _useImageSimilarity = true;
+    private bool _useImageSimilarity;
 
     [ObservableProperty]
-    private bool _useVideoSimilarity = true;
+    private bool _useVideoSimilarity;
 
     [ObservableProperty]
     private bool _matchCreatedDate;
@@ -59,10 +69,29 @@ public partial class HomeViewModel : ObservableObject
     private bool _scanVideos = true;    // 비디오 유사도 비교
 
     [ObservableProperty]
+    private bool _scanAudio;            // 오디오 스캔
+
+    [ObservableProperty]
+    private bool _scanDocuments;        // 문서 스캔
+
+    [ObservableProperty]
     private bool _canStartScan;
 
-    public HomeViewModel()
+    public HomeViewModel(
+        IScanService scanService,
+        ScanViewModel scanViewModel,
+        ResultsViewModel resultsViewModel,
+        SettingsViewModel settingsViewModel,
+        IAppLogger logger,
+        IMessenger messenger)
     {
+        _scanService = scanService;
+        _scanViewModel = scanViewModel;
+        _resultsViewModel = resultsViewModel;
+        _settingsViewModel = settingsViewModel;
+        _logger = logger;
+        _messenger = messenger;
+
         SelectedFolders.CollectionChanged += (_, _) => UpdateCanStartScan();
     }
 
@@ -115,16 +144,14 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     private async Task StartScan()
     {
-        Console.WriteLine($"[StartScan] Called. CanStartScan={CanStartScan}, FolderCount={SelectedFolders.Count}");
-        Debug.WriteLine($"[StartScan] Called. CanStartScan={CanStartScan}, FolderCount={SelectedFolders.Count}");
+        _logger.LogDebug("스캔 시작 요청: CanStartScan={CanStartScan}, FolderCount={FolderCount}", CanStartScan, SelectedFolders.Count);
 
         if (!CanStartScan)
         {
-            Console.WriteLine("[StartScan] CanStartScan is false, returning");
             return;
         }
 
-        Console.WriteLine($"[StartScan] Starting scan with folders: {string.Join(", ", SelectedFolders)}");
+        _logger.LogInformation("스캔 시작: {Folders}", string.Join(", ", SelectedFolders));
 
         var config = new DupSweep.Core.Models.ScanConfig
         {
@@ -140,22 +167,20 @@ public partial class HomeViewModel : ObservableObject
             VideoSimilarityThreshold = VideoSimilarityThreshold,
             ScanAllFiles = ScanAllFiles,
             ScanImages = ScanImages,
-            ScanVideos = ScanVideos
+            ScanVideos = ScanVideos,
+            ScanAudio = ScanAudio,
+            ScanDocuments = ScanDocuments,
+            ParallelThreads = _settingsViewModel.ParallelThreads,
+            ThumbnailSize = _settingsViewModel.ThumbnailSize,
+            FfmpegPath = string.IsNullOrWhiteSpace(_settingsViewModel.FfmpegPath) ? null : _settingsViewModel.FfmpegPath
         };
 
-        var settingsVm = App.Services.GetService(typeof(SettingsViewModel)) as SettingsViewModel;
-        if (settingsVm != null)
+        if (!string.IsNullOrWhiteSpace(config.FfmpegPath))
         {
-            config.ParallelThreads = settingsVm.ParallelThreads;
-            config.ThumbnailSize = settingsVm.ThumbnailSize;
-            config.FfmpegPath = string.IsNullOrWhiteSpace(settingsVm.FfmpegPath) ? null : settingsVm.FfmpegPath;
-            if (!string.IsNullOrWhiteSpace(config.FfmpegPath))
+            var ffprobePath = Path.Combine(Path.GetDirectoryName(config.FfmpegPath) ?? string.Empty, "ffprobe.exe");
+            if (File.Exists(ffprobePath))
             {
-                var ffprobePath = Path.Combine(Path.GetDirectoryName(config.FfmpegPath) ?? string.Empty, "ffprobe.exe");
-                if (File.Exists(ffprobePath))
-                {
-                    config.FfprobePath = ffprobePath;
-                }
+                config.FfprobePath = ffprobePath;
             }
         }
 
@@ -173,47 +198,34 @@ public partial class HomeViewModel : ObservableObject
 
             if (result != MessageBoxResult.Yes)
             {
-                Console.WriteLine("[StartScan] User cancelled due to missing FFmpeg");
+                _logger.LogDebug("FFmpeg 미설정으로 사용자가 스캔 취소");
                 return;
             }
-            Console.WriteLine("[StartScan] User confirmed to proceed without FFmpeg");
         }
 
-        var mainVm = App.Services.GetService(typeof(MainViewModel)) as MainViewModel;
-        var scanVm = App.Services.GetService(typeof(ScanViewModel)) as ScanViewModel;
-        var resultsVm = App.Services.GetService(typeof(ResultsViewModel)) as ResultsViewModel;
-        var scanService = App.Services.GetService(typeof(DupSweep.Core.Services.Interfaces.IScanService)) as DupSweep.Core.Services.Interfaces.IScanService;
-
-        if (scanVm == null || resultsVm == null || scanService == null || mainVm == null)
-        {
-            Console.WriteLine($"[StartScan] Service null check failed: scanVm={scanVm != null}, resultsVm={resultsVm != null}, scanService={scanService != null}, mainVm={mainVm != null}");
-            return;
-        }
-
-        Console.WriteLine("[StartScan] All services resolved successfully");
-
-        scanVm.Reset();
-        mainVm.NavigateToScanCommand.Execute(null);
+        _scanViewModel.Reset();
+        _messenger.Send(new NavigateMessage(NavigationTarget.Scan));
 
         var progress = new Progress<DupSweep.Core.Models.ScanProgress>(p =>
         {
-            Console.WriteLine($"[StartScan] Progress: Phase={p.Phase}, Processed={p.ProcessedFiles}/{p.TotalFiles}");
-            scanVm.ApplyProgress(p);
+            _scanViewModel.ApplyProgress(p);
         });
 
         try
         {
-            Console.WriteLine("[StartScan] Calling scanService.StartScanAsync...");
-            var result = await scanService.StartScanAsync(config, progress);
-            Console.WriteLine($"[StartScan] Scan completed. Groups found: {result?.DuplicateGroups?.Count ?? 0}");
-            resultsVm.LoadResults(result);
-            mainVm.NavigateToResultsCommand.Execute(null);
+            _logger.LogDebug("scanService.StartScanAsync 호출");
+            var scanResult = await _scanService.StartScanAsync(config, progress);
+            _logger.LogInformation("스캔 완료: {Groups}개 그룹 발견", scanResult?.DuplicateGroups?.Count ?? 0);
+            if (scanResult != null)
+            {
+                _resultsViewModel.LoadResults(scanResult);
+                _messenger.Send(new NavigateMessage(NavigationTarget.Results));
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[StartScan] ERROR: {ex.GetType().Name}: {ex.Message}");
-            Console.WriteLine($"[StartScan] StackTrace: {ex.StackTrace}");
-            scanVm.ApplyProgress(new DupSweep.Core.Models.ScanProgress
+            _logger.LogError(ex, "스캔 중 오류 발생");
+            _scanViewModel.ApplyProgress(new DupSweep.Core.Models.ScanProgress
             {
                 Phase = DupSweep.Core.Models.ScanPhase.Error,
                 CurrentFile = string.Empty,
@@ -225,7 +237,7 @@ public partial class HomeViewModel : ObservableObject
                 IsPaused = false,
                 IsCancelled = false
             });
-            scanVm.StatusMessage = $"Error: {ex.Message}";
+            _scanViewModel.StatusMessage = $"Error: {ex.Message}";
         }
     }
 }

@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
+using CommunityToolkit.Mvvm.Messaging;
+using DupSweep.App.Messages;
 
 namespace DupSweep.App.ViewModels;
 
@@ -10,6 +11,12 @@ namespace DupSweep.App.ViewModels;
 /// </summary>
 public partial class MainViewModel : ObservableObject
 {
+    private readonly HomeViewModel _homeViewModel;
+    private readonly ScanViewModel _scanViewModel;
+    private readonly ResultsViewModel _resultsViewModel;
+    private readonly SettingsViewModel _settingsViewModel;
+    private readonly FolderTreeViewModel _folderTreeViewModel;
+
     [ObservableProperty]
     private object? _currentView;
 
@@ -21,8 +28,42 @@ public partial class MainViewModel : ObservableObject
 
     private readonly string[] _titles = { "홈", "스캔", "결과", "설정", "폴더 트리" };
 
-    public MainViewModel()
+    public MainViewModel(
+        HomeViewModel homeViewModel,
+        ScanViewModel scanViewModel,
+        ResultsViewModel resultsViewModel,
+        SettingsViewModel settingsViewModel,
+        FolderTreeViewModel folderTreeViewModel,
+        IMessenger messenger)
     {
+        _homeViewModel = homeViewModel;
+        _scanViewModel = scanViewModel;
+        _resultsViewModel = resultsViewModel;
+        _settingsViewModel = settingsViewModel;
+        _folderTreeViewModel = folderTreeViewModel;
+
+        messenger.Register<NavigateMessage>(this, (_, message) =>
+        {
+            switch (message.Value)
+            {
+                case NavigationTarget.Home:
+                    NavigateToHome();
+                    break;
+                case NavigationTarget.Scan:
+                    NavigateToScan();
+                    break;
+                case NavigationTarget.Results:
+                    NavigateToResults();
+                    break;
+                case NavigationTarget.Settings:
+                    NavigateToSettings();
+                    break;
+                case NavigationTarget.FolderTree:
+                    NavigateToFolderTree();
+                    break;
+            }
+        });
+
         // 홈 뷰로 시작
         NavigateToHome();
     }
@@ -55,7 +96,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void NavigateToHome()
     {
-        CurrentView = App.Services.GetRequiredService<HomeViewModel>();
+        CurrentView = _homeViewModel;
         SelectedNavIndex = 0;
         Title = _titles[0];
     }
@@ -63,7 +104,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void NavigateToScan()
     {
-        CurrentView = App.Services.GetRequiredService<ScanViewModel>();
+        CurrentView = _scanViewModel;
         SelectedNavIndex = 1;
         Title = _titles[1];
     }
@@ -71,15 +112,15 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void NavigateToResults()
     {
-        CurrentView = App.Services.GetRequiredService<ResultsViewModel>();
-        SelectedNavIndex = 2;
-        Title = _titles[2];
+        CurrentView = _resultsViewModel;
+        SelectedNavIndex = 1;
+        Title = "스캔 결과";
     }
 
     [RelayCommand]
     private void NavigateToSettings()
     {
-        CurrentView = App.Services.GetRequiredService<SettingsViewModel>();
+        CurrentView = _settingsViewModel;
         SelectedNavIndex = 3;
         Title = _titles[3];
     }
@@ -87,7 +128,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void NavigateToFolderTree()
     {
-        CurrentView = App.Services.GetRequiredService<FolderTreeViewModel>();
+        CurrentView = _folderTreeViewModel;
         SelectedNavIndex = 4;
         Title = _titles[4];
     }

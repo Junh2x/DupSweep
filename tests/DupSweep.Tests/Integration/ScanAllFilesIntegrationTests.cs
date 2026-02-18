@@ -1,4 +1,5 @@
 using DupSweep.Core.Algorithms;
+using DupSweep.Core.Logging;
 using DupSweep.Core.Models;
 using DupSweep.Core.Processors;
 using DupSweep.Core.Services;
@@ -451,10 +452,12 @@ public class ScanAllFilesIntegrationTests : IDisposable
                 return Task.FromResult(hash);
             });
 
+        var loggerMock = new Mock<IAppLogger>();
         var scanService = new ScanService(
             _hashServiceMock.Object,
             _imageProcessorMock.Object,
-            _videoProcessorMock.Object);
+            _videoProcessorMock.Object,
+            loggerMock.Object);
 
         var config = new ScanConfig
         {

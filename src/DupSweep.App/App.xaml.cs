@@ -1,7 +1,7 @@
 using System.Windows;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using DupSweep.App.ViewModels;
-using DupSweep.App.Views;
 using DupSweep.Core.Logging;
 using DupSweep.Core.Processors;
 using DupSweep.Core.Services;
@@ -82,6 +82,9 @@ public partial class App : Application
 
         // Infrastructure services (로깅 포함)
         services.AddDupSweepInfrastructure(loggingConfig);
+
+        // Messaging
+        services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
 
         // ViewModels - 모든 ViewModel은 Singleton이어야 상태가 유지됨
         services.AddSingleton<MainViewModel>();

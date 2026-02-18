@@ -159,16 +159,6 @@ public class AppLogger : IAppLogger
         }
     }
 
-    public void LogHashCacheHit(string filePath, string hashType)
-    {
-        if (_config.MinimumLevel <= Core.Logging.LogLevel.Debug)
-        {
-            _logger.LogDebug(
-                "해시 캐시 히트 - 파일: {FilePath}, 유형: {HashType}",
-                filePath, hashType);
-        }
-    }
-
     public void LogHashError(string filePath, string hashType, Exception exception)
     {
         _logger.LogError(exception,

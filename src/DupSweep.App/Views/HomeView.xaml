@@ -186,172 +186,234 @@
             </Button>
         </Grid>
 
-        <!-- Right Panel - Options -->
-        <Border Grid.Column="1" Style="{StaticResource Card}" Padding="0">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16,16,14,16">
-                <StackPanel>
+        <!-- Right Panel - Options (Tab-based) -->
+        <Border Grid.Column="1" Style="{StaticResource Card}" Padding="16">
+            <TabControl Style="{StaticResource OptionsTabControl}">
 
-                    <!-- 스캔 대상 -->
-                    <TextBlock Text="스캔 대상"
-                               Style="{StaticResource TitleSmall}"
-                               Foreground="{StaticResource TextSecondaryBrush}"
-                               Margin="0,0,0,12" />
-
-                    <StackPanel Margin="0,0,0,20">
-                        <CheckBox IsChecked="{Binding ScanAllFiles}"
-                                  Margin="0,0,0,12">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="FileMultiple" Width="18" Height="18"
+                <!-- Tab 1: 파일 대상 -->
+                <TabItem Header="파일 대상" Style="{StaticResource OptionsTabItem}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,2,0">
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding ScanAllFiles}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,16">
+                                <StackPanel Orientation="Horizontal" Margin="4,0,0,0">
+                                    <materialDesign:PackIcon Kind="FileMultiple" Width="20" Height="20"
                                                              VerticalAlignment="Center" Margin="0,0,8,0"
                                                              Foreground="{StaticResource AccentBrush}" />
-                                    <TextBlock Text="모든 파일" VerticalAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="ALL (모든 파일)" VerticalAlignment="Center" FontWeight="SemiBold" />
                                 </StackPanel>
-                                <TextBlock Text="확장자 무관하게 모든 파일의 중복 탐지 (해시 기반)"
-                                           Style="{StaticResource Caption}" Margin="26,2,0,0" />
-                            </StackPanel>
-                        </CheckBox>
+                            </CheckBox>
 
-                        <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,12" />
+                            <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,12" />
 
-                        <TextBlock Text="유사도 비교 대상"
-                                   Style="{StaticResource Caption}"
-                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                   Margin="0,0,0,8" />
+                            <TextBlock Text="카테고리별 선택"
+                                       Style="{StaticResource Caption}"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,0,0,10" />
 
-                        <CheckBox IsChecked="{Binding ScanImages}"
-                                  Margin="0,0,0,8">
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Image" Width="18" Height="18"
-                                                         VerticalAlignment="Center" Margin="0,0,8,0"
-                                                         Foreground="{StaticResource AccentBrush}" />
-                                <TextBlock Text="이미지" VerticalAlignment="Center" />
-                                <TextBlock Text="(JPG, PNG, GIF, BMP, WebP...)"
-                                           Style="{StaticResource Caption}"
-                                           VerticalAlignment="Center" Margin="8,0,0,0" />
-                            </StackPanel>
-                        </CheckBox>
+                            <CheckBox IsChecked="{Binding ScanImages}"
+                                      IsEnabled="{Binding ScanAllFiles, Converter={StaticResource InverseBooleanConverter}}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,12">
+                                <StackPanel Margin="4,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Image" Width="20" Height="20"
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 Foreground="{StaticResource AccentBrush}" />
+                                        <TextBlock Text="이미지" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="JPG, PNG, GIF, BMP, WebP, TIFF, ICO, HEIC"
+                                               Style="{StaticResource Caption}" Margin="28,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
 
-                        <CheckBox IsChecked="{Binding ScanVideos}">
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Video" Width="18" Height="18"
-                                                         VerticalAlignment="Center" Margin="0,0,8,0"
-                                                         Foreground="{StaticResource AccentBrush}" />
-                                <TextBlock Text="비디오" VerticalAlignment="Center" />
-                                <TextBlock Text="(MP4, AVI, MKV, MOV...)"
-                                           Style="{StaticResource Caption}"
-                                           VerticalAlignment="Center" Margin="8,0,0,0" />
-                            </StackPanel>
-                        </CheckBox>
-                    </StackPanel>
+                            <CheckBox IsChecked="{Binding ScanVideos}"
+                                      IsEnabled="{Binding ScanAllFiles, Converter={StaticResource InverseBooleanConverter}}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,12">
+                                <StackPanel Margin="4,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Video" Width="20" Height="20"
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 Foreground="{StaticResource AccentBrush}" />
+                                        <TextBlock Text="비디오" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="MP4, AVI, MKV, MOV, WMV, FLV, WebM"
+                                               Style="{StaticResource Caption}" Margin="28,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
 
-                    <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,16" />
+                            <CheckBox IsChecked="{Binding ScanAudio}"
+                                      IsEnabled="{Binding ScanAllFiles, Converter={StaticResource InverseBooleanConverter}}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,12">
+                                <StackPanel Margin="4,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="MusicNote" Width="20" Height="20"
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 Foreground="{StaticResource AccentBrush}" />
+                                        <TextBlock Text="오디오" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="MP3, WAV, FLAC, AAC, OGG, WMA, M4A"
+                                               Style="{StaticResource Caption}" Margin="28,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
 
-                    <!-- 감지 조건 -->
-                    <TextBlock Text="감지 조건"
-                               Style="{StaticResource TitleSmall}"
-                               Foreground="{StaticResource TextSecondaryBrush}"
-                               Margin="0,0,0,12" />
-
-                    <StackPanel Margin="0,0,0,20">
-                        <CheckBox IsChecked="{Binding UseHashComparison}"
-                                  Margin="0,0,0,8">
-                            <StackPanel>
-                                <TextBlock Text="해시 비교 (정확한 중복)" />
-                                <TextBlock Text="파일 내용이 완전히 동일한 파일 탐지"
-                                           Style="{StaticResource Caption}" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </CheckBox>
-
-                        <CheckBox IsChecked="{Binding UseSizeComparison}"
-                                  Margin="0,0,0,8">
-                            <StackPanel>
-                                <TextBlock Text="용량 일치" />
-                                <TextBlock Text="파일 크기가 동일한 파일만 비교"
-                                           Style="{StaticResource Caption}" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </CheckBox>
-
-                        <CheckBox IsChecked="{Binding UseResolutionComparison}"
-                                  Margin="0,0,0,8">
-                            <StackPanel>
-                                <TextBlock Text="해상도 일치" />
-                                <TextBlock Text="이미지/비디오 해상도가 동일한 파일만 비교"
-                                           Style="{StaticResource Caption}" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </CheckBox>
-
-                        <CheckBox IsChecked="{Binding MatchCreatedDate}"
-                                  Margin="0,0,0,8">
-                            <StackPanel>
-                                <TextBlock Text="생성 날짜 일치" />
-                                <TextBlock Text="파일 생성 날짜가 동일한 파일만 비교"
-                                           Style="{StaticResource Caption}" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </CheckBox>
-
-                        <CheckBox IsChecked="{Binding MatchModifiedDate}"
-                                  Margin="0,0,0,8">
-                            <StackPanel>
-                                <TextBlock Text="수정 날짜 일치" />
-                                <TextBlock Text="파일 수정 날짜가 동일한 파일만 비교"
-                                           Style="{StaticResource Caption}" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </CheckBox>
-
-                        <CheckBox IsChecked="{Binding UseImageSimilarity}"
-                                  Margin="0,0,0,4">
-                            <StackPanel>
-                                <TextBlock Text="이미지 유사도 비교" />
-                                <TextBlock Text="비슷해 보이는 이미지 탐지 (pHash)"
-                                           Style="{StaticResource Caption}" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </CheckBox>
-
-                        <!-- Image Similarity Threshold -->
-                        <StackPanel Margin="24,4,0,8"
-                                    Visibility="{Binding UseImageSimilarity, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <DockPanel Margin="0,0,0,4">
-                                <TextBlock Text="{Binding SimilarityThreshold, StringFormat={}{0:0}%}"
-                                           DockPanel.Dock="Right"
-                                           Foreground="{StaticResource AccentBrush}"
-                                           FontWeight="SemiBold" />
-                                <TextBlock Text="유사도 임계값" Style="{StaticResource Caption}" />
-                            </DockPanel>
-                            <Slider Minimum="50" Maximum="100"
-                                    Value="{Binding SimilarityThreshold}"
-                                    TickFrequency="5"
-                                    IsSnapToTickEnabled="True" />
+                            <CheckBox IsChecked="{Binding ScanDocuments}"
+                                      IsEnabled="{Binding ScanAllFiles, Converter={StaticResource InverseBooleanConverter}}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,4">
+                                <StackPanel Margin="4,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileDocument" Width="20" Height="20"
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 Foreground="{StaticResource AccentBrush}" />
+                                        <TextBlock Text="문서" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="PDF, DOC, DOCX, XLS, XLSX, PPT, TXT, HWP"
+                                               Style="{StaticResource Caption}" Margin="28,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
                         </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
 
-                        <CheckBox IsChecked="{Binding UseVideoSimilarity}"
-                                  Margin="0,0,0,4">
-                            <StackPanel>
-                                <TextBlock Text="비디오 유사도 비교" />
-                                <TextBlock Text="비슷한 비디오 탐지 (FFmpeg 필요)"
-                                           Style="{StaticResource Caption}" Margin="0,2,0,0" />
-                            </StackPanel>
-                        </CheckBox>
+                <!-- Tab 2: 스캔 로직 -->
+                <TabItem Header="스캔 로직" Style="{StaticResource OptionsTabItem}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,2,0">
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding UseHashComparison}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,12">
+                                <StackPanel Margin="4,0,0,0">
+                                    <TextBlock Text="해시" FontWeight="SemiBold" />
+                                    <TextBlock Text="XxHash64, BLAKE3 해시 비교 감지"
+                                               Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
 
-                        <!-- Video Similarity Threshold -->
-                        <StackPanel Margin="24,4,0,0"
-                                    Visibility="{Binding UseVideoSimilarity, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <DockPanel Margin="0,0,0,4">
-                                <TextBlock Text="{Binding VideoSimilarityThreshold, StringFormat={}{0:0}%}"
-                                           DockPanel.Dock="Right"
-                                           Foreground="{StaticResource AccentBrush}"
-                                           FontWeight="SemiBold" />
-                                <TextBlock Text="유사도 임계값" Style="{StaticResource Caption}" />
-                            </DockPanel>
-                            <Slider Minimum="50" Maximum="100"
-                                    Value="{Binding VideoSimilarityThreshold}"
-                                    TickFrequency="5"
-                                    IsSnapToTickEnabled="True" />
+                            <CheckBox IsChecked="{Binding UseSizeComparison}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,12">
+                                <StackPanel Margin="4,0,0,0">
+                                    <TextBlock Text="파일 크기" />
+                                    <TextBlock Text="파일 크기가 동일한 파일 감지"
+                                               Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
+
+                            <CheckBox IsChecked="{Binding UseResolutionComparison}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,12">
+                                <StackPanel Margin="4,0,0,0">
+                                    <TextBlock Text="해상도" />
+                                    <TextBlock Text="이미지/비디오 해상도가 동일한 파일 감지"
+                                               Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
+
+                            <CheckBox IsChecked="{Binding MatchCreatedDate}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,12">
+                                <StackPanel Margin="4,0,0,0">
+                                    <TextBlock Text="생성 날짜" />
+                                    <TextBlock Text="파일 생성 날짜가 동일한 파일 감지"
+                                               Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
+
+                            <CheckBox IsChecked="{Binding MatchModifiedDate}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,4">
+                                <StackPanel Margin="4,0,0,0">
+                                    <TextBlock Text="수정 날짜 일치" />
+                                    <TextBlock Text="파일 수정 날짜가 동일한 파일 감지"
+                                               Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
                         </StackPanel>
-                    </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
 
-                </StackPanel>
-            </ScrollViewer>
+                <!-- Tab 3: 유사도 비교 -->
+                <TabItem Header="유사도 비교" Style="{StaticResource OptionsTabItem}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,2,0">
+                        <StackPanel>
+                            <TextBlock Text="퍼셉추얼 해싱 기반 유사 파일 탐지 (옵션)"
+                                       Style="{StaticResource Caption}"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       Margin="0,0,0,16" />
+
+                            <CheckBox IsChecked="{Binding UseImageSimilarity}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,4">
+                                <StackPanel Margin="4,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="ImageMultiple" Width="20" Height="20"
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 Foreground="{StaticResource AccentBrush}" />
+                                        <TextBlock Text="이미지 유사도 비교" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="비슷해 보이는 이미지 탐지 (dHash)"
+                                               Style="{StaticResource Caption}" Margin="28,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
+
+                            <StackPanel Margin="34,6,0,16"
+                                        Visibility="{Binding UseImageSimilarity, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <DockPanel Margin="0,0,0,4">
+                                    <TextBlock Text="{Binding SimilarityThreshold, StringFormat={}{0:0}%}"
+                                               DockPanel.Dock="Right"
+                                               Foreground="{StaticResource AccentBrush}"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="유사도 임계값" Style="{StaticResource Caption}" />
+                                </DockPanel>
+                                <Slider Minimum="50" Maximum="100"
+                                        Value="{Binding SimilarityThreshold}"
+                                        TickFrequency="5"
+                                        IsSnapToTickEnabled="True" />
+                            </StackPanel>
+
+                            <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,12"
+                                       Visibility="{Binding UseImageSimilarity, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                            <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,12"
+                                       Visibility="{Binding UseImageSimilarity, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                            <CheckBox IsChecked="{Binding UseVideoSimilarity}"
+                                      materialDesign:CheckBoxAssist.CheckBoxSize="26"
+                                      Margin="0,0,0,4">
+                                <StackPanel Margin="4,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="VideoBox" Width="20" Height="20"
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 Foreground="{StaticResource AccentBrush}" />
+                                        <TextBlock Text="비디오 유사도 비교" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="비슷한 비디오 탐지 (FFmpeg 필요)"
+                                               Style="{StaticResource Caption}" Margin="28,4,0,0" />
+                                </StackPanel>
+                            </CheckBox>
+
+                            <StackPanel Margin="34,6,0,0"
+                                        Visibility="{Binding UseVideoSimilarity, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <DockPanel Margin="0,0,0,4">
+                                    <TextBlock Text="{Binding VideoSimilarityThreshold, StringFormat={}{0:0}%}"
+                                               DockPanel.Dock="Right"
+                                               Foreground="{StaticResource AccentBrush}"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="유사도 임계값" Style="{StaticResource Caption}" />
+                                </DockPanel>
+                                <Slider Minimum="50" Maximum="100"
+                                        Value="{Binding VideoSimilarityThreshold}"
+                                        TickFrequency="5"
+                                        IsSnapToTickEnabled="True" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+            </TabControl>
         </Border>
     </Grid>
 </UserControl>

@@ -79,11 +79,6 @@ public interface IAppLogger
     void LogHashComputed(string filePath, string hashType, string hashValue, TimeSpan elapsed);
 
     /// <summary>
-    /// 해시 캐시 히트 로그
-    /// </summary>
-    void LogHashCacheHit(string filePath, string hashType);
-
-    /// <summary>
     /// 해시 계산 오류 로그
     /// </summary>
     void LogHashError(string filePath, string hashType, Exception exception);
