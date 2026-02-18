@@ -19,10 +19,10 @@
         <StackPanel Grid.Row="0"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
-                    Width="500">
+                    Width="420">
 
             <!-- Progress Ring -->
-            <Grid HorizontalAlignment="Center" Margin="0,0,0,32">
+            <Grid HorizontalAlignment="Center" Margin="0,0,0,20">
                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
                              Value="{Binding Progress}"
                              Width="200" Height="200"
@@ -39,7 +39,7 @@
             </Grid>
 
             <!-- Statistics -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp2" Padding="24">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp2" Padding="16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -86,7 +86,7 @@
                        Style="{StaticResource MaterialDesignCaptionTextBlock}"
                        TextTrimming="CharacterEllipsis"
                        HorizontalAlignment="Center"
-                       Margin="0,16,0,0"
+                       Margin="0,10,0,0"
                        Opacity="0.6"
                        MaxWidth="500" />
         </StackPanel>

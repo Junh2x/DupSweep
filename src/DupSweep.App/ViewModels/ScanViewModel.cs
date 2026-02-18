@@ -114,8 +114,20 @@ public partial class ScanViewModel : ObservableObject
         IsScanning = progress.Phase is not DupSweep.Core.Models.ScanPhase.Completed
             and not DupSweep.Core.Models.ScanPhase.Cancelled
             and not DupSweep.Core.Models.ScanPhase.Error;
-        StatusMessage = progress.StatusMessage;
+        StatusMessage = ResolveStatusMessage(progress.StatusMessage);
         OnPropertyChanged(nameof(FormattedPotentialSavings));
+    }
+
+    private static string ResolveStatusMessage(string rawMessage)
+    {
+        var parts = rawMessage.Split('|');
+        var key = parts[0];
+        if (parts.Length > 1)
+        {
+            var args = parts[1..].Cast<object>().ToArray();
+            return LanguageService.Instance.GetString(key, args);
+        }
+        return LanguageService.Instance.GetString(key);
     }
 
     private static string FormatFileSize(long bytes)

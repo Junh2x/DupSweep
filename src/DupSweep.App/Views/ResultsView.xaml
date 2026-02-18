@@ -128,7 +128,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="220" Margin="0,0,4,4"
+                                        <Border Width="200" Margin="0,0,4,4"
                                                 CornerRadius="4" Cursor="Hand"
                                                 BorderThickness="2"
                                                 MouseLeftButtonDown="FileCard_Click"
@@ -177,13 +177,13 @@
 
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="60" />
+                                                    <ColumnDefinition Width="56" />
                                                     <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
 
                                                 <!-- Thumbnail -->
                                                 <Border Grid.Column="0" Background="{DynamicResource MaterialDesignDivider}"
-                                                        CornerRadius="4,0,0,4" Height="60">
+                                                        CornerRadius="4,0,0,4" Height="56">
                                                     <Grid>
                                                         <materialDesign:PackIcon Kind="FileImage" Width="24" Height="24"
                                                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -229,7 +229,7 @@
 
         <!-- Action Bar -->
         <Border Grid.Row="2" Background="{DynamicResource MaterialDesignCardBackground}"
-                Margin="0,8,0,0" Padding="8"
+                Margin="0,8,0,0" Padding="6"
                 Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">

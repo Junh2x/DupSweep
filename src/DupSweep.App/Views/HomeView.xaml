@@ -16,7 +16,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Left Panel - Folder Selection -->
-        <Grid Grid.Column="0" Margin="0,0,24,0">
+        <Grid Grid.Column="0" Margin="0,0,16,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -24,7 +24,7 @@
             </Grid.RowDefinitions>
 
             <!-- Section Header -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel Grid.Row="0" Margin="0,0,0,12">
                 <TextBlock Text="{DynamicResource Home.ScanFolders}"
                            Style="{StaticResource TitleLarge}" />
                 <TextBlock Text="{DynamicResource Home.AddFolderHint}"
@@ -92,8 +92,8 @@
                         <Border DockPanel.Dock="Top"
                                 Background="{StaticResource BackgroundBrush}"
                                 CornerRadius="8"
-                                Padding="12"
-                                Margin="0,0,0,16">
+                                Padding="8"
+                                Margin="0,0,0,10">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                                     <Button Content="{DynamicResource Home.ClearAll}"
@@ -122,7 +122,7 @@
                                     <DataTemplate>
                                         <Border Background="{StaticResource BackgroundBrush}"
                                                 CornerRadius="10"
-                                                Padding="16,12"
+                                                Padding="12,8"
                                                 Margin="0,0,0,8">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -132,8 +132,8 @@
                                                 </Grid.ColumnDefinitions>
 
                                                 <Border Grid.Column="0"
-                                                        Width="44" Height="44"
-                                                        CornerRadius="10"
+                                                        Width="36" Height="36"
+                                                        CornerRadius="8"
                                                         Background="{StaticResource AccentLightBrush}"
                                                         Opacity="0.15">
                                                 </Border>
@@ -177,7 +177,7 @@
                     Command="{Binding StartScanCommand}"
                     IsEnabled="{Binding CanStartScan}"
                     HorizontalAlignment="Right"
-                    Margin="0,20,0,0"
+                    Margin="0,12,0,0"
                     Padding="32,14">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Magnify" Width="20" Height="20" VerticalAlignment="Center" />
@@ -187,7 +187,7 @@
         </Grid>
 
         <!-- Right Panel - Options (Tab-based) -->
-        <Border Grid.Column="1" Style="{StaticResource Card}" Padding="16">
+        <Border Grid.Column="1" Style="{StaticResource Card}" Padding="12">
             <TabControl Style="{StaticResource OptionsTabControl}">
 
                 <!-- Tab 1: 파일 대상 -->

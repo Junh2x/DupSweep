@@ -10,37 +10,18 @@
              d:DesignHeight="600" d:DesignWidth="900">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="600" Margin="0,0,0,32">
+        <StackPanel MaxWidth="540" Margin="0,0,0,20">
             <!-- Header -->
             <TextBlock Text="{DynamicResource Settings.Title}"
                        Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                       Margin="0,0,0,24" />
+                       Margin="0,0,0,16" />
 
             <!-- Appearance -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="{DynamicResource Settings.Appearance}"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
-                               Margin="0,0,0,16" />
-
-                    <DockPanel>
-                        <ComboBox DockPanel.Dock="Right"
-                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                                  SelectedItem="{Binding ThumbnailSize}"
-                                  Width="100">
-                            <ComboBoxItem Content="64" />
-                            <ComboBoxItem Content="128" />
-                            <ComboBoxItem Content="256" />
-                        </ComboBox>
-                        <StackPanel>
-                            <TextBlock Text="{DynamicResource Settings.ThumbnailSize}" />
-                            <TextBlock Text="{DynamicResource Settings.ThumbnailSizeHint}"
-                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                       Opacity="0.6" />
-                        </StackPanel>
-                    </DockPanel>
-
-                    <Separator Background="{DynamicResource MaterialDesignDivider}" Margin="0,16" />
+                               Margin="0,0,0,12" />
 
                     <DockPanel>
                         <ComboBox DockPanel.Dock="Right"
@@ -48,7 +29,8 @@
                                   ItemsSource="{Binding AvailableLanguages}"
                                   SelectedItem="{Binding SelectedLanguage}"
                                   DisplayMemberPath="DisplayName"
-                                  Width="140" />
+                                  Width="110"
+                                  materialDesign:ComboBoxAssist.ShowSelectedItem="True" />
                         <StackPanel>
                             <TextBlock Text="{DynamicResource Settings.Language}" />
                         </StackPanel>
@@ -57,11 +39,11 @@
             </materialDesign:Card>
 
             <!-- Deletion -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="{DynamicResource Settings.Deletion}"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
-                               Margin="0,0,0,16" />
+                               Margin="0,0,0,12" />
 
                     <DockPanel>
                         <ToggleButton DockPanel.Dock="Right"
@@ -78,11 +60,11 @@
             </materialDesign:Card>
 
             <!-- Performance -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="{DynamicResource Settings.Performance}"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
-                               Margin="0,0,0,16" />
+                               Margin="0,0,0,12" />
 
                     <StackPanel Margin="0,0,0,8">
                         <StackPanel Orientation="Horizontal">
@@ -92,8 +74,9 @@
                         <Slider Minimum="1"
                                 Maximum="32"
                                 Value="{Binding ParallelThreads}"
-                                Style="{StaticResource MaterialDesignDiscreteSlider}"
-                                TickFrequency="1" />
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                AutoToolTipPlacement="TopLeft" />
                         <TextBlock Text="{DynamicResource Settings.ParallelThreadsHint}"
                                    Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                    Opacity="0.6" />
@@ -102,11 +85,11 @@
             </materialDesign:Card>
 
             <!-- FFmpeg -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="FFmpeg"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
-                               Margin="0,0,0,16" />
+                               Margin="0,0,0,12" />
 
                     <DockPanel>
                         <Button DockPanel.Dock="Right"

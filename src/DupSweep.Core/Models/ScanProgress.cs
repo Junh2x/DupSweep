@@ -26,16 +26,20 @@ public class ScanProgress
     /// <summary>
     /// 현재 단계에 맞는 상태 메시지 반환
     /// </summary>
+    /// <summary>
+    /// 현재 단계와 처리 상태를 나타내는 키-기반 상태 메시지.
+    /// UI 레이어에서 LanguageService를 통해 번역된 문자열로 변환합니다.
+    /// </summary>
     public string StatusMessage => Phase switch
     {
-        ScanPhase.Initializing => "초기화 중...",
-        ScanPhase.Scanning => $"파일 스캔 중... ({ProcessedFiles}/{TotalFiles})",
-        ScanPhase.Hashing => $"해시 계산 중... ({ProcessedFiles}/{TotalFiles})",
-        ScanPhase.Comparing => "파일 비교 중...",
-        ScanPhase.Completed => "스캔 완료",
-        ScanPhase.Cancelled => "스캔 취소됨",
-        ScanPhase.Error => "오류 발생",
-        _ => "알 수 없음"
+        ScanPhase.Initializing => "ScanProgress.Initializing",
+        ScanPhase.Scanning => $"ScanProgress.Scanning|{ProcessedFiles}|{TotalFiles}",
+        ScanPhase.Hashing => $"ScanProgress.Hashing|{ProcessedFiles}|{TotalFiles}",
+        ScanPhase.Comparing => "ScanProgress.Comparing",
+        ScanPhase.Completed => "ScanProgress.Completed",
+        ScanPhase.Cancelled => "ScanProgress.Cancelled",
+        ScanPhase.Error => "ScanProgress.Error",
+        _ => "ScanProgress.Unknown"
     };
 }
 

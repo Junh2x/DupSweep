@@ -69,8 +69,12 @@ public partial class MainWindow : Window
 
     #region Navigation
 
+    private bool _isNavigating;
+
     private void NavItem_Checked(object sender, RoutedEventArgs e)
     {
+        if (_isNavigating) return;
+
         if (sender is RadioButton radioButton && radioButton.Tag is string tagStr)
         {
             if (int.TryParse(tagStr, out int index))
@@ -83,18 +87,26 @@ public partial class MainWindow : Window
 
     private void UpdateNavRadioButton(int index)
     {
-        RadioButton? navButton = index switch
+        _isNavigating = true;
+        try
         {
-            0 => HomeNav,
-            1 => ScanNav,
-            3 => SettingsNav,
-            4 => FolderTreeNav,
-            _ => null
-        };
+            RadioButton? navButton = index switch
+            {
+                0 => HomeNav,
+                1 => ScanNav,
+                3 => SettingsNav,
+                4 => FolderTreeNav,
+                _ => null
+            };
 
-        if (navButton != null)
+            if (navButton != null)
+            {
+                navButton.IsChecked = true;
+            }
+        }
+        finally
         {
-            navButton.IsChecked = true;
+            _isNavigating = false;
         }
     }
 

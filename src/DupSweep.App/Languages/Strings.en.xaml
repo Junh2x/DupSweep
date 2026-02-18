@@ -8,11 +8,11 @@
 
     <!-- Navigation -->
     <sys:String x:Key="Nav.MainMenu">Main Menu</sys:String>
-    <sys:String x:Key="Nav.Home">Home</sys:String>
+    <sys:String x:Key="Nav.Home">Scan Settings</sys:String>
     <sys:String x:Key="Nav.Scan">Scan</sys:String>
     <sys:String x:Key="Nav.Results">Results</sys:String>
     <sys:String x:Key="Nav.Tools">Tools</sys:String>
-    <sys:String x:Key="Nav.FolderTree">Folder Tree</sys:String>
+    <sys:String x:Key="Nav.FolderTree">Folder Tree Analysis</sys:String>
     <sys:String x:Key="Nav.Settings">Settings</sys:String>
     <sys:String x:Key="Nav.SettingsLabel">Preferences</sys:String>
 
@@ -29,11 +29,11 @@
     <sys:String x:Key="Subtitle.FolderTree">Browse folder structure and check disk usage</sys:String>
 
     <!-- Titles -->
-    <sys:String x:Key="Title.Home">Home</sys:String>
+    <sys:String x:Key="Title.Home">Scan Settings</sys:String>
     <sys:String x:Key="Title.Scan">Scan</sys:String>
     <sys:String x:Key="Title.Results">Results</sys:String>
     <sys:String x:Key="Title.Settings">Settings</sys:String>
-    <sys:String x:Key="Title.FolderTree">Folder Tree</sys:String>
+    <sys:String x:Key="Title.FolderTree">Folder Tree Analysis</sys:String>
     <sys:String x:Key="Title.ScanResults">Scan Results</sys:String>
 
     <!-- Home View -->
@@ -117,9 +117,7 @@ Do you want to continue?</sys:String>
     <sys:String x:Key="Settings.Title">Preferences</sys:String>
     <sys:String x:Key="Settings.Appearance">Appearance</sys:String>
     <sys:String x:Key="Settings.Language">Language</sys:String>
-    <sys:String x:Key="Settings.ThumbnailSize">Thumbnail Size</sys:String>
-    <sys:String x:Key="Settings.ThumbnailSizeHint">Preview thumbnail size</sys:String>
-    <sys:String x:Key="Settings.Deletion">Deletion</sys:String>
+<sys:String x:Key="Settings.Deletion">Deletion</sys:String>
     <sys:String x:Key="Settings.ShowConfirmDialog">Show Confirmation Dialog</sys:String>
     <sys:String x:Key="Settings.ConfirmBeforeDelete">Confirm before deleting files</sys:String>
     <sys:String x:Key="Settings.Performance">Performance</sys:String>
@@ -135,6 +133,7 @@ Do you want to continue?</sys:String>
     <!-- Folder Tree View -->
     <sys:String x:Key="FolderTree.SelectFolder">Select Folder</sys:String>
     <sys:String x:Key="FolderTree.SelectFolderHint">Select a folder</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderToAnalyzeHint">Select a folder to analyze disk usage</sys:String>
     <sys:String x:Key="FolderTree.FolderFileList">Folder / File List</sys:String>
     <sys:String x:Key="FolderTree.SelectFolderToShowList">Select a folder to display the list</sys:String>
     <sys:String x:Key="FolderTree.FoldersAnalyzed">{0:N0} folders analyzed</sys:String>

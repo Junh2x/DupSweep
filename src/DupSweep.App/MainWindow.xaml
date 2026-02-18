@@ -272,12 +272,12 @@
                         ClipToBounds="True">
                     <Grid>
                         <ContentControl Content="{Binding CurrentView}"
-                                        Margin="24,16,24,24" />
+                                        Margin="16,12,16,16" />
 
                         <!-- Notification Host - Toast notifications overlay -->
                         <controls:NotificationHost VerticalAlignment="Bottom"
                                                    HorizontalAlignment="Right"
-                                                   Margin="0,0,24,24" />
+                                                   Margin="0,0,16,16" />
                     </Grid>
                 </Border>
             </Grid>
