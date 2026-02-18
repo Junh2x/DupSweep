@@ -22,11 +22,11 @@
     <sys:String x:Key="Window.Close">닫기</sys:String>
 
     <!-- Subtitles (per page) -->
-    <sys:String x:Key="Subtitle.Home">중복 파일을 검색할 폴더를 선택하세요</sys:String>
+    <sys:String x:Key="Subtitle.Home">중복 파일을 검색할 폴더를 선택하세요.</sys:String>
     <sys:String x:Key="Subtitle.Scan">중복 파일을 검색 중...</sys:String>
     <sys:String x:Key="Subtitle.Results"></sys:String>
     <sys:String x:Key="Subtitle.Settings">애플리케이션 설정</sys:String>
-    <sys:String x:Key="Subtitle.FolderTree">폴더 구조를 탐색하고 용량을 확인하세요</sys:String>
+    <sys:String x:Key="Subtitle.FolderTree">폴더 구조를 탐색하고 용량을 확인하세요.</sys:String>
 
     <!-- Titles -->
     <sys:String x:Key="Title.Home">스캔 설정</sys:String>
@@ -38,8 +38,8 @@
 
     <!-- Home View -->
     <sys:String x:Key="Home.ScanFolders">스캔 폴더</sys:String>
-    <sys:String x:Key="Home.AddFolderHint">중복 파일을 찾을 폴더를 추가하세요</sys:String>
-    <sys:String x:Key="Home.DropFolderHere">폴더를 여기에 놓으세요</sys:String>
+    <sys:String x:Key="Home.AddFolderHint">중복 파일을 찾을 폴더를 추가하세요.</sys:String>
+    <sys:String x:Key="Home.DropFolderHere">폴더를 여기에 놓으세요.</sys:String>
     <sys:String x:Key="Home.OrClickBelow">또는 아래 버튼을 클릭하여 탐색</sys:String>
     <sys:String x:Key="Home.BrowseFolder">폴더 찾아보기</sys:String>
     <sys:String x:Key="Home.ClearAll">모두 지우기</sys:String>
@@ -108,10 +108,17 @@
     <sys:String x:Key="Results.ResolutionLabel">해상도: </sys:String>
     <sys:String x:Key="Results.ModifiedDate">수정일: </sys:String>
     <sys:String x:Key="Results.CreatedDate">생성일: </sys:String>
-    <sys:String x:Key="Results.RunScanHint">스캔을 실행하여 중복 파일을 찾으세요</sys:String>
+    <sys:String x:Key="Results.RunScanHint">스캔을 실행하여 중복 파일을 찾으세요.</sys:String>
     <sys:String x:Key="Results.SelectedCount">개 선택</sys:String>
     <sys:String x:Key="Results.Trash">휴지통</sys:String>
     <sys:String x:Key="Results.Delete">삭제</sys:String>
+    <sys:String x:Key="Results.ColumnName">파일명</sys:String>
+    <sys:String x:Key="Results.ColumnSize">크기</sys:String>
+    <sys:String x:Key="Results.ColumnResolution">해상도</sys:String>
+    <sys:String x:Key="Results.ColumnModified">수정일</sys:String>
+    <sys:String x:Key="Results.ColumnCreated">생성일</sys:String>
+    <sys:String x:Key="Results.ColumnHash">해시</sys:String>
+    <sys:String x:Key="Results.Path">경로</sys:String>
 
     <!-- Settings View -->
     <sys:String x:Key="Settings.Title">환경설정</sys:String>
@@ -132,10 +139,10 @@
 
     <!-- Folder Tree View -->
     <sys:String x:Key="FolderTree.SelectFolder">폴더 선택</sys:String>
-    <sys:String x:Key="FolderTree.SelectFolderHint">폴더를 선택하세요</sys:String>
-    <sys:String x:Key="FolderTree.SelectFolderToAnalyzeHint">폴더를 선택하여 디스크 사용량을 분석하세요</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderHint">폴더를 선택하세요.</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderToAnalyzeHint">폴더를 선택하여 디스크 사용량을 분석하세요.</sys:String>
     <sys:String x:Key="FolderTree.FolderFileList">폴더/파일 목록</sys:String>
-    <sys:String x:Key="FolderTree.SelectFolderToShowList">폴더를 선택하면 목록이 표시됩니다</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderToShowList">폴더를 선택하면 목록이 표시됩니다.</sys:String>
     <sys:String x:Key="FolderTree.FoldersAnalyzed">{0:N0}개 폴더 분석됨</sys:String>
     <sys:String x:Key="FolderTree.AnalyzingFolder">폴더 분석 중...</sys:String>
     <sys:String x:Key="FolderTree.AnalysisFailed">폴더 분석 실패</sys:String>
@@ -147,7 +154,7 @@
     <sys:String x:Key="FolderTree.LoadListFailed">목록을 불러올 수 없습니다: {0}</sys:String>
     <sys:String x:Key="FolderTree.NoOtherItems">기타 항목 없음</sys:String>
     <sys:String x:Key="FolderTree.OthersSummary">기타: {0}개 폴더, {1}개 파일</sys:String>
-    <sys:String x:Key="FolderTree.LoadOthersFailed">기타 목록을 불러올 수 없습니다</sys:String>
+    <sys:String x:Key="FolderTree.LoadOthersFailed">기타 목록을 불러올 수 없습니다.</sys:String>
 
     <!-- Delete Confirmation Dialog -->
     <sys:String x:Key="Delete.ConfirmTitle">삭제 확인</sys:String>

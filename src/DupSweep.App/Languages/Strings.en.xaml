@@ -22,11 +22,11 @@
     <sys:String x:Key="Window.Close">Close</sys:String>
 
     <!-- Subtitles (per page) -->
-    <sys:String x:Key="Subtitle.Home">Select folders to scan for duplicate files</sys:String>
+    <sys:String x:Key="Subtitle.Home">Select folders to scan for duplicate files.</sys:String>
     <sys:String x:Key="Subtitle.Scan">Scanning for duplicate files...</sys:String>
     <sys:String x:Key="Subtitle.Results"></sys:String>
     <sys:String x:Key="Subtitle.Settings">Application settings</sys:String>
-    <sys:String x:Key="Subtitle.FolderTree">Browse folder structure and check disk usage</sys:String>
+    <sys:String x:Key="Subtitle.FolderTree">Browse folder structure and check disk usage.</sys:String>
 
     <!-- Titles -->
     <sys:String x:Key="Title.Home">Scan Settings</sys:String>
@@ -38,8 +38,8 @@
 
     <!-- Home View -->
     <sys:String x:Key="Home.ScanFolders">Scan Folders</sys:String>
-    <sys:String x:Key="Home.AddFolderHint">Add folders to find duplicate files</sys:String>
-    <sys:String x:Key="Home.DropFolderHere">Drop folders here</sys:String>
+    <sys:String x:Key="Home.AddFolderHint">Add folders to find duplicate files.</sys:String>
+    <sys:String x:Key="Home.DropFolderHere">Drop folders here.</sys:String>
     <sys:String x:Key="Home.OrClickBelow">or click the button below to browse</sys:String>
     <sys:String x:Key="Home.BrowseFolder">Browse Folder</sys:String>
     <sys:String x:Key="Home.ClearAll">Clear All</sys:String>
@@ -108,10 +108,17 @@ Do you want to continue?</sys:String>
     <sys:String x:Key="Results.ResolutionLabel">Resolution: </sys:String>
     <sys:String x:Key="Results.ModifiedDate">Modified: </sys:String>
     <sys:String x:Key="Results.CreatedDate">Created: </sys:String>
-    <sys:String x:Key="Results.RunScanHint">Run a scan to find duplicate files</sys:String>
+    <sys:String x:Key="Results.RunScanHint">Run a scan to find duplicate files.</sys:String>
     <sys:String x:Key="Results.SelectedCount"> selected</sys:String>
     <sys:String x:Key="Results.Trash">Trash</sys:String>
     <sys:String x:Key="Results.Delete">Delete</sys:String>
+    <sys:String x:Key="Results.ColumnName">Name</sys:String>
+    <sys:String x:Key="Results.ColumnSize">Size</sys:String>
+    <sys:String x:Key="Results.ColumnResolution">Resolution</sys:String>
+    <sys:String x:Key="Results.ColumnModified">Modified</sys:String>
+    <sys:String x:Key="Results.ColumnCreated">Created</sys:String>
+    <sys:String x:Key="Results.ColumnHash">Hash</sys:String>
+    <sys:String x:Key="Results.Path">Path</sys:String>
 
     <!-- Settings View -->
     <sys:String x:Key="Settings.Title">Preferences</sys:String>
@@ -132,10 +139,10 @@ Do you want to continue?</sys:String>
 
     <!-- Folder Tree View -->
     <sys:String x:Key="FolderTree.SelectFolder">Select Folder</sys:String>
-    <sys:String x:Key="FolderTree.SelectFolderHint">Select a folder</sys:String>
-    <sys:String x:Key="FolderTree.SelectFolderToAnalyzeHint">Select a folder to analyze disk usage</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderHint">Select a folder.</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderToAnalyzeHint">Select a folder to analyze disk usage.</sys:String>
     <sys:String x:Key="FolderTree.FolderFileList">Folder / File List</sys:String>
-    <sys:String x:Key="FolderTree.SelectFolderToShowList">Select a folder to display the list</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderToShowList">Select a folder to display the list.</sys:String>
     <sys:String x:Key="FolderTree.FoldersAnalyzed">{0:N0} folders analyzed</sys:String>
     <sys:String x:Key="FolderTree.AnalyzingFolder">Analyzing folder...</sys:String>
     <sys:String x:Key="FolderTree.AnalysisFailed">Folder analysis failed</sys:String>
@@ -147,7 +154,7 @@ Do you want to continue?</sys:String>
     <sys:String x:Key="FolderTree.LoadListFailed">Failed to load list: {0}</sys:String>
     <sys:String x:Key="FolderTree.NoOtherItems">No other items</sys:String>
     <sys:String x:Key="FolderTree.OthersSummary">Others: {0} folders, {1} files</sys:String>
-    <sys:String x:Key="FolderTree.LoadOthersFailed">Failed to load others list</sys:String>
+    <sys:String x:Key="FolderTree.LoadOthersFailed">Failed to load others list.</sys:String>
 
     <!-- Delete Confirmation Dialog -->
     <sys:String x:Key="Delete.ConfirmTitle">Confirm Deletion</sys:String>

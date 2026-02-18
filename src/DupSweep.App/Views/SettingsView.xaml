@@ -76,7 +76,7 @@
                                 Value="{Binding ParallelThreads}"
                                 TickFrequency="1"
                                 IsSnapToTickEnabled="True"
-                                AutoToolTipPlacement="TopLeft" />
+                                AutoToolTipPlacement="None" />
                         <TextBlock Text="{DynamicResource Settings.ParallelThreadsHint}"
                                    Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                    Opacity="0.6" />

@@ -121,7 +121,9 @@ public class DuplicateDetector
                     continue;
                 }
 
-                var similarity = PerceptualHash.SimilarityPercent(baseFile.PerceptualHash!.Value, other.PerceptualHash!.Value);
+                var similarity = PerceptualHash.CombinedSimilarityPercent(
+                    baseFile.PerceptualHash!.Value, other.PerceptualHash!.Value,
+                    baseFile.ColorHash, other.ColorHash);
                 if (similarity >= thresholdPercent)
                 {
                     groupFiles.Add(other);

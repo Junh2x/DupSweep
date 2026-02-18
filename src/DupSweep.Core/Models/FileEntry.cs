@@ -41,7 +41,8 @@ public class FileEntry
     // 해시값 (필요 시 계산)
     public string? QuickHash { get; set; }      // 빠른 비교용 부분 해시
     public string? FullHash { get; set; }       // 정확한 비교용 전체 해시
-    public ulong? PerceptualHash { get; set; }  // 이미지/비디오 유사도 비교용 지각 해시
+    public ulong? PerceptualHash { get; set; }  // 이미지/비디오 유사도 비교용 지각 해시 (구조)
+    public ulong? ColorHash { get; set; }       // 이미지 유사도 비교용 색상 해시 (색차)
     public ulong? AudioFingerprint { get; set; } // 오디오 유사도 비교용 핑거프린트
 
     // 썸네일 정보

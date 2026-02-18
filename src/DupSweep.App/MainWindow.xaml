@@ -71,12 +71,14 @@
     <Border x:Name="MainBorder"
             Background="{StaticResource BackgroundBrush}"
             CornerRadius="12"
-            BorderThickness="0">
+            BorderBrush="#C0C0C0"
+            BorderThickness="1">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="20"
-                              ShadowDepth="0"
+            <DropShadowEffect BlurRadius="24"
+                              ShadowDepth="2"
+                              Direction="270"
                               Color="#000000"
-                              Opacity="0.15" />
+                              Opacity="0.2" />
         </Border.Effect>
 
         <Grid>
