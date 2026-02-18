@@ -329,6 +329,7 @@ public class ScanService : IScanService
                     _pauseEvent.Wait(cancellationToken);
 
                     image.PerceptualHash = await _imageProcessor.ComputePerceptualHashAsync(image.FilePath, config, cancellationToken);
+                    image.ColorHash = await _imageProcessor.ComputeColorHashAsync(image.FilePath, cancellationToken);
                     processedImages++;
                     ReportProgress(ScanPhase.Comparing, processedImages, images.Count, image.FilePath, duplicateGroups.Count, duplicateGroups.Sum(g => g.PotentialSavings), stopwatch);
                 }

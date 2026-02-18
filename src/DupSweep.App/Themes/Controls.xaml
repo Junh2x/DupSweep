@@ -213,7 +213,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="24" />
+        <Setter Property="Padding" Value="16" />
         <Setter Property="Effect">
             <Setter.Value>
                 <DropShadowEffect BlurRadius="10"
@@ -231,7 +231,7 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="CornerRadius" Value="16" />
-        <Setter Property="Padding" Value="24" />
+        <Setter Property="Padding" Value="16" />
         <Setter Property="Effect">
             <Setter.Value>
                 <DropShadowEffect BlurRadius="24"

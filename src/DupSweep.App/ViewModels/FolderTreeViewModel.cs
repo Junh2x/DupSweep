@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DupSweep.App.Services;
 
 namespace DupSweep.App.ViewModels;
 
@@ -63,7 +64,7 @@ public partial class FolderTreeViewModel : ObservableObject
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "분석할 폴더 선택"
+            Title = LanguageService.Instance.GetString("FolderTree.SelectFolderToAnalyze")
         };
 
         if (dialog.ShowDialog() == true)
@@ -78,7 +79,7 @@ public partial class FolderTreeViewModel : ObservableObject
             return;
 
         IsLoading = true;
-        LoadingMessage = "폴더 분석 중...";
+        LoadingMessage = LanguageService.Instance.GetString("FolderTree.AnalyzingFolder");
         HasData = false;
         BarLevels.Clear();
         Breadcrumbs.Clear();
@@ -98,7 +99,7 @@ public partial class FolderTreeViewModel : ObservableObject
 
             if (_rootNode == null)
             {
-                LoadingMessage = "폴더 분석 실패";
+                LoadingMessage = LanguageService.Instance.GetString("FolderTree.AnalysisFailed");
                 return;
             }
 
@@ -160,7 +161,7 @@ public partial class FolderTreeViewModel : ObservableObject
             {
                 level.Items.Add(new FolderBarItem
                 {
-                    Name = "(파일)",
+                    Name = LanguageService.Instance.GetString("FolderTree.FileLabel"),
                     FullPath = _rootNode.FullPath,
                     Size = _rootNode.FilesSize,
                     FormattedSize = FormatSize(_rootNode.FilesSize),
@@ -186,7 +187,7 @@ public partial class FolderTreeViewModel : ObservableObject
         {
             level.Items.Add(new FolderBarItem
             {
-                Name = $"기타 ({othersCount})",
+                Name = LanguageService.Instance.GetString("FolderTree.Others", othersCount),
                 Size = othersSize,
                 FormattedSize = FormatSize(othersSize),
                 WidthPercent = _rootNode.Size > 0 ? (double)othersSize / _rootNode.Size * 100 : 0,
@@ -327,7 +328,7 @@ public partial class FolderTreeViewModel : ObservableObject
             {
                 level.Items.Add(new FolderBarItem
                 {
-                    Name = "(파일)",
+                    Name = LanguageService.Instance.GetString("FolderTree.FileLabel"),
                     FullPath = parentNode.FullPath,
                     Size = parentNode.FilesSize,
                     FormattedSize = FormatSize(parentNode.FilesSize),
@@ -354,7 +355,7 @@ public partial class FolderTreeViewModel : ObservableObject
         {
             level.Items.Add(new FolderBarItem
             {
-                Name = $"기타 ({othersCount})",
+                Name = LanguageService.Instance.GetString("FolderTree.Others", othersCount),
                 Size = othersSize,
                 FormattedSize = FormatSize(othersSize),
                 WidthPercent = parentNode.Size > 0 ? (double)othersSize / parentNode.Size * 100 : 0,
@@ -500,12 +501,12 @@ public partial class FolderTreeViewModel : ObservableObject
             int totalFolders = items.Count(i => i.IsFolder);
             int totalFiles = items.Count(i => !i.IsFolder);
             int totalItems = totalFolders + totalFiles;
-            CurrentFolderFileInfo = $"{totalFolders}개 폴더, {totalFiles}개 파일" +
-                (totalItems > 50 ? " (상위 50개 표시)" : "");
+            CurrentFolderFileInfo = LanguageService.Instance.GetString("FolderTree.FolderFileSummary", totalFolders, totalFiles) +
+                (totalItems > 50 ? " " + LanguageService.Instance.GetString("FolderTree.Top50Shown") : "");
         }
         catch (Exception ex)
         {
-            CurrentFolderFileInfo = $"목록을 불러올 수 없습니다: {ex.Message}";
+            CurrentFolderFileInfo = LanguageService.Instance.GetString("FolderTree.LoadListFailed", ex.Message);
         }
     }
 
@@ -515,7 +516,7 @@ public partial class FolderTreeViewModel : ObservableObject
 
         if (item.OthersNodes == null && !item.OthersIncludesFiles)
         {
-            CurrentFolderFileInfo = "기타 항목 없음";
+            CurrentFolderFileInfo = LanguageService.Instance.GetString("FolderTree.NoOtherItems");
             return;
         }
 
@@ -573,12 +574,12 @@ public partial class FolderTreeViewModel : ObservableObject
 
             int folderCount = item.OthersNodes?.Count ?? 0;
             int fileCount = items.Count - folderCount;
-            CurrentFolderFileInfo = $"기타: {folderCount}개 폴더, {fileCount}개 파일" +
-                (items.Count > 50 ? " (상위 50개 표시)" : "");
+            CurrentFolderFileInfo = LanguageService.Instance.GetString("FolderTree.OthersSummary", folderCount, fileCount) +
+                (items.Count > 50 ? " " + LanguageService.Instance.GetString("FolderTree.Top50Shown") : "");
         }
         catch
         {
-            CurrentFolderFileInfo = "기타 목록을 불러올 수 없습니다";
+            CurrentFolderFileInfo = LanguageService.Instance.GetString("FolderTree.LoadOthersFailed");
         }
     }
 

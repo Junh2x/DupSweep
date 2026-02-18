@@ -9,6 +9,7 @@ namespace DupSweep.Core.Processors;
 public interface IImageProcessor
 {
     Task<ulong?> ComputePerceptualHashAsync(string filePath, ScanConfig config, CancellationToken cancellationToken);
+    Task<ulong?> ComputeColorHashAsync(string filePath, CancellationToken cancellationToken);
     Task<byte[]?> CreateThumbnailAsync(string filePath, ScanConfig config, CancellationToken cancellationToken);
     Task<(int Width, int Height)> GetImageResolutionAsync(string filePath, CancellationToken cancellationToken);
 }

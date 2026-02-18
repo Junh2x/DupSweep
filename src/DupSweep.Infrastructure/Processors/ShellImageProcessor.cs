@@ -19,6 +19,11 @@ public class ShellImageProcessor : IImageProcessor
         return await _fallbackProcessor.ComputePerceptualHashAsync(filePath, config, cancellationToken);
     }
 
+    public async Task<ulong?> ComputeColorHashAsync(string filePath, CancellationToken cancellationToken)
+    {
+        return await _fallbackProcessor.ComputeColorHashAsync(filePath, cancellationToken);
+    }
+
     public Task<byte[]?> CreateThumbnailAsync(string filePath, ScanConfig config, CancellationToken cancellationToken)
     {
         return Task.Run(() =>
@@ -135,6 +140,42 @@ internal class FallbackImageProcessor : IImageProcessor
                     for (int x = 0; x < 8; x++)
                     {
                         if (row[x].R > row[x + 1].R)
+                        {
+                            hash |= 1UL << bit;
+                        }
+                        bit++;
+                    }
+                }
+            });
+
+            return hash;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<ulong?> ComputeColorHashAsync(string filePath, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var image = await SixLabors.ImageSharp.Image.LoadAsync<SixLabors.ImageSharp.PixelFormats.Rgba32>(filePath, cancellationToken);
+            image.Mutate(x => x.Resize(9, 8));
+
+            ulong hash = 0;
+            int bit = 0;
+
+            image.ProcessPixelRows(accessor =>
+            {
+                for (int y = 0; y < accessor.Height; y++)
+                {
+                    var row = accessor.GetRowSpan(y);
+                    for (int x = 0; x < 8; x++)
+                    {
+                        int chromaDiff1 = row[x].R - row[x].G;
+                        int chromaDiff2 = row[x + 1].R - row[x + 1].G;
+                        if (chromaDiff1 > chromaDiff2)
                         {
                             hash |= 1UL << bit;
                         }

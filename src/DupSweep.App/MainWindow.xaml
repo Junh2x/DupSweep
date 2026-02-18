@@ -71,12 +71,14 @@
     <Border x:Name="MainBorder"
             Background="{StaticResource BackgroundBrush}"
             CornerRadius="12"
-            BorderThickness="0">
+            BorderBrush="#C0C0C0"
+            BorderThickness="1">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="20"
-                              ShadowDepth="0"
+            <DropShadowEffect BlurRadius="24"
+                              ShadowDepth="2"
+                              Direction="270"
                               Color="#000000"
-                              Opacity="0.15" />
+                              Opacity="0.2" />
         </Border.Effect>
 
         <Grid>
@@ -116,7 +118,7 @@
                                            FontSize="22"
                                            FontWeight="Bold"
                                            Foreground="White" />
-                                <TextBlock Text="중복 파일 찾기"
+                                <TextBlock Text="{DynamicResource App.Subtitle}"
                                            FontSize="11"
                                            Foreground="#78909C"
                                            Margin="0,-2,0,0" />
@@ -126,7 +128,7 @@
 
                     <!-- Navigation -->
                     <StackPanel Grid.Row="2">
-                        <TextBlock Text="메인 메뉴"
+                        <TextBlock Text="{DynamicResource Nav.MainMenu}"
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="#546E7A"
@@ -139,7 +141,7 @@
                                      Tag="0">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Home" Width="22" Height="22" VerticalAlignment="Center" />
-                                <TextBlock Text="홈" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{DynamicResource Nav.Home}" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </RadioButton>
 
@@ -149,13 +151,13 @@
                                      Tag="1">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Magnify" Width="22" Height="22" VerticalAlignment="Center" />
-                                <TextBlock Text="스캔" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{DynamicResource Nav.Scan}" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </RadioButton>
 
                         <Separator Margin="24,20" Background="#263850" />
 
-                        <TextBlock Text="도구"
+                        <TextBlock Text="{DynamicResource Nav.Tools}"
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="#546E7A"
@@ -167,13 +169,13 @@
                                      Tag="4">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="FileTree" Width="22" Height="22" VerticalAlignment="Center" />
-                                <TextBlock Text="폴더 트리" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{DynamicResource Nav.FolderTree}" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </RadioButton>
 
                         <Separator Margin="24,20" Background="#263850" />
 
-                        <TextBlock Text="설정"
+                        <TextBlock Text="{DynamicResource Nav.Settings}"
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="#546E7A"
@@ -185,7 +187,7 @@
                                      Tag="3">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="CogOutline" Width="22" Height="22" VerticalAlignment="Center" />
-                                <TextBlock Text="환경설정" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock Text="{DynamicResource Nav.SettingsLabel}" FontSize="14" FontWeight="Medium" Margin="14,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </RadioButton>
                     </StackPanel>
@@ -236,7 +238,7 @@
                             <TextBlock Text="{Binding Title}"
                                        Style="{StaticResource HeadlineMedium}" />
                             <TextBlock x:Name="PageSubtitle"
-                                       Text="중복 파일을 검색할 폴더를 선택하세요"
+                                       Text="{DynamicResource Subtitle.Home}"
                                        Style="{StaticResource Caption}"
                                        Margin="0,2,0,0" />
                         </StackPanel>
@@ -248,17 +250,17 @@
                             <!-- Window Controls -->
                             <Button Style="{StaticResource IconButton}"
                                     Click="MinimizeButton_Click"
-                                    ToolTip="최소화">
+                                    ToolTip="{DynamicResource Window.Minimize}">
                                 <materialDesign:PackIcon Kind="WindowMinimize" Width="18" Height="18" />
                             </Button>
                             <Button Style="{StaticResource IconButton}"
                                     Click="MaximizeButton_Click"
-                                    ToolTip="최대화">
+                                    ToolTip="{DynamicResource Window.Maximize}">
                                 <materialDesign:PackIcon Kind="WindowMaximize" Width="18" Height="18" />
                             </Button>
                             <Button Style="{StaticResource IconButton}"
                                     Click="CloseButton_Click"
-                                    ToolTip="닫기">
+                                    ToolTip="{DynamicResource Window.Close}">
                                 <materialDesign:PackIcon Kind="Close" Width="18" Height="18" />
                             </Button>
                         </StackPanel>
@@ -272,12 +274,12 @@
                         ClipToBounds="True">
                     <Grid>
                         <ContentControl Content="{Binding CurrentView}"
-                                        Margin="24,16,24,24" />
+                                        Margin="16,12,16,16" />
 
                         <!-- Notification Host - Toast notifications overlay -->
                         <controls:NotificationHost VerticalAlignment="Bottom"
                                                    HorizontalAlignment="Right"
-                                                   Margin="0,0,24,24" />
+                                                   Margin="0,0,16,16" />
                     </Grid>
                 </Border>
             </Grid>

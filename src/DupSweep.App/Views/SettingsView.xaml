@@ -10,52 +10,48 @@
              d:DesignHeight="600" d:DesignWidth="900">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="600" Margin="0,0,0,32">
+        <StackPanel MaxWidth="540" Margin="0,0,0,20">
             <!-- Header -->
-            <TextBlock Text="환경설정"
+            <TextBlock Text="{DynamicResource Settings.Title}"
                        Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                       Margin="0,0,0,24" />
+                       Margin="0,0,0,16" />
 
             <!-- Appearance -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
-                    <TextBlock Text="외관"
+                    <TextBlock Text="{DynamicResource Settings.Appearance}"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
-                               Margin="0,0,0,16" />
+                               Margin="0,0,0,12" />
 
                     <DockPanel>
                         <ComboBox DockPanel.Dock="Right"
                                   Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                                  SelectedItem="{Binding ThumbnailSize}"
-                                  Width="100">
-                            <ComboBoxItem Content="64" />
-                            <ComboBoxItem Content="128" />
-                            <ComboBoxItem Content="256" />
-                        </ComboBox>
+                                  ItemsSource="{Binding AvailableLanguages}"
+                                  SelectedItem="{Binding SelectedLanguage}"
+                                  DisplayMemberPath="DisplayName"
+                                  Width="110"
+                                  materialDesign:ComboBoxAssist.ShowSelectedItem="True" />
                         <StackPanel>
-                            <TextBlock Text="썸네일 크기" />
-                            <TextBlock Text="미리보기 썸네일 크기"
-                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                       Opacity="0.6" />
+                            <TextBlock Text="{DynamicResource Settings.Language}" />
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>
             </materialDesign:Card>
 
             <!-- Deletion -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
-                    <TextBlock Text="삭제"
+                    <TextBlock Text="{DynamicResource Settings.Deletion}"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
-                               Margin="0,0,0,16" />
+                               Margin="0,0,0,12" />
 
                     <DockPanel>
                         <ToggleButton DockPanel.Dock="Right"
                                       Style="{StaticResource MaterialDesignSwitchToggleButton}"
                                       IsChecked="{Binding ShowConfirmationDialog}" />
                         <StackPanel>
-                            <TextBlock Text="확인 대화 상자 표시" />
-                            <TextBlock Text="파일 삭제 전 확인"
+                            <TextBlock Text="{DynamicResource Settings.ShowConfirmDialog}" />
+                            <TextBlock Text="{DynamicResource Settings.ConfirmBeforeDelete}"
                                        Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                        Opacity="0.6" />
                         </StackPanel>
@@ -64,23 +60,24 @@
             </materialDesign:Card>
 
             <!-- Performance -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
-                    <TextBlock Text="성능"
+                    <TextBlock Text="{DynamicResource Settings.Performance}"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
-                               Margin="0,0,0,16" />
+                               Margin="0,0,0,12" />
 
                     <StackPanel Margin="0,0,0,8">
-                        <TextBlock>
-                            <Run Text="병렬 스레드:" />
-                            <Run Text="{Binding ParallelThreads}" />
-                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{DynamicResource Settings.ParallelThreads}" />
+                            <TextBlock Text="{Binding ParallelThreads}" Margin="4,0,0,0" />
+                        </StackPanel>
                         <Slider Minimum="1"
                                 Maximum="32"
                                 Value="{Binding ParallelThreads}"
-                                Style="{StaticResource MaterialDesignDiscreteSlider}"
-                                TickFrequency="1" />
-                        <TextBlock Text="병렬 처리를 위한 스레드 수"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                AutoToolTipPlacement="None" />
+                        <TextBlock Text="{DynamicResource Settings.ParallelThreadsHint}"
                                    Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                    Opacity="0.6" />
                     </StackPanel>
@@ -88,19 +85,19 @@
             </materialDesign:Card>
 
             <!-- FFmpeg -->
-            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,16">
+            <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="FFmpeg"
                                Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
-                               Margin="0,0,0,16" />
+                               Margin="0,0,0,12" />
 
                     <DockPanel>
                         <Button DockPanel.Dock="Right"
                                 Style="{StaticResource MaterialDesignOutlinedButton}"
-                                Content="찾아보기"
+                                Content="{DynamicResource Settings.Browse}"
                                 Command="{Binding BrowseFFmpegPathCommand}" />
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="FFmpeg 경로" />
+                            <TextBlock Text="{DynamicResource Settings.FFmpegPath}" />
                             <TextBlock Text="{Binding FfmpegPath, TargetNullValue='설정되지 않음'}"
                                        Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                        Opacity="0.6"
@@ -111,7 +108,7 @@
             </materialDesign:Card>
 
             <!-- Reset -->
-            <Button Content="기본값으로 초기화"
+            <Button Content="{DynamicResource Settings.ResetToDefaults}"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
                     Command="{Binding ResetToDefaultsCommand}"
                     HorizontalAlignment="Left" />

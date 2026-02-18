@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using DupSweep.App.Services;
 using DupSweep.App.ViewModels;
 
 namespace DupSweep.App;
@@ -12,19 +13,20 @@ namespace DupSweep.App;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly string[] _subtitles =
+    private static readonly string[] SubtitleKeys =
     {
-        "중복 파일을 검색할 폴더를 선택하세요",
-        "중복 파일을 검색 중...",
-        "", // (미사용)
-        "애플리케이션 설정",
-        "폴더 구조를 탐색하고 용량을 확인하세요"
+        "Subtitle.Home",
+        "Subtitle.Scan",
+        "Subtitle.Results",
+        "Subtitle.Settings",
+        "Subtitle.FolderTree"
     };
 
     public MainWindow()
     {
         InitializeComponent();
         DataContextChanged += MainWindow_DataContextChanged;
+        LanguageService.Instance.LanguageChanged += (_, _) => UpdateSubtitle();
     }
 
     #region Window Controls
@@ -67,8 +69,12 @@ public partial class MainWindow : Window
 
     #region Navigation
 
+    private bool _isNavigating;
+
     private void NavItem_Checked(object sender, RoutedEventArgs e)
     {
+        if (_isNavigating) return;
+
         if (sender is RadioButton radioButton && radioButton.Tag is string tagStr)
         {
             if (int.TryParse(tagStr, out int index))
@@ -81,18 +87,26 @@ public partial class MainWindow : Window
 
     private void UpdateNavRadioButton(int index)
     {
-        RadioButton? navButton = index switch
+        _isNavigating = true;
+        try
         {
-            0 => HomeNav,
-            1 => ScanNav,
-            3 => SettingsNav,
-            4 => FolderTreeNav,
-            _ => null
-        };
+            RadioButton? navButton = index switch
+            {
+                0 => HomeNav,
+                1 => ScanNav,
+                3 => SettingsNav,
+                4 => FolderTreeNav,
+                _ => null
+            };
 
-        if (navButton != null)
+            if (navButton != null)
+            {
+                navButton.IsChecked = true;
+            }
+        }
+        finally
         {
-            navButton.IsChecked = true;
+            _isNavigating = false;
         }
     }
 
@@ -103,9 +117,9 @@ public partial class MainWindow : Window
             index = ViewModel?.SelectedNavIndex ?? 0;
         }
 
-        if (index >= 0 && index < _subtitles.Length)
+        if (index >= 0 && index < SubtitleKeys.Length)
         {
-            PageSubtitle.Text = _subtitles[index.Value];
+            PageSubtitle.Text = LanguageService.Instance.GetString(SubtitleKeys[index.Value]);
         }
     }
 

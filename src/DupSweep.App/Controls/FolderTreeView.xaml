@@ -15,9 +15,23 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Header -->
+        <!-- Header (hidden when no folder selected) -->
         <Border Grid.Row="0" Background="{DynamicResource MaterialDesignCardBackground}"
-                Padding="8" Margin="0,0,0,4">
+                Padding="6,4" Margin="0,0,0,4">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding HasData}" Value="False" />
+                                <Condition Binding="{Binding IsLoading}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -38,7 +52,7 @@
                                Visibility="{Binding HasData, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
 
-                <Button Grid.Column="1" Content="폴더 선택"
+                <Button Grid.Column="1" Content="{DynamicResource FolderTree.SelectFolder}"
                         Command="{Binding SelectFolderCommand}"
                         Style="{StaticResource MaterialDesignFlatButton}"
                         Height="28" Padding="12,0"
@@ -48,7 +62,7 @@
 
         <!-- Main Content -->
         <Grid Grid.Row="1">
-            <!-- Empty State -->
+            <!-- Empty State - Centered CTA -->
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
@@ -64,10 +78,40 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <materialDesign:PackIcon Kind="ChartBar" Width="48" Height="48"
-                                          HorizontalAlignment="Center" Opacity="0.3" />
-                <TextBlock Text="폴더를 선택하세요" HorizontalAlignment="Center"
-                           Margin="0,8,0,0" Opacity="0.5" />
+
+                <Border Width="80" Height="80"
+                        CornerRadius="40"
+                        Background="{StaticResource BackgroundBrush}"
+                        HorizontalAlignment="Center">
+                    <materialDesign:PackIcon Kind="FolderSearch"
+                                             Width="40" Height="40"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Foreground="{StaticResource AccentBrush}" />
+                </Border>
+
+                <TextBlock Text="{DynamicResource FolderTree.SelectFolderHint}"
+                           Style="{StaticResource TitleMedium}"
+                           HorizontalAlignment="Center"
+                           Margin="0,20,0,0" />
+                <TextBlock Text="{DynamicResource FolderTree.SelectFolderToAnalyzeHint}"
+                           Style="{StaticResource Caption}"
+                           HorizontalAlignment="Center"
+                           Margin="0,6,0,20" />
+
+                <Button Style="{StaticResource SecondaryButton}"
+                        Command="{Binding SelectFolderCommand}"
+                        HorizontalAlignment="Center"
+                        Padding="28,12">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="FolderOpen"
+                                                 Width="20" Height="20"
+                                                 VerticalAlignment="Center" />
+                        <TextBlock Text="{DynamicResource FolderTree.SelectFolder}"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
 
             <!-- Loading -->
@@ -117,11 +161,11 @@
                 </Border>
 
                 <!-- Bar Charts -->
-                <Border Grid.Row="1" Background="{DynamicResource MaterialDesignCardBackground}" Padding="8,4">
+                <Border Grid.Row="1" Background="{DynamicResource MaterialDesignCardBackground}" Padding="6,2">
                     <ItemsControl ItemsSource="{Binding BarLevels}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,2" Height="34">
+                                <Grid Margin="0,2" Height="28">
                                     <TextBlock Text="{Binding Depth, StringFormat=L{0}}"
                                                Width="22" FontSize="11" Opacity="0.4"
                                                VerticalAlignment="Center" />
@@ -136,7 +180,7 @@
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Border Height="34" CornerRadius="3"
+                                                    <Border Height="28" CornerRadius="0"
                                                             Cursor="Hand"
                                                             MouseLeftButtonDown="BarSegment_Click"
                                                             ToolTipService.InitialShowDelay="0"
@@ -242,7 +286,7 @@
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
                             <materialDesign:PackIcon Kind="FolderOpen" Width="14" Height="14"
                                                       VerticalAlignment="Center" Margin="0,0,4,0" Opacity="0.6" />
-                            <TextBlock Text="폴더/파일 목록" FontSize="11" FontWeight="Medium" Opacity="0.7" />
+                            <TextBlock Text="{DynamicResource FolderTree.FolderFileList}" FontSize="11" FontWeight="Medium" Opacity="0.7" />
                             <TextBlock Text="{Binding CurrentFolderFileInfo}" FontSize="10"
                                        Margin="8,0,0,0" Opacity="0.5" VerticalAlignment="Center" />
                         </StackPanel>
@@ -251,7 +295,7 @@
                             <ItemsControl ItemsSource="{Binding CurrentFiles}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Padding="4,2" Margin="0,1"
+                                        <Border Padding="3,2" Margin="0,1"
                                                 Background="{DynamicResource MaterialDesignToolBarBackground}"
                                                 CornerRadius="2">
                                             <Grid>
@@ -295,7 +339,7 @@
                         </ScrollViewer>
 
                         <!-- Empty file list -->
-                        <TextBlock Grid.Row="1" Text="폴더를 선택하면 목록이 표시됩니다"
+                        <TextBlock Grid.Row="1" Text="{DynamicResource FolderTree.SelectFolderToShowList}"
                                    FontSize="11" Opacity="0.4" HorizontalAlignment="Center"
                                    VerticalAlignment="Center">
                             <TextBlock.Style>

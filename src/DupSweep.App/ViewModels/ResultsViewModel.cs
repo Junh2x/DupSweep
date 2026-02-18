@@ -19,7 +19,11 @@ public partial class ResultsViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<DuplicateGroupViewModel> _duplicateGroups = new();
 
+    [ObservableProperty]
+    private ObservableCollection<FileItemViewModel> _allFiles = new();
+
     public ICollectionView DuplicateGroupsView { get; }
+    public ICollectionView AllFilesView { get; }
 
     [ObservableProperty]
     private string _filterType = "All";
@@ -32,6 +36,9 @@ public partial class ResultsViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _hasResults;
+
+    [ObservableProperty]
+    private FileItemViewModel? _focusedFile;
 
     // Auto Select Radio Button States
     [ObservableProperty]
@@ -69,11 +76,16 @@ public partial class ResultsViewModel : ObservableObject
             OnPropertyChanged(nameof(TotalFilesCount));
             DuplicateGroupsView.Refresh();
         };
+
+        AllFilesView = CollectionViewSource.GetDefaultView(AllFiles);
+        AllFilesView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(FileItemViewModel.GroupId)));
     }
 
     public void LoadResults(DupSweep.Core.Models.ScanResult result)
     {
         DuplicateGroups.Clear();
+        AllFiles.Clear();
+        FocusedFile = null;
 
         if (!result.IsSuccessful)
         {
@@ -81,6 +93,7 @@ public partial class ResultsViewModel : ObservableObject
             return;
         }
 
+        int groupIndex = 0;
         foreach (var group in result.DuplicateGroups)
         {
             var groupVm = new DuplicateGroupViewModel
@@ -107,7 +120,10 @@ public partial class ResultsViewModel : ObservableObject
                     ThumbnailPath = file.ThumbnailPath,
                     ThumbnailData = file.ThumbnailData,
                     Width = file.Width,
-                    Height = file.Height
+                    Height = file.Height,
+                    Hash = TruncateHash(file.FullHash ?? file.QuickHash),
+                    GroupId = groupIndex,
+                    ParentGroup = groupVm
                 };
                 fileVm.PropertyChanged += (_, args) =>
                 {
@@ -117,13 +133,21 @@ public partial class ResultsViewModel : ObservableObject
                     }
                 };
                 groupVm.Files.Add(fileVm);
+                AllFiles.Add(fileVm);
             }
 
             DuplicateGroups.Add(groupVm);
+            groupIndex++;
         }
 
         HasResults = DuplicateGroups.Count > 0;
         UpdateSelectionStats();
+    }
+
+    [RelayCommand]
+    private void CloseFocusedFile()
+    {
+        FocusedFile = null;
     }
 
     [RelayCommand]
@@ -305,9 +329,23 @@ public partial class ResultsViewModel : ObservableObject
 
     private void RemoveDeletedFiles(IEnumerable<FileItemViewModel> deletedFiles)
     {
+        var deletedList = deletedFiles.ToList();
+
+        // AllFiles에서도 제거
+        foreach (var file in deletedList)
+        {
+            AllFiles.Remove(file);
+        }
+
+        // FocusedFile이 삭제된 경우 해제
+        if (FocusedFile != null && deletedList.Contains(FocusedFile))
+        {
+            FocusedFile = null;
+        }
+
         foreach (var group in DuplicateGroups.ToList())
         {
-            foreach (var file in deletedFiles.ToList())
+            foreach (var file in deletedList)
             {
                 if (group.Files.Contains(file))
                 {
@@ -338,6 +376,15 @@ public partial class ResultsViewModel : ObservableObject
             System.Windows.MessageBoxImage.Warning);
 
         return result == System.Windows.MessageBoxResult.Yes;
+    }
+
+    private static string TruncateHash(string? hash)
+    {
+        if (string.IsNullOrEmpty(hash))
+        {
+            return "-";
+        }
+        return hash.Length > 16 ? hash[..16] + "..." : hash;
     }
 
     private static string FormatFileSize(long bytes)
@@ -377,12 +424,18 @@ public partial class DuplicateGroupViewModel : ObservableObject
     public int FileCount => Files.Count;
     public long TotalSize => Files.Sum(f => f.Size);
 
+    /// <summary>
+    /// 그룹 구분선에 표시할 라벨 (예: "3 files · Similar Image · 96%")
+    /// </summary>
+    public string GroupLabel => $"{FileCount} files · {GroupType} · {Similarity:0}%";
+
     public DuplicateGroupViewModel()
     {
         Files.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(FileCount));
             OnPropertyChanged(nameof(TotalSize));
+            OnPropertyChanged(nameof(GroupLabel));
         };
     }
 
@@ -529,6 +582,15 @@ public partial class FileItemViewModel : ObservableObject
 
     [ObservableProperty]
     private DateTime _createdDate;
+
+    [ObservableProperty]
+    private string _hash = string.Empty;
+
+    [ObservableProperty]
+    private int _groupId;
+
+    [ObservableProperty]
+    private DuplicateGroupViewModel? _parentGroup;
 
     public string FormattedSize => FormatFileSize(Size);
     public string Resolution => Width > 0 && Height > 0 ? $"{Width}×{Height}" : "-";

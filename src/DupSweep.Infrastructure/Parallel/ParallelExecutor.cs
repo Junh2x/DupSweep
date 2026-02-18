@@ -35,7 +35,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
     public void UpdateOptions(ParallelProcessingOptions options)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
-        _logger.LogInformation("병렬 처리 ?�션???�데?�트?�었?�니??");
+        _logger.LogInformation("병렬 처리 옵션이 업데이트되었습니다");
     }
 
     #region CPU Bound Operations
@@ -52,7 +52,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
             CancellationToken = cancellationToken
         };
 
-        _logger.LogDebug("CPU 바운??병렬 처리 ?�작 - 병렬?? {Parallelism}", parallelism);
+        _logger.LogDebug("CPU 바운드 병렬 처리 시작 - 병렬도: {Parallelism}", parallelism);
 
         await SystemParallel.ForEachAsync(source, options, async (item, ct) =>
         {
@@ -72,7 +72,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
         var parallelism = GetEffectiveCpuParallelism();
         var results = new ConcurrentBag<TResult>();
 
-        _logger.LogDebug("CPU 바운??병렬 처리 (결과 반환) ?�작 - 병렬?? {Parallelism}", parallelism);
+        _logger.LogDebug("CPU 바운드 병렬 처리 (결과 반환) 시작 - 병렬도: {Parallelism}", parallelism);
 
         await SystemParallel.ForEachAsync(source, new SystemParallelOptions
         {
@@ -104,7 +104,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
         var driveType = drivePath != null ? DetectStorageDriveType(drivePath) : StorageDriveType.Unknown;
         var parallelism = GetAdaptiveParallelism(driveType);
 
-        _logger.LogDebug("I/O 바운??병렬 처리 ?�작 - ?�라?�브 ?�형: {StorageDriveType}, 병렬?? {Parallelism}",
+        _logger.LogDebug("I/O 바운드 병렬 처리 시작 - 드라이브 유형: {StorageDriveType}, 병렬도: {Parallelism}",
             driveType, parallelism);
 
         await SystemParallel.ForEachAsync(source, new SystemParallelOptions
@@ -135,7 +135,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
         var items = source.ToList();
         var driveType = drivePath != null ? DetectStorageDriveType(drivePath) : StorageDriveType.Unknown;
 
-        // ?�일 ?�기�?분류
+        // 파일 크기별 분류
         var smallFiles = new List<T>();
         var mediumFiles = new List<T>();
         var largeFiles = new List<T>();
@@ -152,31 +152,31 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
         }
 
         _logger.LogDebug(
-            "?�일 ?�기 최적??병렬 처리 - ?�형: {Small}, 중형: {Medium}, ?�?? {Large}, ?�라?�브: {StorageDriveType}",
+            "파일 크기 최적화 병렬 처리 - 소형: {Small}, 중형: {Medium}, 대형: {Large}, 드라이브: {StorageDriveType}",
             smallFiles.Count, mediumFiles.Count, largeFiles.Count, driveType);
 
-        // ?��? ?�일 ?�선 처리 (빠른 ?�드�?
+        // 소형 파일 우선 처리 (빠른 피드백)
         if (_options.EnableSmallFilesPriority && smallFiles.Count > 0)
         {
             var smallParallelism = GetAdaptiveParallelism(driveType);
             await ProcessBatchAsync(smallFiles, body, smallParallelism, cancellationToken);
         }
 
-        // 중간 ?�기 ?�일 처리
+        // 중간 크기 파일 처리
         if (mediumFiles.Count > 0)
         {
             var mediumParallelism = GetAdaptiveParallelism(driveType);
             await ProcessBatchAsync(mediumFiles, body, mediumParallelism, cancellationToken);
         }
 
-        // ?�?�량 ?�일 처리 (병렬???�한)
+        // 대용량 파일 처리 (병렬도 제한)
         if (largeFiles.Count > 0)
         {
             var largeParallelism = Math.Min(_options.LargeFileParallelism, GetAdaptiveParallelism(driveType));
             await ProcessBatchAsync(largeFiles, body, largeParallelism, cancellationToken);
         }
 
-        // ?��? ?�일 ?�선 처리가 비활?�화??경우
+        // 소형 파일 우선 처리가 비활성화된 경우
         if (!_options.EnableSmallFilesPriority && smallFiles.Count > 0)
         {
             var smallParallelism = GetAdaptiveParallelism(driveType);
@@ -216,11 +216,11 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
             if (string.IsNullOrEmpty(root))
                 return StorageDriveType.Unknown;
 
-            // 캐시 ?�인
+            // 캐시 확인
             if (_driveTypeCache.TryGetValue(root, out var cachedType))
                 return cachedType;
 
-            // ?�트?�크 ?�라?�브 ?�인
+            // 네트워크 드라이브 확인
             if (root.StartsWith(@"\\"))
             {
                 _driveTypeCache[root] = StorageDriveType.Network;
@@ -229,7 +229,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
 
             var driveInfo = new DriveInfo(root);
 
-            // ?�라?�브 ?�형 ?�인
+            // 드라이브 유형 확인
             if (driveInfo.DriveType == System.IO.DriveType.Network)
             {
                 _driveTypeCache[root] = StorageDriveType.Network;
@@ -242,7 +242,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
                 return StorageDriveType.Removable;
             }
 
-            // SSD vs HDD ?�별 (Windows only)
+            // SSD vs HDD 식별 (Windows only)
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 var isSsd = DetectSsdWindows(root);
@@ -251,13 +251,13 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
                 return detectedType;
             }
 
-            // 기본�?
+            // 기본값
             _driveTypeCache[root] = StorageDriveType.Unknown;
             return StorageDriveType.Unknown;
         }
         catch (Exception ex)
         {
-            _logger.LogDebug("?�라?�브 ?�형 감�? ?�패: {Path}, ?�류: {Error}", path, ex.Message);
+            _logger.LogDebug("드라이브 유형 감지 실패: {Path}, 오류: {Error}", path, ex.Message);
             return StorageDriveType.Unknown;
         }
     }
@@ -268,7 +268,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
         {
             var driveLetter = root.TrimEnd('\\', ':');
 
-            // WMI�??�용?�여 ?�라?�브 ?�형 ?�인
+            // WMI를 사용하여 드라이브 유형 확인
             using var searcher = new ManagementObjectSearcher(
                 $"SELECT MediaType FROM MSFT_PhysicalDisk WHERE DeviceID='{GetPhysicalDiskId(driveLetter)}'");
 
@@ -286,10 +286,10 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
         }
         catch
         {
-            // WMI ?�근 ?�패 ??기본�?반환
+            // WMI 접근 실패 시 기본값 반환
         }
 
-        // 기본?�으�?SSD�?가??(?�능???�전???�택)
+        // 기본적으로 SSD로 가정 (성능 안전한 선택)
         return true;
     }
 
@@ -327,7 +327,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
 
     public ResourceUsage GetCurrentResourceUsage()
     {
-        // 캐시??�??�용 (?�무 ?�주 조회?��? ?�도�?
+        // 캐시된 값 사용 (너무 자주 조회하지 않도록)
         if (_lastResourceUsage != null &&
             (DateTime.Now - _lastResourceCheck).TotalMilliseconds < _options.ResourceMonitorIntervalMs)
         {
@@ -341,14 +341,14 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
 
         try
         {
-            // GC ??메모�?
+            // GC 힙 메모리
             usage.GcHeapBytes = GC.GetTotalMemory(false);
 
-            // ?�로?�스 메모�?
+            // 프로세스 메모리
             using var process = Process.GetCurrentProcess();
             usage.UsedMemoryBytes = process.WorkingSet64;
 
-            // ?�스??메모�?(Windows)
+            // 시스템 메모리 (Windows)
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 var memStatus = new MEMORYSTATUSEX();
@@ -361,12 +361,12 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
                 }
             }
 
-            // CPU ?�용�?(간접 측정)
+            // CPU 사용률 (간접 측정)
             usage.CpuUsagePercent = EstimateCpuUsage();
         }
         catch (Exception ex)
         {
-            _logger.LogDebug("리소???�용??조회 ?�패: {Error}", ex.Message);
+            _logger.LogDebug("리소스 사용량 조회 실패: {Error}", ex.Message);
         }
 
         _lastResourceUsage = usage;
@@ -408,12 +408,12 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
 
         var resourceUsage = GetCurrentResourceUsage();
 
-        // 리소??과�?????병렬??감소
+        // 리소스 과부하 시 병렬도 감소
         if (resourceUsage.IsOverloaded(_options))
         {
             var reducedParallelism = Math.Max(1, baseParallelism / 2);
             _logger.LogDebug(
-                "리소??과�???감�? - 병렬??감소: {Base} -> {Reduced}, CPU: {Cpu:F1}%, Memory: {Memory:F1}%",
+                "리소스 과부하 감지 - 병렬도 감소: {Base} -> {Reduced}, CPU: {Cpu:F1}%, Memory: {Memory:F1}%",
                 baseParallelism, reducedParallelism, resourceUsage.CpuUsagePercent, resourceUsage.MemoryUsagePercent);
             return reducedParallelism;
         }
@@ -444,7 +444,7 @@ public class ParallelExecutor : IParallelExecutor, IDisposable
 
         if (resourceUsage.IsOverloaded(_options))
         {
-            // 짧�? ?�기로 ?�스??부??감소
+            // 짧은 대기로 시스템 부하 감소
             await Task.Delay(100, cancellationToken);
         }
     }

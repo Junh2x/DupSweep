@@ -1,0 +1,195 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- App -->
+    <sys:String x:Key="App.Title">DupSweep</sys:String>
+    <sys:String x:Key="App.Subtitle">Find Duplicate Files</sys:String>
+
+    <!-- Navigation -->
+    <sys:String x:Key="Nav.MainMenu">Main Menu</sys:String>
+    <sys:String x:Key="Nav.Home">Scan Settings</sys:String>
+    <sys:String x:Key="Nav.Scan">Scan</sys:String>
+    <sys:String x:Key="Nav.Results">Results</sys:String>
+    <sys:String x:Key="Nav.Tools">Tools</sys:String>
+    <sys:String x:Key="Nav.FolderTree">Folder Tree Analysis</sys:String>
+    <sys:String x:Key="Nav.Settings">Settings</sys:String>
+    <sys:String x:Key="Nav.SettingsLabel">Preferences</sys:String>
+
+    <!-- Window Controls -->
+    <sys:String x:Key="Window.Minimize">Minimize</sys:String>
+    <sys:String x:Key="Window.Maximize">Maximize</sys:String>
+    <sys:String x:Key="Window.Close">Close</sys:String>
+
+    <!-- Subtitles (per page) -->
+    <sys:String x:Key="Subtitle.Home">Select folders to scan for duplicate files.</sys:String>
+    <sys:String x:Key="Subtitle.Scan">Scanning for duplicate files...</sys:String>
+    <sys:String x:Key="Subtitle.Results"></sys:String>
+    <sys:String x:Key="Subtitle.Settings">Application settings</sys:String>
+    <sys:String x:Key="Subtitle.FolderTree">Browse folder structure and check disk usage.</sys:String>
+
+    <!-- Titles -->
+    <sys:String x:Key="Title.Home">Scan Settings</sys:String>
+    <sys:String x:Key="Title.Scan">Scan</sys:String>
+    <sys:String x:Key="Title.Results">Results</sys:String>
+    <sys:String x:Key="Title.Settings">Settings</sys:String>
+    <sys:String x:Key="Title.FolderTree">Folder Tree Analysis</sys:String>
+    <sys:String x:Key="Title.ScanResults">Scan Results</sys:String>
+
+    <!-- Home View -->
+    <sys:String x:Key="Home.ScanFolders">Scan Folders</sys:String>
+    <sys:String x:Key="Home.AddFolderHint">Add folders to find duplicate files.</sys:String>
+    <sys:String x:Key="Home.DropFolderHere">Drop folders here.</sys:String>
+    <sys:String x:Key="Home.OrClickBelow">or click the button below to browse</sys:String>
+    <sys:String x:Key="Home.BrowseFolder">Browse Folder</sys:String>
+    <sys:String x:Key="Home.ClearAll">Clear All</sys:String>
+    <sys:String x:Key="Home.AddFolder">Add Folder</sys:String>
+    <sys:String x:Key="Home.RemoveFolder">Remove Folder</sys:String>
+    <sys:String x:Key="Home.StartScan">Start Scan</sys:String>
+    <sys:String x:Key="Home.TabFileTarget">File Target</sys:String>
+    <sys:String x:Key="Home.TabScanLogic">Scan Logic</sys:String>
+    <sys:String x:Key="Home.TabSimilarity">Similarity</sys:String>
+    <sys:String x:Key="Home.AllFiles">ALL (All Files)</sys:String>
+    <sys:String x:Key="Home.SelectByCategory">Select by Category</sys:String>
+    <sys:String x:Key="Home.CategoryImage">Images</sys:String>
+    <sys:String x:Key="Home.CategoryVideo">Videos</sys:String>
+    <sys:String x:Key="Home.CategoryAudio">Audio</sys:String>
+    <sys:String x:Key="Home.CategoryDocument">Documents</sys:String>
+    <sys:String x:Key="Home.Hash">Hash</sys:String>
+    <sys:String x:Key="Home.FileSize">File Size</sys:String>
+    <sys:String x:Key="Home.Resolution">Resolution</sys:String>
+    <sys:String x:Key="Home.CreationDate">Creation Date</sys:String>
+    <sys:String x:Key="Home.ModifiedDateMatch">Modified Date Match</sys:String>
+    <sys:String x:Key="Home.ImageSimilarity">Image Similarity</sys:String>
+    <sys:String x:Key="Home.VideoSimilarity">Video Similarity</sys:String>
+    <sys:String x:Key="Home.SimilarityThreshold">Similarity Threshold</sys:String>
+    <sys:String x:Key="Home.FFmpegNotSet">FFmpeg path is not configured.
+Video similarity check will be skipped.
+
+Do you want to continue?</sys:String>
+    <sys:String x:Key="Home.FFmpegNotSetTitle">FFmpeg Not Set</sys:String>
+
+    <!-- Scan View -->
+    <sys:String x:Key="Scan.ProcessedFiles">Processed Files</sys:String>
+    <sys:String x:Key="Scan.DuplicateGroups">Duplicate Groups</sys:String>
+    <sys:String x:Key="Scan.SavableSpace">Savable Space</sys:String>
+    <sys:String x:Key="Scan.Cancel">Cancel</sys:String>
+    <sys:String x:Key="Scan.Pause">Pause</sys:String>
+    <sys:String x:Key="Scan.Resume">Resume</sys:String>
+    <sys:String x:Key="Scan.ReadyToScan">Ready to scan</sys:String>
+    <sys:String x:Key="Scan.Paused">Paused</sys:String>
+    <sys:String x:Key="Scan.Scanning">Scanning...</sys:String>
+    <sys:String x:Key="Scan.Cancelled">Scan cancelled</sys:String>
+
+    <!-- Scan Progress -->
+    <sys:String x:Key="ScanProgress.Initializing">Initializing...</sys:String>
+    <sys:String x:Key="ScanProgress.Scanning">Scanning files... ({0}/{1})</sys:String>
+    <sys:String x:Key="ScanProgress.Hashing">Calculating hashes... ({0}/{1})</sys:String>
+    <sys:String x:Key="ScanProgress.Comparing">Comparing files...</sys:String>
+    <sys:String x:Key="ScanProgress.Completed">Scan complete</sys:String>
+    <sys:String x:Key="ScanProgress.Cancelled">Scan cancelled</sys:String>
+    <sys:String x:Key="ScanProgress.Error">Error occurred</sys:String>
+    <sys:String x:Key="ScanProgress.Unknown">Unknown</sys:String>
+
+    <!-- Results View -->
+    <sys:String x:Key="Results.Group">Group /</sys:String>
+    <sys:String x:Key="Results.Files">files</sys:String>
+    <sys:String x:Key="Results.DeselectAll">Deselect All</sys:String>
+    <sys:String x:Key="Results.Keep">Keep:</sys:String>
+    <sys:String x:Key="Results.SizeAsc">Size ↑</sys:String>
+    <sys:String x:Key="Results.SizeDesc">Size ↓</sys:String>
+    <sys:String x:Key="Results.Newest">Newest</sys:String>
+    <sys:String x:Key="Results.Oldest">Oldest</sys:String>
+    <sys:String x:Key="Results.ResolutionAsc">Res ↑</sys:String>
+    <sys:String x:Key="Results.ResolutionDesc">Res ↓</sys:String>
+    <sys:String x:Key="Results.AutoSelect">Auto Select</sys:String>
+    <sys:String x:Key="Results.ItemFiles"> files</sys:String>
+    <sys:String x:Key="Results.Size">Size: </sys:String>
+    <sys:String x:Key="Results.ResolutionLabel">Resolution: </sys:String>
+    <sys:String x:Key="Results.ModifiedDate">Modified: </sys:String>
+    <sys:String x:Key="Results.CreatedDate">Created: </sys:String>
+    <sys:String x:Key="Results.RunScanHint">Run a scan to find duplicate files.</sys:String>
+    <sys:String x:Key="Results.SelectedCount"> selected</sys:String>
+    <sys:String x:Key="Results.Trash">Trash</sys:String>
+    <sys:String x:Key="Results.Delete">Delete</sys:String>
+    <sys:String x:Key="Results.ColumnName">Name</sys:String>
+    <sys:String x:Key="Results.ColumnSize">Size</sys:String>
+    <sys:String x:Key="Results.ColumnResolution">Resolution</sys:String>
+    <sys:String x:Key="Results.ColumnModified">Modified</sys:String>
+    <sys:String x:Key="Results.ColumnCreated">Created</sys:String>
+    <sys:String x:Key="Results.ColumnHash">Hash</sys:String>
+    <sys:String x:Key="Results.Path">Path</sys:String>
+
+    <!-- Settings View -->
+    <sys:String x:Key="Settings.Title">Preferences</sys:String>
+    <sys:String x:Key="Settings.Appearance">Appearance</sys:String>
+    <sys:String x:Key="Settings.Language">Language</sys:String>
+<sys:String x:Key="Settings.Deletion">Deletion</sys:String>
+    <sys:String x:Key="Settings.ShowConfirmDialog">Show Confirmation Dialog</sys:String>
+    <sys:String x:Key="Settings.ConfirmBeforeDelete">Confirm before deleting files</sys:String>
+    <sys:String x:Key="Settings.Performance">Performance</sys:String>
+    <sys:String x:Key="Settings.ParallelThreads">Parallel Threads:</sys:String>
+    <sys:String x:Key="Settings.ParallelThreadsHint">Number of threads for parallel processing</sys:String>
+    <sys:String x:Key="Settings.FFmpegPath">FFmpeg Path</sys:String>
+    <sys:String x:Key="Settings.NotSet">Not set</sys:String>
+    <sys:String x:Key="Settings.Browse">Browse</sys:String>
+    <sys:String x:Key="Settings.ResetToDefaults">Reset to Defaults</sys:String>
+    <sys:String x:Key="Settings.SelectFFmpeg">Select FFmpeg executable</sys:String>
+    <sys:String x:Key="Settings.FFmpegFilter">Executable files (*.exe)|*.exe</sys:String>
+
+    <!-- Folder Tree View -->
+    <sys:String x:Key="FolderTree.SelectFolder">Select Folder</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderHint">Select a folder.</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderToAnalyzeHint">Select a folder to analyze disk usage.</sys:String>
+    <sys:String x:Key="FolderTree.FolderFileList">Folder / File List</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderToShowList">Select a folder to display the list.</sys:String>
+    <sys:String x:Key="FolderTree.FoldersAnalyzed">{0:N0} folders analyzed</sys:String>
+    <sys:String x:Key="FolderTree.AnalyzingFolder">Analyzing folder...</sys:String>
+    <sys:String x:Key="FolderTree.AnalysisFailed">Folder analysis failed</sys:String>
+    <sys:String x:Key="FolderTree.SelectFolderToAnalyze">Select a folder to analyze</sys:String>
+    <sys:String x:Key="FolderTree.FileLabel">(file)</sys:String>
+    <sys:String x:Key="FolderTree.Others">Others ({0})</sys:String>
+    <sys:String x:Key="FolderTree.FolderFileSummary">{0} folders, {1} files</sys:String>
+    <sys:String x:Key="FolderTree.Top50Shown">(showing top 50)</sys:String>
+    <sys:String x:Key="FolderTree.LoadListFailed">Failed to load list: {0}</sys:String>
+    <sys:String x:Key="FolderTree.NoOtherItems">No other items</sys:String>
+    <sys:String x:Key="FolderTree.OthersSummary">Others: {0} folders, {1} files</sys:String>
+    <sys:String x:Key="FolderTree.LoadOthersFailed">Failed to load others list.</sys:String>
+
+    <!-- Delete Confirmation Dialog -->
+    <sys:String x:Key="Delete.ConfirmTitle">Confirm Deletion</sys:String>
+    <sys:String x:Key="Delete.FileCount">Files</sys:String>
+    <sys:String x:Key="Delete.ReclaimableSpace">Reclaimable Space</sys:String>
+    <sys:String x:Key="Delete.DeleteMethod">Delete Method</sys:String>
+    <sys:String x:Key="Delete.FilesToDelete">Files to delete:</sys:String>
+    <sys:String x:Key="Delete.Warning">Warning</sys:String>
+    <sys:String x:Key="Delete.DryRunPreview">Preview Only (Dry Run)</sys:String>
+    <sys:String x:Key="Delete.DryRunTooltip">Simulate without actually deleting files</sys:String>
+    <sys:String x:Key="Delete.CancelButton">Cancel</sys:String>
+    <sys:String x:Key="Delete.DeleteButton">Delete Files</sys:String>
+    <sys:String x:Key="Delete.ModePermanent">Permanent</sys:String>
+    <sys:String x:Key="Delete.ModeTrash">Trash</sys:String>
+    <sys:String x:Key="Delete.ConfirmPermanent">Delete Permanently</sys:String>
+    <sys:String x:Key="Delete.ConfirmTrash">Move to Trash</sys:String>
+    <sys:String x:Key="Delete.Blocked">blocked</sys:String>
+    <sys:String x:Key="Delete.WarnHiddenFiles">hidden files</sys:String>
+    <sys:String x:Key="Delete.WarnProtectedExt">protected extensions</sys:String>
+    <sys:String x:Key="Delete.WarnLargeFiles">large files</sys:String>
+    <sys:String x:Key="Delete.WarnRecentlyModified">recently modified</sys:String>
+    <sys:String x:Key="Delete.Warnings">warnings</sys:String>
+
+    <!-- Converters -->
+    <sys:String x:Key="Converter.Pause">Pause</sys:String>
+    <sys:String x:Key="Converter.Resume">Resume</sys:String>
+
+    <!-- Notifications -->
+    <sys:String x:Key="Notification.Success">Success</sys:String>
+    <sys:String x:Key="Notification.Information">Information</sys:String>
+    <sys:String x:Key="Notification.Warning">Warning</sys:String>
+    <sys:String x:Key="Notification.Error">Error</sys:String>
+    <sys:String x:Key="Notification.Processing">Processing</sys:String>
+
+    <!-- Common -->
+    <sys:String x:Key="Common.Error">Error: {0}</sys:String>
+
+</ResourceDictionary>

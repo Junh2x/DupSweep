@@ -31,4 +31,23 @@ public static class PerceptualHash
         var distance = HammingDistance(left, right);
         return 100d - (distance / 64d * 100d);
     }
+
+    /// <summary>
+    /// 구조 해시(dHash)와 색상 해시(ColorHash)를 결합한 유사도 계산
+    /// 구조 60% + 색상 40% 가중 평균으로 색상이 다른 이미지의 오탐 방지
+    /// </summary>
+    public static double CombinedSimilarityPercent(
+        ulong structureHash1, ulong structureHash2,
+        ulong? colorHash1, ulong? colorHash2)
+    {
+        double structureSim = SimilarityPercent(structureHash1, structureHash2);
+
+        if (!colorHash1.HasValue || !colorHash2.HasValue)
+        {
+            return structureSim;
+        }
+
+        double colorSim = SimilarityPercent(colorHash1.Value, colorHash2.Value);
+        return structureSim * 0.6 + colorSim * 0.4;
+    }
 }
