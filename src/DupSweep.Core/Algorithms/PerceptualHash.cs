@@ -40,14 +40,26 @@ public static class PerceptualHash
         ulong structureHash1, ulong structureHash2,
         ulong? colorHash1, ulong? colorHash2)
     {
+        var details = CombinedSimilarityDetails(structureHash1, structureHash2, colorHash1, colorHash2);
+        return details.Combined;
+    }
+
+    /// <summary>
+    /// 구조/색상/결합 유사도를 함께 반환
+    /// </summary>
+    public static (double Structure, double Color, double Combined) CombinedSimilarityDetails(
+        ulong structureHash1, ulong structureHash2,
+        ulong? colorHash1, ulong? colorHash2)
+    {
         double structureSim = SimilarityPercent(structureHash1, structureHash2);
 
         if (!colorHash1.HasValue || !colorHash2.HasValue)
         {
-            return structureSim;
+            return (structureSim, structureSim, structureSim);
         }
 
         double colorSim = SimilarityPercent(colorHash1.Value, colorHash2.Value);
-        return structureSim * 0.6 + colorSim * 0.4;
+        double combined = structureSim * 0.6 + colorSim * 0.4;
+        return (structureSim, colorSim, combined);
     }
 }

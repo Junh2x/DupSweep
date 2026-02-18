@@ -10,17 +10,15 @@
              d:DesignHeight="600" d:DesignWidth="900">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="540" Margin="0,0,0,20">
-            <!-- Header -->
+        <StackPanel MaxWidth="560" Margin="0,0,0,20">
             <TextBlock Text="{DynamicResource Settings.Title}"
-                       Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                       Style="{StaticResource HeadlineMedium}"
                        Margin="0,0,0,16" />
 
-            <!-- Appearance -->
             <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="{DynamicResource Settings.Appearance}"
-                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Style="{StaticResource TitleMedium}"
                                Margin="0,0,0,12" />
 
                     <DockPanel>
@@ -29,47 +27,45 @@
                                   ItemsSource="{Binding AvailableLanguages}"
                                   SelectedItem="{Binding SelectedLanguage}"
                                   DisplayMemberPath="DisplayName"
-                                  Width="110"
+                                  Width="130"
                                   materialDesign:ComboBoxAssist.ShowSelectedItem="True" />
-                        <StackPanel>
-                            <TextBlock Text="{DynamicResource Settings.Language}" />
+                        <StackPanel Margin="0,4,16,0">
+                            <TextBlock Text="{DynamicResource Settings.Language}" Style="{StaticResource BodyMedium}" />
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>
             </materialDesign:Card>
 
-            <!-- Deletion -->
             <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="{DynamicResource Settings.Deletion}"
-                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Style="{StaticResource TitleMedium}"
                                Margin="0,0,0,12" />
 
                     <DockPanel>
                         <ToggleButton DockPanel.Dock="Right"
                                       Style="{StaticResource MaterialDesignSwitchToggleButton}"
                                       IsChecked="{Binding ShowConfirmationDialog}" />
-                        <StackPanel>
-                            <TextBlock Text="{DynamicResource Settings.ShowConfirmDialog}" />
+                        <StackPanel Margin="0,2,16,0">
+                            <TextBlock Text="{DynamicResource Settings.ShowConfirmDialog}" Style="{StaticResource BodyMedium}" />
                             <TextBlock Text="{DynamicResource Settings.ConfirmBeforeDelete}"
-                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                       Opacity="0.6" />
+                                       Style="{StaticResource Caption}"
+                                       Opacity="0.75" />
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>
             </materialDesign:Card>
 
-            <!-- Performance -->
             <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="{DynamicResource Settings.Performance}"
-                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Style="{StaticResource TitleMedium}"
                                Margin="0,0,0,12" />
 
                     <StackPanel Margin="0,0,0,8">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{DynamicResource Settings.ParallelThreads}" />
-                            <TextBlock Text="{Binding ParallelThreads}" Margin="4,0,0,0" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="{DynamicResource Settings.ParallelThreads}" Style="{StaticResource BodyMedium}" />
+                            <TextBlock Text="{Binding ParallelThreads}" Style="{StaticResource BodyMedium}" Margin="4,0,0,0" FontWeight="SemiBold" />
                         </StackPanel>
                         <Slider Minimum="1"
                                 Maximum="32"
@@ -78,17 +74,16 @@
                                 IsSnapToTickEnabled="True"
                                 AutoToolTipPlacement="None" />
                         <TextBlock Text="{DynamicResource Settings.ParallelThreadsHint}"
-                                   Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                   Opacity="0.6" />
+                                   Style="{StaticResource Caption}"
+                                   Opacity="0.75" />
                     </StackPanel>
                 </StackPanel>
             </materialDesign:Card>
 
-            <!-- FFmpeg -->
             <materialDesign:Card materialDesign:ElevationAssist.Elevation="Dp1" Margin="0,0,0,12">
                 <StackPanel Margin="16">
                     <TextBlock Text="FFmpeg"
-                               Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                               Style="{StaticResource TitleMedium}"
                                Margin="0,0,0,12" />
 
                     <DockPanel>
@@ -96,18 +91,17 @@
                                 Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Content="{DynamicResource Settings.Browse}"
                                 Command="{Binding BrowseFFmpegPathCommand}" />
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="{DynamicResource Settings.FFmpegPath}" />
-                            <TextBlock Text="{Binding FfmpegPath, TargetNullValue='설정되지 않음'}"
-                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                       Opacity="0.6"
+                        <StackPanel Margin="0,2,16,0">
+                            <TextBlock Text="{DynamicResource Settings.FFmpegPath}" Style="{StaticResource BodyMedium}" />
+                            <TextBlock Text="{Binding FfmpegPath, TargetNullValue={DynamicResource Settings.NotSet}}"
+                                       Style="{StaticResource Caption}"
+                                       Opacity="0.75"
                                        TextTrimming="CharacterEllipsis" />
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>
             </materialDesign:Card>
 
-            <!-- Reset -->
             <Button Content="{DynamicResource Settings.ResetToDefaults}"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
                     Command="{Binding ResetToDefaultsCommand}"

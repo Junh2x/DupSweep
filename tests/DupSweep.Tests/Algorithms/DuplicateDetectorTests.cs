@@ -282,4 +282,44 @@ public class DuplicateDetectorTests
         Assert.Single(groups);
         Assert.Equal(2, groups[0].Files.Count);
     }
+
+    [Fact]
+    public void FindSimilarImages_ColorMismatch_DoesNotGroupEvenWhenStructureMatches()
+    {
+        // Arrange
+        ulong structureHash = 0x123456789ABCDEF0UL;
+        ulong colorHashA = 0x0000000000000000UL;
+        ulong colorHashB = 0xFFFFFFFFFFFFFFFFUL;
+
+        var files = new List<FileEntry>
+        {
+            new() { FilePath = "img1.jpg", FileType = FileType.Image, PerceptualHash = structureHash, ColorHash = colorHashA },
+            new() { FilePath = "img2.jpg", FileType = FileType.Image, PerceptualHash = structureHash, ColorHash = colorHashB }
+        };
+
+        // Act
+        var groups = _detector.FindSimilarImages(files, 85);
+
+        // Assert
+        Assert.Empty(groups);
+    }
+
+    [Fact]
+    public void FindSimilarImages_HugeSizeGap_DoesNotGroup()
+    {
+        // Arrange
+        ulong structureHash = 0x123456789ABCDEF0UL;
+
+        var files = new List<FileEntry>
+        {
+            new() { FilePath = "img1.jpg", FileType = FileType.Image, PerceptualHash = structureHash, ColorHash = structureHash, Size = 1_000_000 },
+            new() { FilePath = "img2.jpg", FileType = FileType.Image, PerceptualHash = structureHash, ColorHash = structureHash, Size = 120_000 }
+        };
+
+        // Act
+        var groups = _detector.FindSimilarImages(files, 85);
+
+        // Assert
+        Assert.Empty(groups);
+    }
 }

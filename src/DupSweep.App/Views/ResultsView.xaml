@@ -7,7 +7,26 @@
              xmlns:viewmodels="clr-namespace:DupSweep.App.ViewModels"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewmodels:ResultsViewModel}"
-             d:DesignHeight="600" d:DesignWidth="900">
+             d:DesignHeight="640" d:DesignWidth="980">
+
+    <UserControl.Resources>
+        <Style x:Key="ResultsChipRadio" TargetType="RadioButton" BasedOn="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}">
+            <Setter Property="Margin" Value="0,0,6,6" />
+            <Setter Property="Padding" Value="10,4" />
+        </Style>
+
+        <Style x:Key="ResultsHeaderText" TargetType="TextBlock">
+            <Setter Property="Style" Value="{StaticResource LabelMedium}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+        </Style>
+
+        <Style x:Key="ResultsValueText" TargetType="TextBlock">
+            <Setter Property="Style" Value="{StaticResource BodySmall}" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -16,313 +35,274 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Auto Select Bar -->
+        <!-- Top Controls -->
         <Border Grid.Row="0"
-                Background="{DynamicResource MaterialDesignToolBarBackground}"
-                Padding="8"
-                Margin="0,0,0,4"
+                Style="{StaticResource Card}"
+                Padding="12"
+                Margin="0,0,0,8"
                 Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}}">
-            <DockPanel>
-                <!-- 우측: 통계 및 선택해제 버튼 -->
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
-                        <TextBlock Text="{Binding DuplicateGroups.Count, Mode=OneWay}" FontSize="11" Opacity="0.6" />
-                        <TextBlock Text="{DynamicResource Results.Group}" FontSize="11" Opacity="0.6" Margin="3,0" />
-                        <TextBlock Text="{Binding TotalFilesCount, Mode=OneWay}" FontSize="11" Opacity="0.6" />
-                        <TextBlock Text="{DynamicResource Results.Files}" FontSize="11" Opacity="0.6" Margin="3,0,0,0" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <WrapPanel>
+                        <TextBlock Text="{DynamicResource Results.Keep}" Style="{StaticResource BodySmall}" Margin="0,0,8,6" VerticalAlignment="Center" />
+                        <RadioButton Content="{DynamicResource Results.SizeAsc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectLargest}" Style="{StaticResource ResultsChipRadio}" />
+                        <RadioButton Content="{DynamicResource Results.SizeDesc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectSmallest}" Style="{StaticResource ResultsChipRadio}" />
+                        <RadioButton Content="{DynamicResource Results.Newest}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectNewest}" Style="{StaticResource ResultsChipRadio}" />
+                        <RadioButton Content="{DynamicResource Results.Oldest}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectOldest}" Style="{StaticResource ResultsChipRadio}" />
+                        <RadioButton Content="{DynamicResource Results.ResolutionAsc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectHighRes}" Style="{StaticResource ResultsChipRadio}" />
+                        <RadioButton Content="{DynamicResource Results.ResolutionDesc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectLowRes}" Style="{StaticResource ResultsChipRadio}" />
+                    </WrapPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="{DynamicResource Results.AutoSelect}"
+                                Command="{Binding ApplyAutoSelectCommand}"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                Padding="12,5"
+                                Margin="0,0,8,0" />
+                        <Button Content="{DynamicResource Results.DeselectAll}"
+                                Command="{Binding ClearSelectionCommand}"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Padding="12,5" />
                     </StackPanel>
-                    <Button Content="{DynamicResource Results.DeselectAll}"
-                            Command="{Binding ClearSelectionCommand}"
-                            Style="{StaticResource MaterialDesignOutlinedButton}"
-                            Padding="12,4" Height="28" />
                 </StackPanel>
 
-                <!-- 좌측: 자동선택 옵션 및 버튼 -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="{DynamicResource Results.Keep}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0" Opacity="0.7" />
-                    <RadioButton Content="{DynamicResource Results.SizeAsc}" GroupName="AutoSelect"
-                                 IsChecked="{Binding AutoSelectLargest}"
-                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
-                                 Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="{DynamicResource Results.SizeDesc}" GroupName="AutoSelect"
-                                 IsChecked="{Binding AutoSelectSmallest}"
-                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
-                                 Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="{DynamicResource Results.Newest}" GroupName="AutoSelect"
-                                 IsChecked="{Binding AutoSelectNewest}"
-                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
-                                 Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="{DynamicResource Results.Oldest}" GroupName="AutoSelect"
-                                 IsChecked="{Binding AutoSelectOldest}"
-                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
-                                 Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="{DynamicResource Results.ResolutionAsc}" GroupName="AutoSelect"
-                                 IsChecked="{Binding AutoSelectHighRes}"
-                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
-                                 Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="{DynamicResource Results.ResolutionDesc}" GroupName="AutoSelect"
-                                 IsChecked="{Binding AutoSelectLowRes}"
-                                 Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
-                                 Margin="0,0,8,0" Padding="8,4" />
-                    <Button Content="{DynamicResource Results.AutoSelect}"
-                            Command="{Binding ApplyAutoSelectCommand}"
-                            Style="{StaticResource MaterialDesignRaisedButton}"
-                            Padding="12,4" Height="28" />
-                </StackPanel>
-            </DockPanel>
+                <Border Grid.Column="1"
+                        Background="{StaticResource DividerBrush}"
+                        CornerRadius="8"
+                        Padding="10,8"
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Caption}">
+                            <Run Text="{Binding DuplicateGroups.Count}" />
+                            <Run Text=" " />
+                            <Run Text="{DynamicResource Results.Group}" />
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource Caption}">
+                            <Run Text="{Binding TotalFilesCount}" />
+                            <Run Text=" " />
+                            <Run Text="{DynamicResource Results.Files}" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Border>
 
-        <!-- Main Content: File List + Detail Panel -->
+        <!-- Main content -->
         <Grid Grid.Row="1"
               Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="560" />
+                <ColumnDefinition Width="6" />
+                <ColumnDefinition Width="320" MinWidth="260" />
             </Grid.ColumnDefinitions>
 
-            <!-- File List (ListView + GridView) -->
-            <ListView Grid.Column="0"
-                      ItemsSource="{Binding AllFilesView}"
-                      VirtualizingPanel.IsVirtualizing="True"
-                      VirtualizingPanel.VirtualizationMode="Recycling"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      Background="Transparent"
-                      BorderThickness="0"
-                      SelectionMode="Single"
-                      PreviewMouseLeftButtonUp="FileRow_Click">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="36">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected}"
-                                              HorizontalAlignment="Center"
-                                              IsHitTestVisible="False" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="{DynamicResource Results.ColumnName}" Width="200">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"
-                                               FontSize="12" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="{DynamicResource Results.ColumnSize}" Width="80">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding FormattedSize}" FontSize="11" Opacity="0.8" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="{DynamicResource Results.ColumnResolution}" Width="90">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Resolution}" FontSize="11" Opacity="0.8" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="{DynamicResource Results.ColumnModified}" Width="90">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding ModifiedDate, StringFormat={}{0:yyyy-MM-dd}}"
-                                               FontSize="11" Opacity="0.7" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="{DynamicResource Results.ColumnCreated}" Width="90">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding CreatedDate, StringFormat={}{0:yyyy-MM-dd}}"
-                                               FontSize="11" Opacity="0.7" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="{DynamicResource Results.ColumnHash}" Width="120">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Hash}" FontSize="10" Opacity="0.5"
-                                               FontFamily="Consolas" TextTrimming="CharacterEllipsis" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
+            <Border Grid.Column="0" Style="{StaticResource Card}" Padding="0" ClipToBounds="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                <!-- Group Separator Style -->
-                <ListView.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
+                    <Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="{StaticResource DividerBrush}" Background="{StaticResource SurfaceBrush}" Padding="16,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36" />
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="1.2*" />
+                                <ColumnDefinition Width="1.2*" />
+                                <ColumnDefinition Width="1.5*" />
+                                <ColumnDefinition Width="1.5*" />
+                                <ColumnDefinition Width="1.8*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="1" Text="{DynamicResource Results.ColumnName}" Style="{StaticResource ResultsHeaderText}" />
+                            <TextBlock Grid.Column="2" Text="{DynamicResource Results.ColumnSize}" Style="{StaticResource ResultsHeaderText}" />
+                            <TextBlock Grid.Column="3" Text="{DynamicResource Results.ColumnResolution}" Style="{StaticResource ResultsHeaderText}" />
+                            <TextBlock Grid.Column="4" Text="{DynamicResource Results.ColumnModified}" Style="{StaticResource ResultsHeaderText}" />
+                            <TextBlock Grid.Column="5" Text="{DynamicResource Results.ColumnCreated}" Style="{StaticResource ResultsHeaderText}" />
+                            <TextBlock Grid.Column="6" Text="{DynamicResource Results.ColumnHash}" Style="{StaticResource ResultsHeaderText}" />
+                        </Grid>
+                    </Border>
+
+                    <ListView Grid.Row="1"
+                              ItemsSource="{Binding AllFilesView}"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              SelectionMode="Single"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              VirtualizingPanel.IsVirtualizing="True"
+                              VirtualizingPanel.VirtualizationMode="Recycling"
+                              PreviewMouseLeftButtonUp="FileRow_Click">
+
+                        <ListView.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#F3F6FA"
+                                                BorderBrush="{StaticResource DividerBrush}"
+                                                BorderThickness="0,1,0,1"
+                                                Padding="12,8">
+                                            <TextBlock Text="{Binding Items[0].ParentGroup.GroupLabel}"
+                                                       Style="{StaticResource LabelMedium}"
+                                                       FontWeight="SemiBold" />
+                                        </Border>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ListView.GroupStyle>
+
+                        <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderBrush="{DynamicResource MaterialDesignBody}"
-                                        BorderThickness="0,2,0,0" Padding="4,6,4,4" Margin="0,2,0,0">
-                                    <TextBlock Text="{Binding Items[0].ParentGroup.GroupLabel}"
-                                               FontSize="11" FontWeight="SemiBold" Opacity="0.7" />
-                                </Border>
+                                <Grid Margin="0,0,0,1" Height="36">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="36" />
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition Width="1.2*" />
+                                        <ColumnDefinition Width="1.2*" />
+                                        <ColumnDefinition Width="1.5*" />
+                                        <ColumnDefinition Width="1.5*" />
+                                        <ColumnDefinition Width="1.8*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+                                    <TextBlock Grid.Column="1" Text="{Binding FileName}" Style="{StaticResource ResultsValueText}" Margin="0,0,8,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding FormattedSize}" Style="{StaticResource ResultsValueText}" />
+                                    <TextBlock Grid.Column="3" Text="{Binding Resolution}" Style="{StaticResource ResultsValueText}" />
+                                    <TextBlock Grid.Column="4" Text="{Binding ModifiedDate, StringFormat={}{0:yyyy-MM-dd}}" Style="{StaticResource ResultsValueText}" />
+                                    <TextBlock Grid.Column="5" Text="{Binding CreatedDate, StringFormat={}{0:yyyy-MM-dd}}" Style="{StaticResource ResultsValueText}" />
+                                    <TextBlock Grid.Column="6" Text="{Binding Hash}" Style="{StaticResource ResultsValueText}" FontFamily="{StaticResource MonospaceFont}" FontSize="11" Opacity="0.7" />
+                                </Grid>
                             </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                    </GroupStyle>
-                </ListView.GroupStyle>
+                        </ListView.ItemTemplate>
 
-                <!-- Row Container Style -->
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="Margin" Value="0" />
-                        <Setter Property="MinHeight" Value="28" />
-                        <Setter Property="Cursor" Value="Hand" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListViewItem">
-                                    <Border x:Name="Bd" Padding="0,2" BorderThickness="3,0,0,0" BorderBrush="Transparent"
-                                            Background="Transparent">
-                                        <GridViewRowPresenter />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                            <Setter TargetName="Bd" Property="Background" Value="#E3F2FD" />
-                                            <Setter TargetName="Bd" Property="BorderBrush" Value="#2196F3" />
-                                        </DataTrigger>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Bd" Property="Background" Value="#F5F5F5" />
-                                        </Trigger>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding IsSelected}" Value="True" />
-                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter TargetName="Bd" Property="Background" Value="#BBDEFB" />
-                                        </MultiDataTrigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="10,0" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="BorderThickness" Value="3,0,0,0" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListViewItem">
+                                            <Border x:Name="Container"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                <ContentPresenter />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter TargetName="Container" Property="Background" Value="#EAF4FF" />
+                                                    <Setter TargetName="Container" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Container" Property="Background" Value="#F7FAFD" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </Grid>
+            </Border>
 
-            <!-- Detail Panel (Right, shown on file click) -->
-            <Border Grid.Column="1" Width="280"
-                    Background="{DynamicResource MaterialDesignCardBackground}"
-                    BorderBrush="{DynamicResource MaterialDesignDivider}"
-                    BorderThickness="1,0,0,0"
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource DividerBrush}" ShowsPreview="True" />
+
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="14"
                     Visibility="{Binding FocusedFile, Converter={StaticResource NullToVisibilityConverter}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="12">
-                        <!-- Header: Filename + Close Button -->
-                        <DockPanel Margin="0,0,0,8">
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,10">
                             <Button DockPanel.Dock="Right"
                                     Style="{StaticResource MaterialDesignIconButton}"
                                     Command="{Binding CloseFocusedFileCommand}"
-                                    Width="24" Height="24" Padding="0">
+                                    Width="28" Height="28" Padding="0">
                                 <materialDesign:PackIcon Kind="Close" Width="16" Height="16" />
                             </Button>
-                            <TextBlock Text="{Binding FocusedFile.FileName}" FontSize="13" FontWeight="Bold"
-                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding FocusedFile.FileName}"
+                                       Style="{StaticResource TitleSmall}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Margin="0,3,8,0" />
                         </DockPanel>
 
-                        <!-- Thumbnail -->
-                        <Border Background="{DynamicResource MaterialDesignDivider}"
-                                CornerRadius="4" Margin="0,0,0,8"
-                                MaxHeight="260">
+                        <Border Background="{StaticResource DividerBrush}" CornerRadius="8" Height="220" Margin="0,0,0,10">
                             <Grid>
-                                <materialDesign:PackIcon Kind="FileImage" Width="32" Height="32"
-                                                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                          Opacity="0.2" />
+                                <materialDesign:PackIcon Kind="FileImage" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.25" />
                                 <Image Source="{Binding FocusedFile.FilePath, Converter={StaticResource FilePathToThumbnailConverter}, IsAsync=True}"
-                                       Stretch="Uniform" MaxHeight="256" />
+                                       Stretch="Uniform" Margin="8" />
                             </Grid>
                         </Border>
 
-                        <!-- Full Path -->
-                        <TextBlock Text="{Binding FocusedFile.FilePath}" FontSize="10" Opacity="0.6"
-                                   TextWrapping="Wrap" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding FocusedFile.FilePath}" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,0,0,10" />
 
-                        <Separator Margin="0,0,0,8" />
-
-                        <!-- Metadata Grid -->
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource Results.Size}"
-                                       FontSize="11" Opacity="0.6" Margin="0,0,12,4" />
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding FocusedFile.FormattedSize}"
-                                       FontSize="11" />
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource Results.Size}" Style="{StaticResource LabelMedium}" Margin="0,0,10,6" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding FocusedFile.FormattedSize}" Style="{StaticResource BodySmall}" />
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource Results.ResolutionLabel}"
-                                       FontSize="11" Opacity="0.6" Margin="0,0,12,4" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FocusedFile.Resolution}"
-                                       FontSize="11" />
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource Results.ResolutionLabel}" Style="{StaticResource LabelMedium}" Margin="0,0,10,6" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FocusedFile.Resolution}" Style="{StaticResource BodySmall}" />
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource Results.ModifiedDate}"
-                                       FontSize="11" Opacity="0.6" Margin="0,0,12,4" />
-                            <TextBlock Grid.Row="2" Grid.Column="1"
-                                       Text="{Binding FocusedFile.ModifiedDate, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
-                                       FontSize="11" />
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource Results.ModifiedDate}" Style="{StaticResource LabelMedium}" Margin="0,0,10,6" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding FocusedFile.ModifiedDate, StringFormat={}{0:yyyy-MM-dd HH:mm}}" Style="{StaticResource BodySmall}" />
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource Results.CreatedDate}"
-                                       FontSize="11" Opacity="0.6" Margin="0,0,12,4" />
-                            <TextBlock Grid.Row="3" Grid.Column="1"
-                                       Text="{Binding FocusedFile.CreatedDate, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
-                                       FontSize="11" />
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource Results.CreatedDate}" Style="{StaticResource LabelMedium}" Margin="0,0,10,6" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding FocusedFile.CreatedDate, StringFormat={}{0:yyyy-MM-dd HH:mm}}" Style="{StaticResource BodySmall}" />
 
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource Results.ColumnHash}"
-                                       FontSize="11" Opacity="0.6" Margin="0,0,12,4" />
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding FocusedFile.Hash}"
-                                       FontSize="10" FontFamily="Consolas" TextWrapping="Wrap" />
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource Results.ColumnHash}" Style="{StaticResource LabelMedium}" Margin="0,0,10,6" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding FocusedFile.Hash}" Style="{StaticResource CodeText}" TextWrapping="Wrap" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
         </Grid>
 
-        <!-- No Results -->
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"
                     Visibility="{Binding HasResults, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue=Visible}">
-            <materialDesign:PackIcon Kind="FileSearch" Width="48" Height="48"
-                                     HorizontalAlignment="Center" Opacity="0.3" />
-            <TextBlock Text="{DynamicResource Results.RunScanHint}" FontSize="12"
-                       HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.5" />
+            <materialDesign:PackIcon Kind="FileSearch" Width="50" Height="50" HorizontalAlignment="Center" Opacity="0.25" />
+            <TextBlock Text="{DynamicResource Results.RunScanHint}" Style="{StaticResource BodyMedium}" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.7" />
         </StackPanel>
 
-        <!-- Action Bar -->
-        <Border Grid.Row="2" Background="{DynamicResource MaterialDesignCardBackground}"
-                Margin="0,4,0,0" Padding="6"
-                Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}">
+        <Border Grid.Row="2"
+                Style="{StaticResource Card}"
+                Padding="10"
+                Margin="0,8,0,0"
+                Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}}">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
-                    <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"
-                                              VerticalAlignment="Center" Margin="0,0,4,0" Opacity="0.6" />
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding SelectedFilesCount, Mode=OneWay}" FontSize="12" FontWeight="Bold" />
-                        <TextBlock Text="{DynamicResource Results.SelectedCount}" FontSize="12" Margin="3,0,0,0" />
-                    </StackPanel>
-                    <TextBlock VerticalAlignment="Center" FontSize="12"
-                               Foreground="{DynamicResource SecondaryHueMidBrush}" Margin="8,0,0,0">
-                        <Run Text="(" /><Run Text="{Binding FormattedPotentialSavings, Mode=OneWay}" /><Run Text=")" />
+                    <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,6,0" Opacity="0.65" />
+                    <TextBlock Style="{StaticResource BodyMedium}">
+                        <Run Text="{Binding SelectedFilesCount}" />
+                        <Run Text=" {DynamicResource Results.SelectedCount}" />
+                        <Run Text=" (" />
+                        <Run Text="{Binding FormattedPotentialSavings}" />
+                        <Run Text=")" />
                     </TextBlock>
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button Content="{DynamicResource Results.Trash}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                            Command="{Binding MoveToTrashCommand}" Margin="0,0,4,0"
-                            Padding="12,4" Height="28" />
-                    <Button Content="{DynamicResource Results.Delete}" Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
-                            Command="{Binding DeletePermanentlyCommand}"
-                            Padding="12,4" Height="28" />
+                    <Button Content="{DynamicResource Results.Trash}" Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding MoveToTrashCommand}" Padding="12,5" Margin="0,0,6,0" />
+                    <Button Content="{DynamicResource Results.Delete}" Style="{StaticResource MaterialDesignRaisedSecondaryButton}" Command="{Binding DeletePermanentlyCommand}" Padding="12,5" />
                 </StackPanel>
             </DockPanel>
         </Border>
