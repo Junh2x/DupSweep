@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DupSweep.Core.Services.Interfaces;
 
 namespace DupSweep.App.ViewModels;
 
@@ -9,6 +10,8 @@ namespace DupSweep.App.ViewModels;
 /// </summary>
 public partial class ScanViewModel : ObservableObject
 {
+    private readonly IScanService _scanService;
+
     [ObservableProperty]
     private double _progress;
 
@@ -41,42 +44,41 @@ public partial class ScanViewModel : ObservableObject
 
     public string FormattedPotentialSavings => FormatFileSize(PotentialSavings);
 
-    public ScanViewModel()
+    public ScanViewModel(IScanService scanService)
     {
+        _scanService = scanService;
     }
 
     [RelayCommand]
     private void PauseScan()
     {
-        var scanService = App.Services.GetService(typeof(DupSweep.Core.Services.Interfaces.IScanService)) as DupSweep.Core.Services.Interfaces.IScanService;
-        if (scanService == null || !scanService.IsRunning)
+        if (!_scanService.IsRunning)
         {
             return;
         }
 
-        if (scanService.IsPaused)
+        if (_scanService.IsPaused)
         {
-            scanService.Resume();
+            _scanService.Resume();
         }
         else
         {
-            scanService.Pause();
+            _scanService.Pause();
         }
 
-        IsPaused = scanService.IsPaused;
+        IsPaused = _scanService.IsPaused;
         StatusMessage = IsPaused ? "Paused" : "Scanning...";
     }
 
     [RelayCommand]
     private void CancelScan()
     {
-        var scanService = App.Services.GetService(typeof(DupSweep.Core.Services.Interfaces.IScanService)) as DupSweep.Core.Services.Interfaces.IScanService;
-        if (scanService == null || !scanService.IsRunning)
+        if (!_scanService.IsRunning)
         {
             return;
         }
 
-        scanService.Cancel();
+        _scanService.Cancel();
         StatusMessage = "Scan cancelled";
     }
 

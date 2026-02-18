@@ -7,8 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Blake3" Version="2.2.0" />
     <PackageReference Include="FFMpegCore" Version="5.4.0" />
-    <PackageReference Include="LiteDB" Version="5.0.21" />
-    <PackageReference Include="MetadataExtractor" Version="2.9.0" />
+<PackageReference Include="MetadataExtractor" Version="2.9.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Serilog" Version="4.2.0" />

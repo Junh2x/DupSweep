@@ -1,3 +1,4 @@
+using DupSweep.Core.Logging;
 using DupSweep.Core.Models;
 using DupSweep.Core.Processors;
 using DupSweep.Core.Services;
@@ -13,6 +14,7 @@ public class ScanServiceTests : IDisposable
     private readonly Mock<IHashService> _hashServiceMock;
     private readonly Mock<IImageProcessor> _imageProcessorMock;
     private readonly Mock<IVideoProcessor> _videoProcessorMock;
+    private readonly Mock<IAppLogger> _loggerMock;
     private readonly ScanService _scanService;
 
     public ScanServiceTests()
@@ -21,11 +23,13 @@ public class ScanServiceTests : IDisposable
         _hashServiceMock = new Mock<IHashService>();
         _imageProcessorMock = new Mock<IImageProcessor>();
         _videoProcessorMock = new Mock<IVideoProcessor>();
+        _loggerMock = new Mock<IAppLogger>();
 
         _scanService = new ScanService(
             _hashServiceMock.Object,
             _imageProcessorMock.Object,
-            _videoProcessorMock.Object);
+            _videoProcessorMock.Object,
+            _loggerMock.Object);
     }
 
     [Fact]

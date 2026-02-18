@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DupSweep.Core.Services.Interfaces;
 
 namespace DupSweep.App.ViewModels;
 
@@ -12,6 +13,9 @@ namespace DupSweep.App.ViewModels;
 /// </summary>
 public partial class ResultsViewModel : ObservableObject
 {
+    private readonly IDeleteService _deleteService;
+    private readonly SettingsViewModel _settingsViewModel;
+
     [ObservableProperty]
     private ObservableCollection<DuplicateGroupViewModel> _duplicateGroups = new();
 
@@ -52,8 +56,11 @@ public partial class ResultsViewModel : ObservableObject
 
     public int TotalFilesCount => DuplicateGroups.Sum(g => g.FileCount);
 
-    public ResultsViewModel()
+    public ResultsViewModel(IDeleteService deleteService, SettingsViewModel settingsViewModel)
     {
+        _deleteService = deleteService;
+        _settingsViewModel = settingsViewModel;
+
         DuplicateGroupsView = CollectionViewSource.GetDefaultView(DuplicateGroups);
         DuplicateGroupsView.Filter = FilterGroup;
         DuplicateGroups.CollectionChanged += (_, _) =>
@@ -222,12 +229,6 @@ public partial class ResultsViewModel : ObservableObject
     [RelayCommand]
     private async Task MoveToTrash()
     {
-        var deleteService = App.Services.GetService(typeof(DupSweep.Core.Services.Interfaces.IDeleteService)) as DupSweep.Core.Services.Interfaces.IDeleteService;
-        if (deleteService == null)
-        {
-            return;
-        }
-
         var selectedFiles = DuplicateGroups
             .SelectMany(g => g.Files)
             .Where(f => f.IsSelected)
@@ -243,19 +244,13 @@ public partial class ResultsViewModel : ObservableObject
             return;
         }
 
-        await deleteService.MoveToTrashAsync(selectedFiles.Select(f => f.FilePath), CancellationToken.None);
+        await _deleteService.MoveToTrashAsync(selectedFiles.Select(f => f.FilePath), CancellationToken.None);
         RemoveDeletedFiles(selectedFiles);
     }
 
     [RelayCommand]
     private async Task DeletePermanently()
     {
-        var deleteService = App.Services.GetService(typeof(DupSweep.Core.Services.Interfaces.IDeleteService)) as DupSweep.Core.Services.Interfaces.IDeleteService;
-        if (deleteService == null)
-        {
-            return;
-        }
-
         var selectedFiles = DuplicateGroups
             .SelectMany(g => g.Files)
             .Where(f => f.IsSelected)
@@ -271,7 +266,7 @@ public partial class ResultsViewModel : ObservableObject
             return;
         }
 
-        await deleteService.DeletePermanentlyAsync(selectedFiles.Select(f => f.FilePath), CancellationToken.None);
+        await _deleteService.DeletePermanentlyAsync(selectedFiles.Select(f => f.FilePath), CancellationToken.None);
         RemoveDeletedFiles(selectedFiles);
     }
 
@@ -329,10 +324,9 @@ public partial class ResultsViewModel : ObservableObject
         UpdateSelectionStats();
     }
 
-    private static bool ConfirmDeletion(string message)
+    private bool ConfirmDeletion(string message)
     {
-        var settings = App.Services.GetService(typeof(SettingsViewModel)) as SettingsViewModel;
-        if (settings != null && !settings.ShowConfirmationDialog)
+        if (!_settingsViewModel.ShowConfirmationDialog)
         {
             return true;
         }

@@ -32,7 +32,6 @@ public class ScanProgress
         ScanPhase.Scanning => $"파일 스캔 중... ({ProcessedFiles}/{TotalFiles})",
         ScanPhase.Hashing => $"해시 계산 중... ({ProcessedFiles}/{TotalFiles})",
         ScanPhase.Comparing => "파일 비교 중...",
-        ScanPhase.GeneratingThumbnails => "썸네일 생성 중...",
         ScanPhase.Completed => "스캔 완료",
         ScanPhase.Cancelled => "스캔 취소됨",
         ScanPhase.Error => "오류 발생",
@@ -49,7 +48,6 @@ public enum ScanPhase
     Scanning,             // 파일 탐색
     Hashing,              // 해시 계산
     Comparing,            // 중복 비교
-    GeneratingThumbnails, // 썸네일 생성
     Completed,            // 완료
     Cancelled,            // 취소됨
     Error                 // 오류
