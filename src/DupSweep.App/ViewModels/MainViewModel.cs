@@ -72,8 +72,8 @@ public partial class MainViewModel : ObservableObject
     private void NavigateToResults()
     {
         CurrentView = App.Services.GetRequiredService<ResultsViewModel>();
-        SelectedNavIndex = 2;
-        Title = _titles[2];
+        SelectedNavIndex = 1;
+        Title = "스캔 결과";
     }
 
     [RelayCommand]

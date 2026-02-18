@@ -10,18 +10,20 @@ public class ScanConfig
     public List<string> Directories { get; set; } = new();
 
     // 중복 탐지 방법 설정
-    public bool UseHashComparison { get; set; } = true;        // 해시값 비교 사용
-    public bool UseSizeComparison { get; set; } = true;        // 파일 크기 비교 사용
-    public bool UseResolutionComparison { get; set; } = false; // 해상도 비교 사용
-    public bool UseImageSimilarity { get; set; } = true;       // 이미지 유사도 비교 사용
-    public bool UseVideoSimilarity { get; set; } = true;       // 비디오 유사도 비교 사용
-    public bool MatchCreatedDate { get; set; } = false;        // 생성일 일치 필요
-    public bool MatchModifiedDate { get; set; } = false;       // 수정일 일치 필요
+    public bool UseHashComparison { get; set; }        // 해시값 비교 사용
+    public bool UseSizeComparison { get; set; }        // 파일 크기 비교 사용
+    public bool UseResolutionComparison { get; set; }  // 해상도 비교 사용
+    public bool UseImageSimilarity { get; set; }       // 이미지 유사도 비교 사용
+    public bool UseVideoSimilarity { get; set; }       // 비디오 유사도 비교 사용
+    public bool MatchCreatedDate { get; set; }         // 생성일 일치 필요
+    public bool MatchModifiedDate { get; set; }        // 수정일 일치 필요
 
     // 스캔 대상 파일 유형
     public bool ScanAllFiles { get; set; } = true;  // 모든 파일 스캔 (해시 기반 중복 탐지)
     public bool ScanImages { get; set; } = true;    // 이미지 스캔 (유사도 비교용)
     public bool ScanVideos { get; set; } = true;    // 비디오 스캔 (유사도 비교용)
+    public bool ScanAudio { get; set; } = false;    // 오디오 스캔
+    public bool ScanDocuments { get; set; } = false; // 문서 스캔
 
     // 유사도 임계값 (0-100)
     public double ImageSimilarityThreshold { get; set; } = 85;
@@ -66,6 +68,16 @@ public class ScanConfig
             extensions.AddRange(new[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".3gp" });
         }
 
+        if (ScanAudio)
+        {
+            extensions.AddRange(new[] { ".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", ".m4a" });
+        }
+
+        if (ScanDocuments)
+        {
+            extensions.AddRange(new[] { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".hwp", ".hwpx" });
+        }
+
         return extensions;
     }
 
@@ -83,5 +95,21 @@ public class ScanConfig
     public static IReadOnlyList<string> VideoExtensions { get; } = new[]
     {
         ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".3gp"
+    };
+
+    /// <summary>
+    /// 오디오 확장자 목록
+    /// </summary>
+    public static IReadOnlyList<string> AudioExtensions { get; } = new[]
+    {
+        ".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", ".m4a"
+    };
+
+    /// <summary>
+    /// 문서 확장자 목록
+    /// </summary>
+    public static IReadOnlyList<string> DocumentExtensions { get; } = new[]
+    {
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".hwp", ".hwpx"
     };
 }

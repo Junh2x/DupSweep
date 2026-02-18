@@ -21,19 +21,19 @@ public partial class HomeViewModel : ObservableObject
 
     // 감지 조건
     [ObservableProperty]
-    private bool _useHashComparison = true;
+    private bool _useHashComparison;
 
     [ObservableProperty]
-    private bool _useSizeComparison = true;
+    private bool _useSizeComparison;
 
     [ObservableProperty]
     private bool _useResolutionComparison;
 
     [ObservableProperty]
-    private bool _useImageSimilarity = true;
+    private bool _useImageSimilarity;
 
     [ObservableProperty]
-    private bool _useVideoSimilarity = true;
+    private bool _useVideoSimilarity;
 
     [ObservableProperty]
     private bool _matchCreatedDate;
@@ -57,6 +57,12 @@ public partial class HomeViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _scanVideos = true;    // 비디오 유사도 비교
+
+    [ObservableProperty]
+    private bool _scanAudio;            // 오디오 스캔
+
+    [ObservableProperty]
+    private bool _scanDocuments;        // 문서 스캔
 
     [ObservableProperty]
     private bool _canStartScan;
@@ -140,7 +146,9 @@ public partial class HomeViewModel : ObservableObject
             VideoSimilarityThreshold = VideoSimilarityThreshold,
             ScanAllFiles = ScanAllFiles,
             ScanImages = ScanImages,
-            ScanVideos = ScanVideos
+            ScanVideos = ScanVideos,
+            ScanAudio = ScanAudio,
+            ScanDocuments = ScanDocuments
         };
 
         var settingsVm = App.Services.GetService(typeof(SettingsViewModel)) as SettingsViewModel;
