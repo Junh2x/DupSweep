@@ -68,3 +68,8 @@ NUL
 
 # Claude settings
 .claude/
+
+# Markdown files (except README.md, LICENSE.md at root)
+/*.md
+!README.md
+!LICENSE.md
