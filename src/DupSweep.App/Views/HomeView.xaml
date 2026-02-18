@@ -25,9 +25,9 @@
 
             <!-- Section Header -->
             <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                <TextBlock Text="스캔 폴더"
+                <TextBlock Text="{DynamicResource Home.ScanFolders}"
                            Style="{StaticResource TitleLarge}" />
-                <TextBlock Text="중복 파일을 찾을 폴더를 추가하세요"
+                <TextBlock Text="{DynamicResource Home.AddFolderHint}"
                            Style="{StaticResource Caption}"
                            Margin="0,4,0,0" />
             </StackPanel>
@@ -69,16 +69,16 @@
                                                          Foreground="{StaticResource AccentBrush}" />
                             </Border>
 
-                            <TextBlock Text="폴더를 여기에 놓으세요"
+                            <TextBlock Text="{DynamicResource Home.DropFolderHere}"
                                        Style="{StaticResource TitleMedium}"
                                        HorizontalAlignment="Center"
                                        Margin="0,20,0,0" />
-                            <TextBlock Text="또는 아래 버튼을 클릭하여 탐색"
+                            <TextBlock Text="{DynamicResource Home.OrClickBelow}"
                                        Style="{StaticResource Caption}"
                                        HorizontalAlignment="Center"
                                        Margin="0,6,0,20" />
 
-                            <Button Content="폴더 찾아보기"
+                            <Button Content="{DynamicResource Home.BrowseFolder}"
                                     Style="{StaticResource SecondaryButton}"
                                     Command="{Binding AddFolderCommand}"
                                     HorizontalAlignment="Center"
@@ -96,7 +96,7 @@
                                 Margin="0,0,0,16">
                             <DockPanel>
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                                    <Button Content="모두 지우기"
+                                    <Button Content="{DynamicResource Home.ClearAll}"
                                             Style="{StaticResource GhostButton}"
                                             Command="{Binding ClearFoldersCommand}"
                                             Foreground="{StaticResource ErrorBrush}"
@@ -108,7 +108,7 @@
                                             Padding="16,8">
                                         <StackPanel Orientation="Horizontal">
                                             <materialDesign:PackIcon Kind="Plus" Width="18" Height="18" VerticalAlignment="Center" />
-                                            <TextBlock Text="폴더 추가" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                            <TextBlock Text="{DynamicResource Home.AddFolder}" Margin="8,0,0,0" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
@@ -158,7 +158,7 @@
                                                         Style="{StaticResource IconButton}"
                                                         Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}"
-                                                        ToolTip="폴더 제거">
+                                                        ToolTip="{DynamicResource Home.RemoveFolder}">
                                                     <materialDesign:PackIcon Kind="Close" Width="18" Height="18" />
                                                 </Button>
                                             </Grid>
@@ -181,7 +181,7 @@
                     Padding="32,14">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Magnify" Width="20" Height="20" VerticalAlignment="Center" />
-                    <TextBlock Text="스캔 시작" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="15" />
+                    <TextBlock Text="{DynamicResource Home.StartScan}" Margin="10,0,0,0" VerticalAlignment="Center" FontSize="15" />
                 </StackPanel>
             </Button>
         </Grid>
@@ -191,7 +191,7 @@
             <TabControl Style="{StaticResource OptionsTabControl}">
 
                 <!-- Tab 1: 파일 대상 -->
-                <TabItem Header="파일 대상" Style="{StaticResource OptionsTabItem}">
+                <TabItem Header="{DynamicResource Home.TabFileTarget}" Style="{StaticResource OptionsTabItem}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,2,0">
                         <StackPanel>
                             <CheckBox IsChecked="{Binding ScanAllFiles}"
@@ -201,13 +201,13 @@
                                     <materialDesign:PackIcon Kind="FileMultiple" Width="20" Height="20"
                                                              VerticalAlignment="Center" Margin="0,0,8,0"
                                                              Foreground="{StaticResource AccentBrush}" />
-                                    <TextBlock Text="ALL (모든 파일)" VerticalAlignment="Center" FontWeight="SemiBold" />
+                                    <TextBlock Text="{DynamicResource Home.AllFiles}" VerticalAlignment="Center" FontWeight="SemiBold" />
                                 </StackPanel>
                             </CheckBox>
 
                             <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,12" />
 
-                            <TextBlock Text="카테고리별 선택"
+                            <TextBlock Text="{DynamicResource Home.SelectByCategory}"
                                        Style="{StaticResource Caption}"
                                        Foreground="{StaticResource TextSecondaryBrush}"
                                        Margin="0,0,0,10" />
@@ -221,7 +221,7 @@
                                         <materialDesign:PackIcon Kind="Image" Width="20" Height="20"
                                                                  VerticalAlignment="Center" Margin="0,0,8,0"
                                                                  Foreground="{StaticResource AccentBrush}" />
-                                        <TextBlock Text="이미지" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Home.CategoryImage}" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="JPG, PNG, GIF, BMP, WebP, TIFF, ICO, HEIC"
                                                Style="{StaticResource Caption}" Margin="28,4,0,0" />
@@ -237,7 +237,7 @@
                                         <materialDesign:PackIcon Kind="Video" Width="20" Height="20"
                                                                  VerticalAlignment="Center" Margin="0,0,8,0"
                                                                  Foreground="{StaticResource AccentBrush}" />
-                                        <TextBlock Text="비디오" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Home.CategoryVideo}" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="MP4, AVI, MKV, MOV, WMV, FLV, WebM"
                                                Style="{StaticResource Caption}" Margin="28,4,0,0" />
@@ -253,7 +253,7 @@
                                         <materialDesign:PackIcon Kind="MusicNote" Width="20" Height="20"
                                                                  VerticalAlignment="Center" Margin="0,0,8,0"
                                                                  Foreground="{StaticResource AccentBrush}" />
-                                        <TextBlock Text="오디오" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Home.CategoryAudio}" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="MP3, WAV, FLAC, AAC, OGG, WMA, M4A"
                                                Style="{StaticResource Caption}" Margin="28,4,0,0" />
@@ -269,7 +269,7 @@
                                         <materialDesign:PackIcon Kind="FileDocument" Width="20" Height="20"
                                                                  VerticalAlignment="Center" Margin="0,0,8,0"
                                                                  Foreground="{StaticResource AccentBrush}" />
-                                        <TextBlock Text="문서" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Home.CategoryDocument}" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="PDF, DOC, DOCX, XLS, XLSX, PPT, TXT, HWP"
                                                Style="{StaticResource Caption}" Margin="28,4,0,0" />
@@ -280,14 +280,14 @@
                 </TabItem>
 
                 <!-- Tab 2: 스캔 로직 -->
-                <TabItem Header="스캔 로직" Style="{StaticResource OptionsTabItem}">
+                <TabItem Header="{DynamicResource Home.TabScanLogic}" Style="{StaticResource OptionsTabItem}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,2,0">
                         <StackPanel>
                             <CheckBox IsChecked="{Binding UseHashComparison}"
                                       materialDesign:CheckBoxAssist.CheckBoxSize="26"
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
-                                    <TextBlock Text="해시" FontWeight="SemiBold" />
+                                    <TextBlock Text="{DynamicResource Home.Hash}" FontWeight="SemiBold" />
                                     <TextBlock Text="XxHash64, BLAKE3 해시 비교 감지"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
@@ -297,7 +297,7 @@
                                       materialDesign:CheckBoxAssist.CheckBoxSize="26"
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
-                                    <TextBlock Text="파일 크기" />
+                                    <TextBlock Text="{DynamicResource Home.FileSize}" />
                                     <TextBlock Text="파일 크기가 동일한 파일 감지"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
@@ -307,7 +307,7 @@
                                       materialDesign:CheckBoxAssist.CheckBoxSize="26"
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
-                                    <TextBlock Text="해상도" />
+                                    <TextBlock Text="{DynamicResource Home.Resolution}" />
                                     <TextBlock Text="이미지/비디오 해상도가 동일한 파일 감지"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
@@ -317,7 +317,7 @@
                                       materialDesign:CheckBoxAssist.CheckBoxSize="26"
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
-                                    <TextBlock Text="생성 날짜" />
+                                    <TextBlock Text="{DynamicResource Home.CreationDate}" />
                                     <TextBlock Text="파일 생성 날짜가 동일한 파일 감지"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
@@ -327,7 +327,7 @@
                                       materialDesign:CheckBoxAssist.CheckBoxSize="26"
                                       Margin="0,0,0,4">
                                 <StackPanel Margin="4,0,0,0">
-                                    <TextBlock Text="수정 날짜 일치" />
+                                    <TextBlock Text="{DynamicResource Home.ModifiedDateMatch}" />
                                     <TextBlock Text="파일 수정 날짜가 동일한 파일 감지"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
@@ -337,7 +337,7 @@
                 </TabItem>
 
                 <!-- Tab 3: 유사도 비교 -->
-                <TabItem Header="유사도 비교" Style="{StaticResource OptionsTabItem}">
+                <TabItem Header="{DynamicResource Home.TabSimilarity}" Style="{StaticResource OptionsTabItem}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,2,0">
                         <StackPanel>
                             <TextBlock Text="퍼셉추얼 해싱 기반 유사 파일 탐지 (옵션)"
@@ -353,7 +353,7 @@
                                         <materialDesign:PackIcon Kind="ImageMultiple" Width="20" Height="20"
                                                                  VerticalAlignment="Center" Margin="0,0,8,0"
                                                                  Foreground="{StaticResource AccentBrush}" />
-                                        <TextBlock Text="이미지 유사도 비교" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Home.ImageSimilarity}" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="비슷해 보이는 이미지 탐지 (dHash)"
                                                Style="{StaticResource Caption}" Margin="28,4,0,0" />
@@ -367,7 +367,7 @@
                                                DockPanel.Dock="Right"
                                                Foreground="{StaticResource AccentBrush}"
                                                FontWeight="SemiBold" />
-                                    <TextBlock Text="유사도 임계값" Style="{StaticResource Caption}" />
+                                    <TextBlock Text="{DynamicResource Home.SimilarityThreshold}" Style="{StaticResource Caption}" />
                                 </DockPanel>
                                 <Slider Minimum="50" Maximum="100"
                                         Value="{Binding SimilarityThreshold}"
@@ -388,7 +388,7 @@
                                         <materialDesign:PackIcon Kind="VideoBox" Width="20" Height="20"
                                                                  VerticalAlignment="Center" Margin="0,0,8,0"
                                                                  Foreground="{StaticResource AccentBrush}" />
-                                        <TextBlock Text="비디오 유사도 비교" VerticalAlignment="Center" />
+                                        <TextBlock Text="{DynamicResource Home.VideoSimilarity}" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="비슷한 비디오 탐지 (FFmpeg 필요)"
                                                Style="{StaticResource Caption}" Margin="28,4,0,0" />
@@ -402,7 +402,7 @@
                                                DockPanel.Dock="Right"
                                                Foreground="{StaticResource AccentBrush}"
                                                FontWeight="SemiBold" />
-                                    <TextBlock Text="유사도 임계값" Style="{StaticResource Caption}" />
+                                    <TextBlock Text="{DynamicResource Home.SimilarityThreshold}" Style="{StaticResource Caption}" />
                                 </DockPanel>
                                 <Slider Minimum="50" Maximum="100"
                                         Value="{Binding VideoSimilarityThreshold}"

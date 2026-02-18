@@ -38,7 +38,7 @@
                                Visibility="{Binding HasData, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
 
-                <Button Grid.Column="1" Content="폴더 선택"
+                <Button Grid.Column="1" Content="{DynamicResource FolderTree.SelectFolder}"
                         Command="{Binding SelectFolderCommand}"
                         Style="{StaticResource MaterialDesignFlatButton}"
                         Height="28" Padding="12,0"
@@ -66,7 +66,7 @@
                 </StackPanel.Style>
                 <materialDesign:PackIcon Kind="ChartBar" Width="48" Height="48"
                                           HorizontalAlignment="Center" Opacity="0.3" />
-                <TextBlock Text="폴더를 선택하세요" HorizontalAlignment="Center"
+                <TextBlock Text="{DynamicResource FolderTree.SelectFolderHint}" HorizontalAlignment="Center"
                            Margin="0,8,0,0" Opacity="0.5" />
             </StackPanel>
 
@@ -242,7 +242,7 @@
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
                             <materialDesign:PackIcon Kind="FolderOpen" Width="14" Height="14"
                                                       VerticalAlignment="Center" Margin="0,0,4,0" Opacity="0.6" />
-                            <TextBlock Text="폴더/파일 목록" FontSize="11" FontWeight="Medium" Opacity="0.7" />
+                            <TextBlock Text="{DynamicResource FolderTree.FolderFileList}" FontSize="11" FontWeight="Medium" Opacity="0.7" />
                             <TextBlock Text="{Binding CurrentFolderFileInfo}" FontSize="10"
                                        Margin="8,0,0,0" Opacity="0.5" VerticalAlignment="Center" />
                         </StackPanel>
@@ -295,7 +295,7 @@
                         </ScrollViewer>
 
                         <!-- Empty file list -->
-                        <TextBlock Grid.Row="1" Text="폴더를 선택하면 목록이 표시됩니다"
+                        <TextBlock Grid.Row="1" Text="{DynamicResource FolderTree.SelectFolderToShowList}"
                                    FontSize="11" Opacity="0.4" HorizontalAlignment="Center"
                                    VerticalAlignment="Center">
                             <TextBlock.Style>

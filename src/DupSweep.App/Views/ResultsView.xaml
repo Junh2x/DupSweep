@@ -25,13 +25,13 @@
             <DockPanel>
                 <!-- 우측: 통계 및 선택해제 버튼 -->
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock VerticalAlignment="Center" Margin="0,0,12,0" FontSize="11" Opacity="0.6">
-                        <Run Text="{Binding DuplicateGroups.Count, Mode=OneWay}" />
-                        <Run Text="그룹 /" />
-                        <Run Text="{Binding TotalFilesCount, Mode=OneWay}" />
-                        <Run Text="파일" />
-                    </TextBlock>
-                    <Button Content="선택 해제"
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <TextBlock Text="{Binding DuplicateGroups.Count, Mode=OneWay}" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Results.Group}" FontSize="11" Opacity="0.6" Margin="3,0" />
+                        <TextBlock Text="{Binding TotalFilesCount, Mode=OneWay}" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Results.Files}" FontSize="11" Opacity="0.6" Margin="3,0,0,0" />
+                    </StackPanel>
+                    <Button Content="{DynamicResource Results.DeselectAll}"
                             Command="{Binding ClearSelectionCommand}"
                             Style="{StaticResource MaterialDesignOutlinedButton}"
                             Padding="12,4" Height="28" />
@@ -39,32 +39,32 @@
 
                 <!-- 좌측: 자동선택 옵션 및 버튼 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="유지:" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0" Opacity="0.7" />
-                    <RadioButton Content="용량↑" GroupName="AutoSelect"
+                    <TextBlock Text="{DynamicResource Results.Keep}" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0" Opacity="0.7" />
+                    <RadioButton Content="{DynamicResource Results.SizeAsc}" GroupName="AutoSelect"
                                  IsChecked="{Binding AutoSelectLargest}"
                                  Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
                                  Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="용량↓" GroupName="AutoSelect"
+                    <RadioButton Content="{DynamicResource Results.SizeDesc}" GroupName="AutoSelect"
                                  IsChecked="{Binding AutoSelectSmallest}"
                                  Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
                                  Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="최신" GroupName="AutoSelect"
+                    <RadioButton Content="{DynamicResource Results.Newest}" GroupName="AutoSelect"
                                  IsChecked="{Binding AutoSelectNewest}"
                                  Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
                                  Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="오래된" GroupName="AutoSelect"
+                    <RadioButton Content="{DynamicResource Results.Oldest}" GroupName="AutoSelect"
                                  IsChecked="{Binding AutoSelectOldest}"
                                  Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
                                  Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="해상도↑" GroupName="AutoSelect"
+                    <RadioButton Content="{DynamicResource Results.ResolutionAsc}" GroupName="AutoSelect"
                                  IsChecked="{Binding AutoSelectHighRes}"
                                  Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
                                  Margin="0,0,4,0" Padding="8,4" />
-                    <RadioButton Content="해상도↓" GroupName="AutoSelect"
+                    <RadioButton Content="{DynamicResource Results.ResolutionDesc}" GroupName="AutoSelect"
                                  IsChecked="{Binding AutoSelectLowRes}"
                                  Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}"
                                  Margin="0,0,8,0" Padding="8,4" />
-                    <Button Content="자동 선택"
+                    <Button Content="{DynamicResource Results.AutoSelect}"
                             Command="{Binding ApplyAutoSelectCommand}"
                             Style="{StaticResource MaterialDesignRaisedButton}"
                             Padding="12,4" Height="28" />
@@ -113,10 +113,10 @@
                                                Foreground="{DynamicResource PrimaryHueMidBrush}" />
                                     <TextBlock Text="{Binding GroupType}" FontSize="11" Opacity="0.5" />
                                 </StackPanel>
-                                <TextBlock FontSize="12" FontWeight="Medium">
-                                    <Run Text="{Binding FileCount, Mode=OneWay}" />
-                                    <Run Text="개 파일" />
-                                </TextBlock>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding FileCount, Mode=OneWay}" FontSize="12" FontWeight="Medium" />
+                                    <TextBlock Text="{DynamicResource Results.ItemFiles}" FontSize="12" FontWeight="Medium" Margin="3,0,0,0" />
+                                </StackPanel>
                             </DockPanel>
 
                             <!-- File Cards -->
@@ -148,13 +148,13 @@
                                                             <RowDefinition />
                                                             <RowDefinition />
                                                         </Grid.RowDefinitions>
-                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="크기: " Opacity="0.7" />
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource Results.Size}" Opacity="0.7" />
                                                         <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding FormattedSize}" />
-                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="해상도: " Opacity="0.7" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource Results.ResolutionLabel}" Opacity="0.7" />
                                                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Resolution}" />
-                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="수정일: " Opacity="0.7" />
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource Results.ModifiedDate}" Opacity="0.7" />
                                                         <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ModifiedDate, StringFormat={}{0:yyyy-MM-dd HH:mm}}" />
-                                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="생성일: " Opacity="0.7" />
+                                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource Results.CreatedDate}" Opacity="0.7" />
                                                         <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CreatedDate, StringFormat={}{0:yyyy-MM-dd HH:mm}}" />
                                                     </Grid>
                                                 </StackPanel>
@@ -223,7 +223,7 @@
                     Visibility="{Binding HasResults, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue=Visible}">
             <materialDesign:PackIcon Kind="FileSearch" Width="48" Height="48"
                                      HorizontalAlignment="Center" Opacity="0.3" />
-            <TextBlock Text="스캔을 실행하여 중복 파일을 찾으세요" FontSize="12"
+            <TextBlock Text="{DynamicResource Results.RunScanHint}" FontSize="12"
                        HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.5" />
         </StackPanel>
 
@@ -235,10 +235,10 @@
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
                     <materialDesign:PackIcon Kind="Delete" Width="16" Height="16"
                                               VerticalAlignment="Center" Margin="0,0,4,0" Opacity="0.6" />
-                    <TextBlock VerticalAlignment="Center" FontSize="12">
-                        <Run Text="{Binding SelectedFilesCount, Mode=OneWay}" FontWeight="Bold" />
-                        <Run Text="개 선택" />
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SelectedFilesCount, Mode=OneWay}" FontSize="12" FontWeight="Bold" />
+                        <TextBlock Text="{DynamicResource Results.SelectedCount}" FontSize="12" Margin="3,0,0,0" />
+                    </StackPanel>
                     <TextBlock VerticalAlignment="Center" FontSize="12"
                                Foreground="{DynamicResource SecondaryHueMidBrush}" Margin="8,0,0,0">
                         <Run Text="(" /><Run Text="{Binding FormattedPotentialSavings, Mode=OneWay}" /><Run Text=")" />
@@ -246,10 +246,10 @@
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button Content="휴지통" Style="{StaticResource MaterialDesignOutlinedButton}"
+                    <Button Content="{DynamicResource Results.Trash}" Style="{StaticResource MaterialDesignOutlinedButton}"
                             Command="{Binding MoveToTrashCommand}" Margin="0,0,4,0"
                             Padding="12,4" Height="28" />
-                    <Button Content="삭제" Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
+                    <Button Content="{DynamicResource Results.Delete}" Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
                             Command="{Binding DeletePermanentlyCommand}"
                             Padding="12,4" Height="28" />
                 </StackPanel>

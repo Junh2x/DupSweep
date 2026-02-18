@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using DupSweep.App.Messages;
+using DupSweep.App.Services;
 using DupSweep.Core.Logging;
 using DupSweep.Core.Services.Interfaces;
 
@@ -191,8 +192,8 @@ public partial class HomeViewModel : ObservableObject
         if (needsFfmpeg && !hasFfmpeg)
         {
             var result = MessageBox.Show(
-                "FFmpeg 경로가 설정되지 않았습니다.\n비디오 유사도 검사가 건너뛰어집니다.\n\n이대로 실행하시겠습니까?",
-                "FFmpeg 미설정",
+                LanguageService.Instance.GetString("Home.FFmpegNotSet"),
+                LanguageService.Instance.GetString("Home.FFmpegNotSetTitle"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
@@ -237,7 +238,7 @@ public partial class HomeViewModel : ObservableObject
                 IsPaused = false,
                 IsCancelled = false
             });
-            _scanViewModel.StatusMessage = $"Error: {ex.Message}";
+            _scanViewModel.StatusMessage = LanguageService.Instance.GetString("Common.Error", ex.Message);
         }
     }
 }

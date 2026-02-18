@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using DupSweep.App.Services;
 
 namespace DupSweep.App.Services;
 
@@ -33,7 +34,7 @@ public partial class NotificationService : ObservableObject
         ShowNotification(new NotificationItem
         {
             Type = NotificationType.Success,
-            Title = title ?? "Success",
+            Title = title ?? LanguageService.Instance.GetString("Notification.Success"),
             Message = message,
             Duration = duration ?? _defaultDuration
         });
@@ -47,7 +48,7 @@ public partial class NotificationService : ObservableObject
         ShowNotification(new NotificationItem
         {
             Type = NotificationType.Info,
-            Title = title ?? "Information",
+            Title = title ?? LanguageService.Instance.GetString("Notification.Information"),
             Message = message,
             Duration = duration ?? _defaultDuration
         });
@@ -61,7 +62,7 @@ public partial class NotificationService : ObservableObject
         ShowNotification(new NotificationItem
         {
             Type = NotificationType.Warning,
-            Title = title ?? "Warning",
+            Title = title ?? LanguageService.Instance.GetString("Notification.Warning"),
             Message = message,
             Duration = duration ?? TimeSpan.FromSeconds(7)
         });
@@ -75,7 +76,7 @@ public partial class NotificationService : ObservableObject
         ShowNotification(new NotificationItem
         {
             Type = NotificationType.Error,
-            Title = title ?? "Error",
+            Title = title ?? LanguageService.Instance.GetString("Notification.Error"),
             Message = message,
             Duration = duration ?? TimeSpan.FromSeconds(10)
         });
@@ -89,7 +90,7 @@ public partial class NotificationService : ObservableObject
         var notification = new NotificationItem
         {
             Type = NotificationType.Progress,
-            Title = title ?? "Processing",
+            Title = title ?? LanguageService.Instance.GetString("Notification.Processing"),
             Message = message,
             Duration = TimeSpan.MaxValue,
             IsProgress = true

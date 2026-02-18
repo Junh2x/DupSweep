@@ -7,6 +7,7 @@ using DupSweep.Core.Processors;
 using DupSweep.Core.Services;
 using DupSweep.Core.Services.Interfaces;
 using DupSweep.Infrastructure.DependencyInjection;
+using DupSweep.App.Services;
 using DupSweep.Infrastructure.Logging;
 using DupSweep.Infrastructure.Processors;
 
@@ -32,6 +33,9 @@ public partial class App : Application
         Services = services.BuildServiceProvider();
 
         // 애플리케이션 시작 로그
+        // 다국어 서비스 초기화
+        LanguageService.Instance.Initialize(AppLanguage.Korean);
+
         var logger = Services.GetRequiredService<IAppLogger>();
         logger.LogInformation("DupSweep 애플리케이션 시작");
         logger.LogMemoryUsage("애플리케이션 시작");

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DupSweep.App.Services;
 using DupSweep.Core.Services.Interfaces;
 
 namespace DupSweep.App.ViewModels;
@@ -40,13 +41,14 @@ public partial class ScanViewModel : ObservableObject
     private bool _isPaused;
 
     [ObservableProperty]
-    private string _statusMessage = "Ready to scan";
+    private string _statusMessage = string.Empty;
 
     public string FormattedPotentialSavings => FormatFileSize(PotentialSavings);
 
     public ScanViewModel(IScanService scanService)
     {
         _scanService = scanService;
+        _statusMessage = LanguageService.Instance.GetString("Scan.ReadyToScan");
     }
 
     [RelayCommand]
@@ -67,7 +69,9 @@ public partial class ScanViewModel : ObservableObject
         }
 
         IsPaused = _scanService.IsPaused;
-        StatusMessage = IsPaused ? "Paused" : "Scanning...";
+        StatusMessage = IsPaused
+            ? LanguageService.Instance.GetString("Scan.Paused")
+            : LanguageService.Instance.GetString("Scan.Scanning");
     }
 
     [RelayCommand]
@@ -79,7 +83,7 @@ public partial class ScanViewModel : ObservableObject
         }
 
         _scanService.Cancel();
-        StatusMessage = "Scan cancelled";
+        StatusMessage = LanguageService.Instance.GetString("Scan.Cancelled");
     }
 
     public void Reset()
@@ -93,7 +97,7 @@ public partial class ScanViewModel : ObservableObject
         ElapsedTime = TimeSpan.Zero;
         IsScanning = true;
         IsPaused = false;
-        StatusMessage = "Scanning...";
+        StatusMessage = LanguageService.Instance.GetString("Scan.Scanning");
         OnPropertyChanged(nameof(FormattedPotentialSavings));
     }
 

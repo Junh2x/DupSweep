@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using DupSweep.App.Messages;
+using DupSweep.App.Services;
 
 namespace DupSweep.App.ViewModels;
 
@@ -24,9 +25,9 @@ public partial class MainViewModel : ObservableObject
     private int _selectedNavIndex;
 
     [ObservableProperty]
-    private string _title = "홈";
+    private string _title = string.Empty;
 
-    private readonly string[] _titles = { "홈", "스캔", "결과", "설정", "폴더 트리" };
+    private static readonly string[] TitleKeys = { "Title.Home", "Title.Scan", "Title.Results", "Title.Settings", "Title.FolderTree" };
 
     public MainViewModel(
         HomeViewModel homeViewModel,
@@ -98,7 +99,7 @@ public partial class MainViewModel : ObservableObject
     {
         CurrentView = _homeViewModel;
         SelectedNavIndex = 0;
-        Title = _titles[0];
+        Title = LanguageService.Instance.GetString(TitleKeys[0]);
     }
 
     [RelayCommand]
@@ -106,7 +107,7 @@ public partial class MainViewModel : ObservableObject
     {
         CurrentView = _scanViewModel;
         SelectedNavIndex = 1;
-        Title = _titles[1];
+        Title = LanguageService.Instance.GetString(TitleKeys[1]);
     }
 
     [RelayCommand]
@@ -114,7 +115,7 @@ public partial class MainViewModel : ObservableObject
     {
         CurrentView = _resultsViewModel;
         SelectedNavIndex = 1;
-        Title = "스캔 결과";
+        Title = LanguageService.Instance.GetString("Title.ScanResults");
     }
 
     [RelayCommand]
@@ -122,7 +123,7 @@ public partial class MainViewModel : ObservableObject
     {
         CurrentView = _settingsViewModel;
         SelectedNavIndex = 3;
-        Title = _titles[3];
+        Title = LanguageService.Instance.GetString(TitleKeys[3]);
     }
 
     [RelayCommand]
@@ -130,7 +131,7 @@ public partial class MainViewModel : ObservableObject
     {
         CurrentView = _folderTreeViewModel;
         SelectedNavIndex = 4;
-        Title = _titles[4];
+        Title = LanguageService.Instance.GetString(TitleKeys[4]);
     }
 
     partial void OnSelectedNavIndexChanged(int value)

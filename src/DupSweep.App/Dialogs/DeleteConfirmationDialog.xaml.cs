@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
+using DupSweep.App.Services;
 using DupSweep.Core.Models;
 
 namespace DupSweep.App.Dialogs;
@@ -99,7 +100,9 @@ public partial class DeleteConfirmationDialog : Window
 
         FileCountText.Text = allowedFiles.Count.ToString();
         TotalSizeText.Text = FormatFileSize(totalSize);
-        DeleteModeText.Text = _isPermanent ? "Permanent" : "Trash";
+        DeleteModeText.Text = _isPermanent
+            ? LanguageService.Instance.GetString("Delete.ModePermanent")
+            : LanguageService.Instance.GetString("Delete.ModeTrash");
         DeleteModeText.Foreground = _isPermanent
             ? (FindResource("ErrorBrush") as SolidColorBrush ?? Brushes.Red)
             : (FindResource("WarningBrush") as SolidColorBrush ?? Brushes.Orange);
@@ -107,7 +110,7 @@ public partial class DeleteConfirmationDialog : Window
         // 차단된 파일 표시
         if (blockedFiles.Any())
         {
-            BlockedCountText.Text = $"({blockedFiles.Count} blocked)";
+            BlockedCountText.Text = $"({blockedFiles.Count} {LanguageService.Instance.GetString("Delete.Blocked")})";
             BlockedCountText.Visibility = Visibility.Visible;
         }
 
@@ -124,18 +127,21 @@ public partial class DeleteConfirmationDialog : Window
         }
 
         // 버튼 텍스트
-        ConfirmButton.Content = _isPermanent ? "Delete Permanently" : "Move to Trash";
+        ConfirmButton.Content = _isPermanent
+            ? LanguageService.Instance.GetString("Delete.ConfirmPermanent")
+            : LanguageService.Instance.GetString("Delete.ConfirmTrash");
     }
 
     private static string GetWarningTypeText(WarningType type)
     {
+        var lang = LanguageService.Instance;
         return type switch
         {
-            WarningType.HiddenFile => "hidden files",
-            WarningType.ProtectedExtension => "protected extensions",
-            WarningType.LargeFile => "large files",
-            WarningType.RecentlyModified => "recently modified",
-            _ => "warnings"
+            WarningType.HiddenFile => lang.GetString("Delete.WarnHiddenFiles"),
+            WarningType.ProtectedExtension => lang.GetString("Delete.WarnProtectedExt"),
+            WarningType.LargeFile => lang.GetString("Delete.WarnLargeFiles"),
+            WarningType.RecentlyModified => lang.GetString("Delete.WarnRecentlyModified"),
+            _ => lang.GetString("Delete.Warnings")
         };
     }
 
