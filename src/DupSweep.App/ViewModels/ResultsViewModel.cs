@@ -65,6 +65,9 @@ public partial class ResultsViewModel : ObservableObject
     [ObservableProperty]
     private bool _autoSelectLowRes;
 
+    [ObservableProperty]
+    private bool _showHashColumn;
+
     public string FormattedPotentialSavings => FormatFileSize(PotentialSavings);
 
     public int TotalFilesCount => DuplicateGroups.Sum(g => g.FileCount);
@@ -75,9 +78,25 @@ public partial class ResultsViewModel : ObservableObject
         _settingsViewModel = settingsViewModel;
     }
 
-    public void LoadResults(DupSweep.Core.Models.ScanResult result)
+    /// <summary>
+    /// 기존 결과를 초기화합니다. 재스캔 시 사용.
+    /// </summary>
+    public void ClearResults()
     {
         FocusedFile = null;
+        DuplicateGroups = new();
+        DisplayItems = new();
+        HasResults = false;
+        SelectedFilesCount = 0;
+        PotentialSavings = 0;
+        OnPropertyChanged(nameof(TotalFilesCount));
+        OnPropertyChanged(nameof(FormattedPotentialSavings));
+    }
+
+    public void LoadResults(DupSweep.Core.Models.ScanResult result, bool showHashColumn = false)
+    {
+        FocusedFile = null;
+        ShowHashColumn = showHashColumn;
 
         if (!result.IsSuccessful)
         {
@@ -632,6 +651,7 @@ public partial class FileItemViewModel : ObservableObject
 
     public string FormattedSize => FormatFileSize(Size);
     public string Resolution => Width > 0 && Height > 0 ? $"{Width}\u00d7{Height}" : "-";
+    public string DirectoryPath => System.IO.Path.GetDirectoryName(FilePath) ?? string.Empty;
 
     private static string FormatFileSize(long bytes)
     {

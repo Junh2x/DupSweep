@@ -34,28 +34,26 @@
 
             <!-- Folder Drop Zone / List -->
             <Border Grid.Row="1"
-                    Style="{StaticResource Card}">
+                    Style="{StaticResource Card}"
+                    Margin="1">
                 <Grid>
                     <!-- Empty State (Drop Zone) -->
+                    <Rectangle x:Name="DropZoneBorder"
+                               StrokeDashArray="6 3"
+                               Stroke="{StaticResource BorderBrush}"
+                               StrokeThickness="2"
+                               RadiusX="8" RadiusY="8"
+                               Margin="2"
+                               IsHitTestVisible="False"
+                               Visibility="{Binding SelectedFolders.Count, Converter={StaticResource InverseIntToVisibilityConverter}, FallbackValue=Visible}" />
+
                     <Border x:Name="DropZone"
-                            BorderThickness="2"
-                            CornerRadius="8"
-                            Margin="0"
+                            Background="Transparent"
+                            Margin="2"
                             Visibility="{Binding SelectedFolders.Count, Converter={StaticResource InverseIntToVisibilityConverter}, FallbackValue=Visible}"
                             AllowDrop="True"
                             Drop="DropZone_Drop"
                             DragOver="DropZone_DragOver">
-                        <Border.BorderBrush>
-                            <VisualBrush>
-                                <VisualBrush.Visual>
-                                    <Rectangle StrokeDashArray="6 3"
-                                               Stroke="{StaticResource BorderBrush}"
-                                               StrokeThickness="2"
-                                               Width="1" Height="1"
-                                               RadiusX="0.5" RadiusY="0.5" />
-                                </VisualBrush.Visual>
-                            </VisualBrush>
-                        </Border.BorderBrush>
 
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <Border Width="80" Height="80"
@@ -288,7 +286,7 @@
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
                                     <TextBlock Text="{DynamicResource Home.Hash}" FontWeight="SemiBold" />
-                                    <TextBlock Text="XxHash64, BLAKE3 해시 비교 감지"
+                                    <TextBlock Text="{DynamicResource Home.HashDesc}"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
@@ -298,7 +296,7 @@
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
                                     <TextBlock Text="{DynamicResource Home.FileSize}" />
-                                    <TextBlock Text="파일 크기가 동일한 파일 감지"
+                                    <TextBlock Text="{DynamicResource Home.FileSizeDesc}"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
@@ -308,7 +306,7 @@
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
                                     <TextBlock Text="{DynamicResource Home.Resolution}" />
-                                    <TextBlock Text="이미지/비디오 해상도가 동일한 파일 감지"
+                                    <TextBlock Text="{DynamicResource Home.ResolutionDesc}"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
@@ -318,7 +316,7 @@
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
                                     <TextBlock Text="{DynamicResource Home.CreationDate}" />
-                                    <TextBlock Text="파일 생성 날짜가 동일한 파일 감지"
+                                    <TextBlock Text="{DynamicResource Home.CreationDateDesc}"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
@@ -328,7 +326,7 @@
                                       Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
                                     <TextBlock Text="{DynamicResource Home.ModifiedDateMatch}" />
-                                    <TextBlock Text="파일 수정 날짜가 동일한 파일 감지"
+                                    <TextBlock Text="{DynamicResource Home.ModifiedDateDesc}"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
@@ -340,7 +338,7 @@
                                       Margin="0,0,0,4">
                                 <StackPanel Margin="4,0,0,0">
                                     <TextBlock Text="{DynamicResource Home.ImageSimilarity}" VerticalAlignment="Center" />
-                                    <TextBlock Text="비슷해 보이는 이미지 탐지 (dHash)"
+                                    <TextBlock Text="{DynamicResource Home.ImageSimilarityDesc}"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
@@ -368,7 +366,7 @@
                                       Margin="0,0,0,4">
                                 <StackPanel Margin="4,0,0,0">
                                     <TextBlock Text="{DynamicResource Home.VideoSimilarity}" VerticalAlignment="Center" />
-                                    <TextBlock Text="비슷한 비디오 탐지 (FFmpeg 필요)"
+                                    <TextBlock Text="{DynamicResource Home.VideoSimilarityDesc}"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>

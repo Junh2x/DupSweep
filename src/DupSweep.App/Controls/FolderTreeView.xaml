@@ -295,9 +295,10 @@
                             <ItemsControl ItemsSource="{Binding CurrentFiles}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Padding="3,2" Margin="0,1"
-                                                Background="{DynamicResource MaterialDesignToolBarBackground}"
-                                                CornerRadius="2">
+                                        <Border Padding="6,4" Margin="0"
+                                                Background="White"
+                                                BorderBrush="#D0D4D8"
+                                                BorderThickness="0,0,0,1">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />

@@ -16,7 +16,16 @@
         AllowsTransparency="True"
         Background="Transparent"
         FontFamily="{StaticResource PrimaryFont}"
-        ResizeMode="CanResizeWithGrip">
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        ResizeMode="CanResize">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="6"
+                      GlassFrameThickness="0"
+                      CornerRadius="0" />
+    </WindowChrome.WindowChrome>
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
@@ -69,24 +78,12 @@
     </Window.Resources>
 
     <Grid>
-        <!-- Shadow layer (separate from content to allow clipping) -->
-        <Border Background="{StaticResource BackgroundBrush}"
-                CornerRadius="12">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="24"
-                                  ShadowDepth="2"
-                                  Direction="270"
-                                  Color="#000000"
-                                  Opacity="0.2" />
-            </Border.Effect>
-        </Border>
-
         <!-- Content layer with clip -->
         <Border x:Name="MainBorder"
                 Background="{StaticResource BackgroundBrush}"
-                CornerRadius="12"
-                BorderBrush="#C0C0C0"
-                BorderThickness="1">
+                BorderBrush="#C8D0D8"
+                BorderThickness="1"
+                CornerRadius="12">
             <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="260" />
@@ -127,7 +124,7 @@
                                 <TextBlock Text="{DynamicResource App.Subtitle}"
                                            FontSize="11"
                                            Foreground="#78909C"
-                                           Margin="0,-2,0,0" />
+                                           Margin="0,4,0,0" />
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
@@ -209,7 +206,7 @@
                                                          Width="16" Height="16"
                                                          Foreground="#546E7A"
                                                          VerticalAlignment="Center" />
-                                <TextBlock Text="Version 2.0.0"
+                                <TextBlock Text="Version 1.0.0"
                                            FontSize="12"
                                            Foreground="#546E7A"
                                            Margin="8,0,0,0"
@@ -240,14 +237,10 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- Page Title -->
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Title}"
-                                       Style="{StaticResource HeadlineMedium}" />
-                            <TextBlock x:Name="PageSubtitle"
-                                       Text="{DynamicResource Subtitle.Home}"
-                                       Style="{StaticResource Caption}"
-                                       Margin="0,2,0,0" />
-                        </StackPanel>
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Title}"
+                                   Style="{StaticResource HeadlineMedium}"
+                                   VerticalAlignment="Center" />
 
                         <!-- Actions -->
                         <StackPanel Grid.Column="1"

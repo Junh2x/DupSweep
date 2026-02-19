@@ -54,10 +54,10 @@ public partial class HomeViewModel : ObservableObject
 
     // 유사도 임계값
     [ObservableProperty]
-    private double _similarityThreshold = 85;
+    private double _similarityThreshold = 90;
 
     [ObservableProperty]
-    private double _videoSimilarityThreshold = 85;
+    private double _videoSimilarityThreshold = 90;
 
     // 파일 타입
     [ObservableProperty]
@@ -216,6 +216,7 @@ public partial class HomeViewModel : ObservableObject
             }
         }
 
+        _resultsViewModel.ClearResults();
         _scanViewModel.Reset();
         _messenger.Send(new NavigateMessage(NavigationTarget.Scan));
 
@@ -231,7 +232,7 @@ public partial class HomeViewModel : ObservableObject
             _logger.LogInformation("스캔 완료: {Groups}개 그룹 발견", scanResult?.DuplicateGroups?.Count ?? 0);
             if (scanResult != null)
             {
-                _resultsViewModel.LoadResults(scanResult);
+                _resultsViewModel.LoadResults(scanResult, config.UseHashComparison);
                 _messenger.Send(new NavigateMessage(NavigationTarget.Results));
             }
         }

@@ -393,7 +393,7 @@ public class LessThanConverter : IValueConverter
 public class FilePathToThumbnailConverter : IValueConverter
 {
     private static readonly ConcurrentDictionary<string, BitmapSource?> _cache = new();
-    private const int ThumbnailSize = 96;
+    private const int ThumbnailSize = 256;
 
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

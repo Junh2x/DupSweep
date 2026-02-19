@@ -9,6 +9,7 @@
              d:DataContext="{d:DesignInstance viewmodels:SettingsViewModel}"
              d:DesignHeight="600" d:DesignWidth="900">
 
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel MaxWidth="560" Margin="0,0,0,20">
             <TextBlock Text="{DynamicResource Settings.Title}"
@@ -27,8 +28,12 @@
                                   ItemsSource="{Binding AvailableLanguages}"
                                   SelectedItem="{Binding SelectedLanguage}"
                                   DisplayMemberPath="DisplayName"
-                                  Width="130"
-                                  materialDesign:ComboBoxAssist.ShowSelectedItem="True" />
+                                  Width="160"
+                                  Height="36"
+                                  Padding="8,4"
+                                  FontSize="13"
+                                  materialDesign:HintAssist.IsFloating="False"
+                                  materialDesign:TextFieldAssist.DecorationVisibility="Collapsed" />
                         <StackPanel Margin="0,4,16,0">
                             <TextBlock Text="{DynamicResource Settings.Language}" Style="{StaticResource BodyMedium}" />
                         </StackPanel>

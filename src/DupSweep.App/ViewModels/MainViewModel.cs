@@ -65,8 +65,23 @@ public partial class MainViewModel : ObservableObject
             }
         });
 
+        LanguageService.Instance.LanguageChanged += OnLanguageChanged;
+
         // 홈 뷰로 시작
         NavigateToHome();
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        var key = SelectedNavIndex switch
+        {
+            0 => TitleKeys[0],
+            1 => CurrentView is ResultsViewModel ? "Title.ScanResults" : TitleKeys[1],
+            3 => TitleKeys[3],
+            4 => TitleKeys[4],
+            _ => TitleKeys[0]
+        };
+        Title = LanguageService.Instance.GetString(key);
     }
 
     /// <summary>

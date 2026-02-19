@@ -15,18 +15,10 @@
         <Style x:Key="ResultsChipRadio" TargetType="RadioButton" BasedOn="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}">
             <Setter Property="Margin" Value="0,0,4,0" />
             <Setter Property="Padding" Value="8,2" />
-            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Height" Value="26" />
             <Setter Property="FontSize" Value="12" />
-        </Style>
-
-        <Style x:Key="ResultsHeaderText" TargetType="TextBlock" BasedOn="{StaticResource LabelMedium}">
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <Style x:Key="ResultsValueText" TargetType="TextBlock" BasedOn="{StaticResource BodySmall}">
-            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="6" />
         </Style>
     </UserControl.Resources>
 
@@ -43,24 +35,36 @@
                 Padding="14,10"
                 Margin="0,0,0,8"
                 Visibility="{Binding HasResults, Converter={StaticResource BoolToVisibilityConverter}}">
-            <DockPanel>
-                <!-- Right side: Stats + Action Buttons -->
-                <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" Margin="16,0,0,0">
-                    <!-- Stats -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,8">
-                        <TextBlock Text="{Binding DuplicateGroups.Count, Mode=OneWay}" Style="{StaticResource Caption}" FontWeight="SemiBold" Opacity="0.6" />
-                        <TextBlock Text=" " Style="{StaticResource Caption}" Opacity="0.6" />
-                        <TextBlock Text="{DynamicResource Results.Group}" Style="{StaticResource Caption}" Opacity="0.6" />
-                        <TextBlock Text="  ·  " Style="{StaticResource Caption}" Opacity="0.4" />
-                        <TextBlock Text="{Binding TotalFilesCount, Mode=OneWay}" Style="{StaticResource Caption}" FontWeight="SemiBold" Opacity="0.6" />
-                        <TextBlock Text=" " Style="{StaticResource Caption}" Opacity="0.6" />
-                        <TextBlock Text="{DynamicResource Results.Files}" Style="{StaticResource Caption}" Opacity="0.6" />
-                    </StackPanel>
-                    <!-- Buttons -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Row 1: Keep label + Chips -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,10">
+                    <TextBlock Text="{DynamicResource Results.Keep}"
+                               Style="{StaticResource Caption}"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Opacity="0.6"
+                               Margin="0,0,10,0" />
+                    <RadioButton Content="{DynamicResource Results.SizeAsc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectLargest}" Style="{StaticResource ResultsChipRadio}" />
+                    <RadioButton Content="{DynamicResource Results.SizeDesc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectSmallest}" Style="{StaticResource ResultsChipRadio}" />
+                    <RadioButton Content="{DynamicResource Results.Newest}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectNewest}" Style="{StaticResource ResultsChipRadio}" />
+                    <RadioButton Content="{DynamicResource Results.Oldest}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectOldest}" Style="{StaticResource ResultsChipRadio}" />
+                    <RadioButton Content="{DynamicResource Results.ResolutionAsc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectHighRes}" Style="{StaticResource ResultsChipRadio}" />
+                    <RadioButton Content="{DynamicResource Results.ResolutionDesc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectLowRes}" Style="{StaticResource ResultsChipRadio}" />
+                </StackPanel>
+
+                <!-- Row 2: Stats left, Buttons right -->
+                <DockPanel Grid.Row="1">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                         <Button Content="{DynamicResource Results.AutoSelect}"
                                 Command="{Binding ApplyAutoSelectCommand}"
-                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Foreground="{StaticResource AccentBrush}"
+                                BorderBrush="{StaticResource AccentBrush}"
                                 Height="28" Padding="14,0"
                                 FontSize="12"
                                 Margin="0,0,6,0" />
@@ -70,21 +74,18 @@
                                 Height="28" Padding="14,0"
                                 FontSize="12" />
                     </StackPanel>
-                </StackPanel>
 
-                <!-- Left side: Selection criteria chips -->
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="{DynamicResource Results.Keep}" Style="{StaticResource Caption}" Margin="0,0,0,6" Opacity="0.6" />
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton Content="{DynamicResource Results.SizeAsc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectLargest}" Style="{StaticResource ResultsChipRadio}" />
-                        <RadioButton Content="{DynamicResource Results.SizeDesc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectSmallest}" Style="{StaticResource ResultsChipRadio}" />
-                        <RadioButton Content="{DynamicResource Results.Newest}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectNewest}" Style="{StaticResource ResultsChipRadio}" />
-                        <RadioButton Content="{DynamicResource Results.Oldest}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectOldest}" Style="{StaticResource ResultsChipRadio}" />
-                        <RadioButton Content="{DynamicResource Results.ResolutionAsc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectHighRes}" Style="{StaticResource ResultsChipRadio}" />
-                        <RadioButton Content="{DynamicResource Results.ResolutionDesc}" GroupName="AutoSelect" IsChecked="{Binding AutoSelectLowRes}" Style="{StaticResource ResultsChipRadio}" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding DuplicateGroups.Count, Mode=OneWay}" Style="{StaticResource Caption}" FontWeight="SemiBold" Opacity="0.6" />
+                        <TextBlock Text=" " Style="{StaticResource Caption}" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Results.Group}" Style="{StaticResource Caption}" Opacity="0.6" />
+                        <TextBlock Text="  ·  " Style="{StaticResource Caption}" Opacity="0.4" />
+                        <TextBlock Text="{Binding TotalFilesCount, Mode=OneWay}" Style="{StaticResource Caption}" FontWeight="SemiBold" Opacity="0.6" />
+                        <TextBlock Text=" " Style="{StaticResource Caption}" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Results.Files}" Style="{StaticResource Caption}" Opacity="0.6" />
                     </StackPanel>
-                </StackPanel>
-            </DockPanel>
+                </DockPanel>
+            </Grid>
         </Border>
 
         <!-- Main content area -->
@@ -95,117 +96,244 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- File List -->
-            <Border Grid.Column="0" Style="{StaticResource Card}" Padding="0" ClipToBounds="True">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+            <!-- File List (DataGrid with native column alignment and resize) -->
+            <Border Grid.Column="0" Style="{StaticResource Card}" Padding="0">
+                <Grid x:Name="DataGridClip" SizeChanged="DataGridClip_SizeChanged">
+                <DataGrid x:Name="FileListView"
+                          ItemsSource="{Binding DisplayItems}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          CanUserResizeColumns="True"
+                          CanUserReorderColumns="False"
+                          CanUserSortColumns="False"
+                          SelectionMode="Single"
+                          SelectionUnit="FullRow"
+                          GridLinesVisibility="Vertical"
+                          VerticalGridLinesBrush="{StaticResource DividerBrush}"
+                          HeadersVisibility="Column"
+                          IsReadOnly="True"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          RowHeaderWidth="0"
+                          EnableRowVirtualization="True"
+                          VirtualizingPanel.IsVirtualizing="True"
+                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          VirtualizingPanel.ScrollUnit="Pixel"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          PreviewMouseLeftButtonUp="FileRow_Click">
 
-                    <!-- Column Headers -->
-                    <Border Grid.Row="0"
-                            BorderThickness="0,0,0,1"
-                            BorderBrush="{StaticResource DividerBrush}"
-                            Background="{StaticResource SurfaceBrush}"
-                            Padding="16,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="36" />
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="1.2*" />
-                                <ColumnDefinition Width="1.2*" />
-                                <ColumnDefinition Width="1.5*" />
-                                <ColumnDefinition Width="1.5*" />
-                                <ColumnDefinition Width="1.8*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="1" Text="{DynamicResource Results.ColumnName}" Style="{StaticResource ResultsHeaderText}" />
-                            <TextBlock Grid.Column="2" Text="{DynamicResource Results.ColumnSize}" Style="{StaticResource ResultsHeaderText}" />
-                            <TextBlock Grid.Column="3" Text="{DynamicResource Results.ColumnResolution}" Style="{StaticResource ResultsHeaderText}" />
-                            <TextBlock Grid.Column="4" Text="{DynamicResource Results.ColumnModified}" Style="{StaticResource ResultsHeaderText}" />
-                            <TextBlock Grid.Column="5" Text="{DynamicResource Results.ColumnCreated}" Style="{StaticResource ResultsHeaderText}" />
-                            <TextBlock Grid.Column="6" Text="{DynamicResource Results.ColumnHash}" Style="{StaticResource ResultsHeaderText}" />
-                        </Grid>
-                    </Border>
-
-                    <!-- File Rows: flat list, no GroupDescriptions, full virtualization -->
-                    <ListView Grid.Row="1"
-                              ItemsSource="{Binding DisplayItems}"
-                              Background="Transparent"
-                              BorderThickness="0"
-                              SelectionMode="Single"
-                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                              ScrollViewer.VerticalScrollBarVisibility="Auto"
-                              VirtualizingPanel.IsVirtualizing="True"
-                              VirtualizingPanel.VirtualizationMode="Recycling"
-                              VirtualizingPanel.ScrollUnit="Pixel"
-                              PreviewMouseLeftButtonUp="FileRow_Click">
-
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel>
-                                    <!-- Group separator: IsFirstInGroup이 true인 행 위에만 표시 -->
-                                    <Border Height="2"
-                                            Background="{StaticResource BorderBrush}"
-                                            Margin="0,3,0,3"
-                                            Visibility="{Binding IsFirstInGroup, Converter={StaticResource BoolToVisibilityConverter}}" />
-
-                                    <Grid Height="34">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="36" />
-                                            <ColumnDefinition Width="3*" />
-                                            <ColumnDefinition Width="1.2*" />
-                                            <ColumnDefinition Width="1.2*" />
-                                            <ColumnDefinition Width="1.5*" />
-                                            <ColumnDefinition Width="1.5*" />
-                                            <ColumnDefinition Width="1.8*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <CheckBox Grid.Column="0"
-                                                  IsChecked="{Binding IsSelected}"
-                                                  HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"
-                                                  IsHitTestVisible="False" />
-                                        <TextBlock Grid.Column="1" Text="{Binding FileName}" Style="{StaticResource ResultsValueText}" Margin="0,0,8,0" />
-                                        <TextBlock Grid.Column="2" Text="{Binding FormattedSize}" Style="{StaticResource ResultsValueText}" />
-                                        <TextBlock Grid.Column="3" Text="{Binding Resolution}" Style="{StaticResource ResultsValueText}" />
-                                        <TextBlock Grid.Column="4" Text="{Binding ModifiedDate, StringFormat={}{0:yyyy-MM-dd}}" Style="{StaticResource ResultsValueText}" />
-                                        <TextBlock Grid.Column="5" Text="{Binding CreatedDate, StringFormat={}{0:yyyy-MM-dd}}" Style="{StaticResource ResultsValueText}" />
-                                        <TextBlock Grid.Column="6" Text="{Binding Hash}" Style="{StaticResource ResultsValueText}" FontFamily="{StaticResource MonospaceFont}" FontSize="11" Opacity="0.7" />
-                                    </Grid>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="Padding" Value="10,0" />
-                                <Setter Property="Margin" Value="0" />
-                                <Setter Property="Cursor" Value="Hand" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListViewItem">
-                                            <Border x:Name="Container"
-                                                    Background="{TemplateBinding Background}"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter />
+                    <!-- Column Header Style -->
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="FontSize" Value="12" />
+                            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}" />
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridColumnHeader">
+                                        <Grid>
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{StaticResource DividerBrush}"
+                                                    BorderThickness="0,0,1,1"
+                                                    Padding="8,7">
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                  VerticalAlignment="Center"
+                                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                             </Border>
-                                            <ControlTemplate.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                    <Setter TargetName="Container" Property="Background" Value="#EAF4FF" />
-                                                </DataTrigger>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="Container" Property="Background" Value="#F7FAFD" />
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                    </ListView>
+                                            <Thumb x:Name="PART_LeftHeaderGripper"
+                                                   HorizontalAlignment="Left"
+                                                   Margin="-4,0,0,0"
+                                                   Width="8"
+                                                   Cursor="SizeWE">
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border Background="Transparent" />
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                            <Thumb x:Name="PART_RightHeaderGripper"
+                                                   HorizontalAlignment="Right"
+                                                   Margin="0,0,-4,0"
+                                                   Width="8"
+                                                   Cursor="SizeWE">
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border Background="Transparent" />
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
+                    <!-- Cell Style: suppress default selection visuals -->
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Focusable" Value="False" />
+                            <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}" />
+                            <Setter Property="FontSize" Value="12" />
+                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border Background="Transparent" Padding="8,4">
+                                            <ContentPresenter VerticalAlignment="Center" />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.CellStyle>
+
+                    <!-- Row Style: custom selection + group separator -->
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridRow">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <Border x:Name="GroupSeparator"
+                                                    Grid.Row="0"
+                                                    Height="2"
+                                                    Background="{StaticResource BorderBrush}"
+                                                    Visibility="Collapsed" />
+                                            <Border x:Name="RowBorder"
+                                                    Grid.Row="1"
+                                                    Background="Transparent"
+                                                    BorderBrush="{StaticResource DividerBrush}"
+                                                    BorderThickness="0,0,0,1"
+                                                    SnapsToDevicePixels="True">
+                                                <DataGridCellsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                            </Border>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsFirstInGroup}" Value="True">
+                                                <Setter TargetName="GroupSeparator" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter TargetName="RowBorder" Property="Background" Value="#EAF4FF" />
+                                            </DataTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="RowBorder" Property="Background" Value="#F7FAFD" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.RowStyle>
+
+                    <!-- Columns -->
+                    <DataGrid.Columns>
+                        <!-- Checkbox -->
+                        <DataGridTemplateColumn Width="46" CanUserResize="False" CanUserSort="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=OneWay}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              IsHitTestVisible="False" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- File Name -->
+                        <DataGridTextColumn Header="{DynamicResource Results.ColumnName}"
+                                            Binding="{Binding FileName, Mode=OneWay}"
+                                            Width="160">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Directory Path (fills remaining space) -->
+                        <DataGridTextColumn Header="{DynamicResource Results.Path}"
+                                            Binding="{Binding DirectoryPath, Mode=OneWay}"
+                                            Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    <Setter Property="ToolTip" Value="{Binding FilePath}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Size -->
+                        <DataGridTextColumn Header="{DynamicResource Results.ColumnSize}"
+                                            Binding="{Binding FormattedSize, Mode=OneWay}"
+                                            Width="75">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Resolution -->
+                        <DataGridTextColumn Header="{DynamicResource Results.ColumnResolution}"
+                                            Binding="{Binding Resolution, Mode=OneWay}"
+                                            Width="75">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Modified Date -->
+                        <DataGridTextColumn Header="{DynamicResource Results.ColumnModified}"
+                                            Binding="{Binding ModifiedDate, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd}}"
+                                            Width="90">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Created Date -->
+                        <DataGridTextColumn Header="{DynamicResource Results.ColumnCreated}"
+                                            Binding="{Binding CreatedDate, Mode=OneWay, StringFormat={}{0:yyyy-MM-dd}}"
+                                            Width="90">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- Hash (conditionally shown via code-behind) -->
+                        <DataGridTextColumn Header="{DynamicResource Results.ColumnHash}"
+                                            Binding="{Binding Hash, Mode=OneWay}"
+                                            Width="130"
+                                            Visibility="Collapsed">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontFamily" Value="{StaticResource MonospaceFont}" />
+                                    <Setter Property="FontSize" Value="11" />
+                                    <Setter Property="Opacity" Value="0.7" />
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
                 </Grid>
             </Border>
 
@@ -292,7 +420,11 @@
                             Height="32" Padding="16,0"
                             Margin="0,0,8,0" />
                     <Button Content="{DynamicResource Results.Delete}"
-                            Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Background="#E53935"
+                            Foreground="White"
+                            BorderBrush="#E53935"
+                            materialDesign:ButtonAssist.CornerRadius="4"
                             Command="{Binding DeletePermanentlyCommand}"
                             Height="32" Padding="16,0" />
                 </StackPanel>

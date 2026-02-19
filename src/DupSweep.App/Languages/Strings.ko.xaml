@@ -4,7 +4,7 @@
 
     <!-- App -->
     <sys:String x:Key="App.Title">DupSweep</sys:String>
-    <sys:String x:Key="App.Subtitle">중복 파일 찾기</sys:String>
+    <sys:String x:Key="App.Subtitle">디스크 정리 도구</sys:String>
 
     <!-- Navigation -->
     <sys:String x:Key="Nav.MainMenu">메인 메뉴</sys:String>
@@ -47,7 +47,7 @@
     <sys:String x:Key="Home.RemoveFolder">폴더 제거</sys:String>
     <sys:String x:Key="Home.StartScan">스캔 시작</sys:String>
     <sys:String x:Key="Home.TabFileTarget">파일 대상</sys:String>
-    <sys:String x:Key="Home.TabScanLogic">스캔 로직</sys:String>
+    <sys:String x:Key="Home.TabScanLogic">탐색 기준</sys:String>
     <sys:String x:Key="Home.TabSimilarity">유사도 비교</sys:String>
     <sys:String x:Key="Home.AllFiles">ALL (모든 파일)</sys:String>
     <sys:String x:Key="Home.SelectByCategory">카테고리별 선택</sys:String>
@@ -63,6 +63,13 @@
     <sys:String x:Key="Home.ImageSimilarity">이미지 유사도 비교</sys:String>
     <sys:String x:Key="Home.VideoSimilarity">비디오 유사도 비교</sys:String>
     <sys:String x:Key="Home.SimilarityThreshold">유사도 임계값</sys:String>
+    <sys:String x:Key="Home.HashDesc">XxHash64, BLAKE3 해시 비교 감지</sys:String>
+    <sys:String x:Key="Home.FileSizeDesc">파일 크기가 동일한 파일 감지</sys:String>
+    <sys:String x:Key="Home.ResolutionDesc">이미지/비디오 해상도가 동일한 파일 감지</sys:String>
+    <sys:String x:Key="Home.CreationDateDesc">파일 생성 날짜가 동일한 파일 감지</sys:String>
+    <sys:String x:Key="Home.ModifiedDateDesc">파일 수정 날짜가 동일한 파일 감지</sys:String>
+    <sys:String x:Key="Home.ImageSimilarityDesc">비슷해 보이는 이미지 탐지 (dHash)</sys:String>
+    <sys:String x:Key="Home.VideoSimilarityDesc">비슷한 비디오 탐지 (FFmpeg 필요)</sys:String>
     <sys:String x:Key="Home.FFmpegNotSet">FFmpeg 경로가 설정되지 않았습니다.
 비디오 유사도 검사가 건너뛰어집니다.
 
