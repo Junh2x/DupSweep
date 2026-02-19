@@ -68,20 +68,26 @@
         </Style>
     </Window.Resources>
 
-    <Border x:Name="MainBorder"
-            Background="{StaticResource BackgroundBrush}"
-            CornerRadius="12"
-            BorderBrush="#C0C0C0"
-            BorderThickness="1">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="24"
-                              ShadowDepth="2"
-                              Direction="270"
-                              Color="#000000"
-                              Opacity="0.2" />
-        </Border.Effect>
+    <Grid>
+        <!-- Shadow layer (separate from content to allow clipping) -->
+        <Border Background="{StaticResource BackgroundBrush}"
+                CornerRadius="12">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24"
+                                  ShadowDepth="2"
+                                  Direction="270"
+                                  Color="#000000"
+                                  Opacity="0.2" />
+            </Border.Effect>
+        </Border>
 
-        <Grid>
+        <!-- Content layer with clip -->
+        <Border x:Name="MainBorder"
+                Background="{StaticResource BackgroundBrush}"
+                CornerRadius="12"
+                BorderBrush="#C0C0C0"
+                BorderThickness="1">
+            <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="260" />
                 <ColumnDefinition Width="*" />
@@ -90,7 +96,7 @@
             <!-- Sidebar -->
             <Border Grid.Column="0"
                     Background="{StaticResource SidebarGradientBrush}"
-                    CornerRadius="12,0,0,12">
+                    CornerRadius="11,0,0,11">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -195,7 +201,7 @@
                     <!-- Footer -->
                     <Border Grid.Row="3"
                             Background="#0F1E33"
-                            CornerRadius="0,0,0,12"
+                            CornerRadius="0,0,0,11"
                             Padding="20,16">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
@@ -224,7 +230,7 @@
                 <!-- Top Bar -->
                 <Border Grid.Row="0"
                         Background="{StaticResource SurfaceBrush}"
-                        CornerRadius="0,12,0,0"
+                        CornerRadius="0,11,0,0"
                         Padding="24,16"
                         MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                     <Grid>
@@ -270,7 +276,7 @@
                 <!-- Content -->
                 <Border Grid.Row="1"
                         Background="{StaticResource BackgroundBrush}"
-                        CornerRadius="0,0,12,0"
+                        CornerRadius="0,0,11,0"
                         ClipToBounds="True">
                     <Grid>
                         <ContentControl Content="{Binding CurrentView}"
@@ -283,6 +289,7 @@
                     </Grid>
                 </Border>
             </Grid>
-        </Grid>
-    </Border>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

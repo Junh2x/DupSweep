@@ -93,10 +93,22 @@
                                 Command="{Binding BrowseFFmpegPathCommand}" />
                         <StackPanel Margin="0,2,16,0">
                             <TextBlock Text="{DynamicResource Settings.FFmpegPath}" Style="{StaticResource BodyMedium}" />
-                            <TextBlock Text="{Binding FfmpegPath, TargetNullValue={DynamicResource Settings.NotSet}}"
-                                       Style="{StaticResource Caption}"
-                                       Opacity="0.75"
-                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Opacity="0.75"
+                                       TextTrimming="CharacterEllipsis">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource Caption}">
+                                        <Setter Property="Text" Value="{Binding FfmpegPath}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding FfmpegPath}" Value="{x:Null}">
+                                                <Setter Property="Text" Value="{DynamicResource Settings.NotSet}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding FfmpegPath}" Value="">
+                                                <Setter Property="Text" Value="{DynamicResource Settings.NotSet}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </StackPanel>
                     </DockPanel>
                 </StackPanel>

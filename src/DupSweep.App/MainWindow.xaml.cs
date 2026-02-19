@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using DupSweep.App.Services;
 using DupSweep.App.ViewModels;
 
@@ -27,6 +28,17 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContextChanged += MainWindow_DataContextChanged;
         LanguageService.Instance.LanguageChanged += (_, _) => UpdateSubtitle();
+        MainBorder.SizeChanged += MainBorder_SizeChanged;
+    }
+
+    private void MainBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        MainBorder.Clip = new RectangleGeometry
+        {
+            RadiusX = 12,
+            RadiusY = 12,
+            Rect = new Rect(0, 0, MainBorder.ActualWidth, MainBorder.ActualHeight)
+        };
     }
 
     #region Window Controls

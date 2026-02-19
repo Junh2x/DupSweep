@@ -105,6 +105,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void NavigateToScan()
     {
+        if (_resultsViewModel.HasResults)
+        {
+            NavigateToResults();
+            return;
+        }
+
         CurrentView = _scanViewModel;
         SelectedNavIndex = 1;
         Title = LanguageService.Instance.GetString(TitleKeys[1]);

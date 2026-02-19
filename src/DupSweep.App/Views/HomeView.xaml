@@ -325,38 +325,23 @@
 
                             <CheckBox IsChecked="{Binding MatchModifiedDate}"
                                       materialDesign:CheckBoxAssist.CheckBoxSize="26"
-                                      Margin="0,0,0,4">
+                                      Margin="0,0,0,12">
                                 <StackPanel Margin="4,0,0,0">
                                     <TextBlock Text="{DynamicResource Home.ModifiedDateMatch}" />
                                     <TextBlock Text="파일 수정 날짜가 동일한 파일 감지"
                                                Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
-                        </StackPanel>
-                    </ScrollViewer>
-                </TabItem>
 
-                <!-- Tab 3: 유사도 비교 -->
-                <TabItem Header="{DynamicResource Home.TabSimilarity}" Style="{StaticResource OptionsTabItem}">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,2,0">
-                        <StackPanel>
-                            <TextBlock Text="퍼셉추얼 해싱 기반 유사 파일 탐지 (옵션)"
-                                       Style="{StaticResource Caption}"
-                                       Foreground="{StaticResource TextSecondaryBrush}"
-                                       Margin="0,0,0,16" />
+                            <Separator Background="{StaticResource DividerBrush}" Margin="0,4,0,12" />
 
                             <CheckBox IsChecked="{Binding UseImageSimilarity}"
                                       materialDesign:CheckBoxAssist.CheckBoxSize="26"
                                       Margin="0,0,0,4">
                                 <StackPanel Margin="4,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="ImageMultiple" Width="20" Height="20"
-                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
-                                                                 Foreground="{StaticResource AccentBrush}" />
-                                        <TextBlock Text="{DynamicResource Home.ImageSimilarity}" VerticalAlignment="Center" />
-                                    </StackPanel>
+                                    <TextBlock Text="{DynamicResource Home.ImageSimilarity}" VerticalAlignment="Center" />
                                     <TextBlock Text="비슷해 보이는 이미지 탐지 (dHash)"
-                                               Style="{StaticResource Caption}" Margin="28,4,0,0" />
+                                               Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
 
@@ -377,21 +362,14 @@
 
                             <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,12"
                                        Visibility="{Binding UseImageSimilarity, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
-                            <Separator Background="{StaticResource DividerBrush}" Margin="0,0,0,12"
-                                       Visibility="{Binding UseImageSimilarity, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                             <CheckBox IsChecked="{Binding UseVideoSimilarity}"
                                       materialDesign:CheckBoxAssist.CheckBoxSize="26"
                                       Margin="0,0,0,4">
                                 <StackPanel Margin="4,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="VideoBox" Width="20" Height="20"
-                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
-                                                                 Foreground="{StaticResource AccentBrush}" />
-                                        <TextBlock Text="{DynamicResource Home.VideoSimilarity}" VerticalAlignment="Center" />
-                                    </StackPanel>
+                                    <TextBlock Text="{DynamicResource Home.VideoSimilarity}" VerticalAlignment="Center" />
                                     <TextBlock Text="비슷한 비디오 탐지 (FFmpeg 필요)"
-                                               Style="{StaticResource Caption}" Margin="28,4,0,0" />
+                                               Style="{StaticResource Caption}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </CheckBox>
 

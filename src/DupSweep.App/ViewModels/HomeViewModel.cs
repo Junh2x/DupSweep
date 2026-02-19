@@ -98,8 +98,20 @@ public partial class HomeViewModel : ObservableObject
 
     private void UpdateCanStartScan()
     {
-        CanStartScan = SelectedFolders.Count > 0;
+        var hasFolder = SelectedFolders.Count > 0;
+        var hasScanLogic = UseHashComparison || UseSizeComparison || UseResolutionComparison
+                           || MatchCreatedDate || MatchModifiedDate
+                           || UseImageSimilarity || UseVideoSimilarity;
+        CanStartScan = hasFolder && hasScanLogic;
     }
+
+    partial void OnUseHashComparisonChanged(bool value) => UpdateCanStartScan();
+    partial void OnUseSizeComparisonChanged(bool value) => UpdateCanStartScan();
+    partial void OnUseResolutionComparisonChanged(bool value) => UpdateCanStartScan();
+    partial void OnMatchCreatedDateChanged(bool value) => UpdateCanStartScan();
+    partial void OnMatchModifiedDateChanged(bool value) => UpdateCanStartScan();
+    partial void OnUseImageSimilarityChanged(bool value) => UpdateCanStartScan();
+    partial void OnUseVideoSimilarityChanged(bool value) => UpdateCanStartScan();
 
     [RelayCommand]
     private void AddFolder()
