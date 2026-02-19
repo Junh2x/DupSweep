@@ -328,6 +328,13 @@ public class ScanService : IScanService
                     cancellationToken.ThrowIfCancellationRequested();
                     _pauseEvent.Wait(cancellationToken);
 
+                    if (image.Width == 0 || image.Height == 0)
+                    {
+                        var (width, height) = await _imageProcessor.GetImageResolutionAsync(image.FilePath, cancellationToken);
+                        image.Width = width;
+                        image.Height = height;
+                    }
+
                     image.PerceptualHash = await _imageProcessor.ComputePerceptualHashAsync(image.FilePath, config, cancellationToken);
                     image.ColorHash = await _imageProcessor.ComputeColorHashAsync(image.FilePath, cancellationToken);
                     processedImages++;

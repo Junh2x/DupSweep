@@ -121,13 +121,24 @@ public class DuplicateDetector
                     continue;
                 }
 
-                var similarity = PerceptualHash.CombinedSimilarityPercent(
+                var similarity = PerceptualHash.CombinedSimilarityDetails(
                     baseFile.PerceptualHash!.Value, other.PerceptualHash!.Value,
                     baseFile.ColorHash, other.ColorHash);
-                if (similarity >= thresholdPercent)
+
+                if (!IsCandidateCompatible(baseFile, other, type))
+                {
+                    continue;
+                }
+
+                var minStructure = Math.Max(70d, thresholdPercent - 5d);
+                var minColor = Math.Max(55d, thresholdPercent - 15d);
+
+                if (similarity.Combined >= thresholdPercent &&
+                    similarity.Structure >= minStructure &&
+                    similarity.Color >= minColor)
                 {
                     groupFiles.Add(other);
-                    totalSimilarity += similarity;
+                    totalSimilarity += similarity.Combined;
                     comparisons++;
                     visited.Add(other.FilePath);
                 }
@@ -147,5 +158,57 @@ public class DuplicateDetector
         }
 
         return groups;
+    }
+
+    private static bool IsCandidateCompatible(FileEntry baseFile, FileEntry other, DuplicateType type)
+    {
+        if (type != DuplicateType.SimilarImage)
+        {
+            return true;
+        }
+
+        if (baseFile.Size > 0 && other.Size > 0)
+        {
+            var sizeRatio = GetRatio(baseFile.Size, other.Size);
+            if (sizeRatio < 0.45)
+            {
+                return false;
+            }
+        }
+
+        if (baseFile.Width > 0 && baseFile.Height > 0 && other.Width > 0 && other.Height > 0)
+        {
+            var areaA = (long)baseFile.Width * baseFile.Height;
+            var areaB = (long)other.Width * other.Height;
+            var areaRatio = GetRatio(areaA, areaB);
+            if (areaRatio < 0.55)
+            {
+                return false;
+            }
+
+            var aspectA = (double)baseFile.Width / baseFile.Height;
+            var aspectB = (double)other.Width / other.Height;
+            var aspectRatio = GetRatio(aspectA, aspectB);
+            if (aspectRatio < 0.7)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static double GetRatio(long a, long b)
+    {
+        var min = Math.Min(a, b);
+        var max = Math.Max(a, b);
+        return max == 0 ? 0 : (double)min / max;
+    }
+
+    private static double GetRatio(double a, double b)
+    {
+        var min = Math.Min(a, b);
+        var max = Math.Max(a, b);
+        return max <= 0 ? 0 : min / max;
     }
 }

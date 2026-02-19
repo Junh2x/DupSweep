@@ -4,7 +4,7 @@
 
     <!-- App -->
     <sys:String x:Key="App.Title">DupSweep</sys:String>
-    <sys:String x:Key="App.Subtitle">Find Duplicate Files</sys:String>
+    <sys:String x:Key="App.Subtitle">Disk Cleanup Tool</sys:String>
 
     <!-- Navigation -->
     <sys:String x:Key="Nav.MainMenu">Main Menu</sys:String>
@@ -47,7 +47,7 @@
     <sys:String x:Key="Home.RemoveFolder">Remove Folder</sys:String>
     <sys:String x:Key="Home.StartScan">Start Scan</sys:String>
     <sys:String x:Key="Home.TabFileTarget">File Target</sys:String>
-    <sys:String x:Key="Home.TabScanLogic">Scan Logic</sys:String>
+    <sys:String x:Key="Home.TabScanLogic">Search Criteria</sys:String>
     <sys:String x:Key="Home.TabSimilarity">Similarity</sys:String>
     <sys:String x:Key="Home.AllFiles">ALL (All Files)</sys:String>
     <sys:String x:Key="Home.SelectByCategory">Select by Category</sys:String>
@@ -63,6 +63,13 @@
     <sys:String x:Key="Home.ImageSimilarity">Image Similarity</sys:String>
     <sys:String x:Key="Home.VideoSimilarity">Video Similarity</sys:String>
     <sys:String x:Key="Home.SimilarityThreshold">Similarity Threshold</sys:String>
+    <sys:String x:Key="Home.HashDesc">Detect by XxHash64, BLAKE3 hash comparison</sys:String>
+    <sys:String x:Key="Home.FileSizeDesc">Detect files with identical file size</sys:String>
+    <sys:String x:Key="Home.ResolutionDesc">Detect files with identical image/video resolution</sys:String>
+    <sys:String x:Key="Home.CreationDateDesc">Detect files with identical creation date</sys:String>
+    <sys:String x:Key="Home.ModifiedDateDesc">Detect files with identical modified date</sys:String>
+    <sys:String x:Key="Home.ImageSimilarityDesc">Detect similar-looking images (dHash)</sys:String>
+    <sys:String x:Key="Home.VideoSimilarityDesc">Detect similar videos (requires FFmpeg)</sys:String>
     <sys:String x:Key="Home.FFmpegNotSet">FFmpeg path is not configured.
 Video similarity check will be skipped.
 

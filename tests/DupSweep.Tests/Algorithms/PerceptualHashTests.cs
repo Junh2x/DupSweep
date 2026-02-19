@@ -96,4 +96,19 @@ public class PerceptualHashTests
             Assert.InRange(similarity, 0.0, 100.0);
         }
     }
+
+    [Fact]
+    public void CombinedSimilarityDetails_NoColorHash_FallsBackToStructure()
+    {
+        // Arrange
+        ulong left = 0x123456789ABCDEF0UL;
+        ulong right = 0x123456789ABCDEF1UL;
+
+        // Act
+        var details = PerceptualHash.CombinedSimilarityDetails(left, right, null, null);
+
+        // Assert
+        Assert.Equal(details.Structure, details.Color, 6);
+        Assert.Equal(details.Structure, details.Combined, 6);
+    }
 }

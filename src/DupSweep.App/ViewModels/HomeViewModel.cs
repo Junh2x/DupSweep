@@ -54,10 +54,10 @@ public partial class HomeViewModel : ObservableObject
 
     // 유사도 임계값
     [ObservableProperty]
-    private double _similarityThreshold = 85;
+    private double _similarityThreshold = 90;
 
     [ObservableProperty]
-    private double _videoSimilarityThreshold = 85;
+    private double _videoSimilarityThreshold = 90;
 
     // 파일 타입
     [ObservableProperty]
@@ -98,8 +98,20 @@ public partial class HomeViewModel : ObservableObject
 
     private void UpdateCanStartScan()
     {
-        CanStartScan = SelectedFolders.Count > 0;
+        var hasFolder = SelectedFolders.Count > 0;
+        var hasScanLogic = UseHashComparison || UseSizeComparison || UseResolutionComparison
+                           || MatchCreatedDate || MatchModifiedDate
+                           || UseImageSimilarity || UseVideoSimilarity;
+        CanStartScan = hasFolder && hasScanLogic;
     }
+
+    partial void OnUseHashComparisonChanged(bool value) => UpdateCanStartScan();
+    partial void OnUseSizeComparisonChanged(bool value) => UpdateCanStartScan();
+    partial void OnUseResolutionComparisonChanged(bool value) => UpdateCanStartScan();
+    partial void OnMatchCreatedDateChanged(bool value) => UpdateCanStartScan();
+    partial void OnMatchModifiedDateChanged(bool value) => UpdateCanStartScan();
+    partial void OnUseImageSimilarityChanged(bool value) => UpdateCanStartScan();
+    partial void OnUseVideoSimilarityChanged(bool value) => UpdateCanStartScan();
 
     [RelayCommand]
     private void AddFolder()
@@ -204,6 +216,7 @@ public partial class HomeViewModel : ObservableObject
             }
         }
 
+        _resultsViewModel.ClearResults();
         _scanViewModel.Reset();
         _messenger.Send(new NavigateMessage(NavigationTarget.Scan));
 
@@ -219,7 +232,7 @@ public partial class HomeViewModel : ObservableObject
             _logger.LogInformation("스캔 완료: {Groups}개 그룹 발견", scanResult?.DuplicateGroups?.Count ?? 0);
             if (scanResult != null)
             {
-                _resultsViewModel.LoadResults(scanResult);
+                _resultsViewModel.LoadResults(scanResult, config.UseHashComparison);
                 _messenger.Send(new NavigateMessage(NavigationTarget.Results));
             }
         }

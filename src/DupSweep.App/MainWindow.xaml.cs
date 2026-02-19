@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using DupSweep.App.Services;
+using System.Windows.Media;
 using DupSweep.App.ViewModels;
 
 namespace DupSweep.App;
@@ -13,20 +13,21 @@ namespace DupSweep.App;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private static readonly string[] SubtitleKeys =
-    {
-        "Subtitle.Home",
-        "Subtitle.Scan",
-        "Subtitle.Results",
-        "Subtitle.Settings",
-        "Subtitle.FolderTree"
-    };
-
     public MainWindow()
     {
         InitializeComponent();
         DataContextChanged += MainWindow_DataContextChanged;
-        LanguageService.Instance.LanguageChanged += (_, _) => UpdateSubtitle();
+        MainBorder.SizeChanged += MainBorder_SizeChanged;
+    }
+
+    private void MainBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        MainBorder.Clip = new RectangleGeometry
+        {
+            RadiusX = 12,
+            RadiusY = 12,
+            Rect = new Rect(0, 0, MainBorder.ActualWidth, MainBorder.ActualHeight)
+        };
     }
 
     #region Window Controls
@@ -80,7 +81,6 @@ public partial class MainWindow : Window
             if (int.TryParse(tagStr, out int index))
             {
                 ViewModel?.NavigateByIndex(index);
-                UpdateSubtitle(index);
             }
         }
     }
@@ -110,19 +110,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private void UpdateSubtitle(int? index = null)
-    {
-        if (index == null)
-        {
-            index = ViewModel?.SelectedNavIndex ?? 0;
-        }
-
-        if (index >= 0 && index < SubtitleKeys.Length)
-        {
-            PageSubtitle.Text = LanguageService.Instance.GetString(SubtitleKeys[index.Value]);
-        }
-    }
-
     private MainViewModel? ViewModel => DataContext as MainViewModel;
 
     private void MainWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -136,20 +123,13 @@ public partial class MainWindow : Window
         {
             newVm.PropertyChanged += ViewModel_PropertyChanged;
         }
-
-        UpdateSubtitle();
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.CurrentView))
-        {
-            UpdateSubtitle();
-        }
-        else if (e.PropertyName == nameof(MainViewModel.SelectedNavIndex))
+        if (e.PropertyName == nameof(MainViewModel.SelectedNavIndex))
         {
             UpdateNavRadioButton(ViewModel?.SelectedNavIndex ?? 0);
-            UpdateSubtitle(ViewModel?.SelectedNavIndex);
         }
     }
     #endregion

@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DupSweep.Core.Services.Interfaces;
@@ -10,20 +9,27 @@ namespace DupSweep.App.ViewModels;
 /// <summary>
 /// 스캔 결과 화면 ViewModel
 /// 중복 파일 그룹 표시, 파일 선택, 삭제 기능 제공
+///
+/// 성능 설계:
+/// - ICollectionView + GroupDescriptions 미사용 (가상화 파괴 방지)
+/// - DisplayItems: 플랫 리스트로 ListView 가상화 보장
+/// - _suppressSelectionUpdate: 일괄 선택 시 O(n²) 방지
 /// </summary>
 public partial class ResultsViewModel : ObservableObject
 {
     private readonly IDeleteService _deleteService;
     private readonly SettingsViewModel _settingsViewModel;
+    private bool _suppressSelectionUpdate;
 
     [ObservableProperty]
     private ObservableCollection<DuplicateGroupViewModel> _duplicateGroups = new();
 
+    /// <summary>
+    /// ListView에 바인딩되는 플랫 리스트.
+    /// DuplicateGroups를 평탄화하고 IsFirstInGroup 플래그로 그룹 구분선 표시.
+    /// </summary>
     [ObservableProperty]
-    private ObservableCollection<FileItemViewModel> _allFiles = new();
-
-    public ICollectionView DuplicateGroupsView { get; }
-    public ICollectionView AllFilesView { get; }
+    private ObservableCollection<FileItemViewModel> _displayItems = new();
 
     [ObservableProperty]
     private string _filterType = "All";
@@ -59,6 +65,9 @@ public partial class ResultsViewModel : ObservableObject
     [ObservableProperty]
     private bool _autoSelectLowRes;
 
+    [ObservableProperty]
+    private bool _showHashColumn;
+
     public string FormattedPotentialSavings => FormatFileSize(PotentialSavings);
 
     public int TotalFilesCount => DuplicateGroups.Sum(g => g.FileCount);
@@ -67,31 +76,39 @@ public partial class ResultsViewModel : ObservableObject
     {
         _deleteService = deleteService;
         _settingsViewModel = settingsViewModel;
-
-        DuplicateGroupsView = CollectionViewSource.GetDefaultView(DuplicateGroups);
-        DuplicateGroupsView.Filter = FilterGroup;
-        DuplicateGroups.CollectionChanged += (_, _) =>
-        {
-            HasResults = DuplicateGroups.Count > 0;
-            OnPropertyChanged(nameof(TotalFilesCount));
-            DuplicateGroupsView.Refresh();
-        };
-
-        AllFilesView = CollectionViewSource.GetDefaultView(AllFiles);
-        AllFilesView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(FileItemViewModel.GroupId)));
     }
 
-    public void LoadResults(DupSweep.Core.Models.ScanResult result)
+    /// <summary>
+    /// 기존 결과를 초기화합니다. 재스캔 시 사용.
+    /// </summary>
+    public void ClearResults()
     {
-        DuplicateGroups.Clear();
-        AllFiles.Clear();
         FocusedFile = null;
+        DuplicateGroups = new();
+        DisplayItems = new();
+        HasResults = false;
+        SelectedFilesCount = 0;
+        PotentialSavings = 0;
+        OnPropertyChanged(nameof(TotalFilesCount));
+        OnPropertyChanged(nameof(FormattedPotentialSavings));
+    }
+
+    public void LoadResults(DupSweep.Core.Models.ScanResult result, bool showHashColumn = false)
+    {
+        FocusedFile = null;
+        ShowHashColumn = showHashColumn;
 
         if (!result.IsSuccessful)
         {
+            DuplicateGroups = new();
+            DisplayItems = new();
             HasResults = false;
             return;
         }
+
+        _suppressSelectionUpdate = true;
+
+        var tempGroups = new List<DuplicateGroupViewModel>();
 
         int groupIndex = 0;
         foreach (var group in result.DuplicateGroups)
@@ -108,6 +125,8 @@ public partial class ResultsViewModel : ObservableObject
                 Similarity = group.Similarity
             };
 
+            // List에 먼저 구성 후 일괄 설정 (CollectionChanged 이벤트 최소화)
+            var files = new List<FileItemViewModel>();
             foreach (var file in group.Files)
             {
                 var fileVm = new FileItemViewModel
@@ -125,23 +144,68 @@ public partial class ResultsViewModel : ObservableObject
                     GroupId = groupIndex,
                     ParentGroup = groupVm
                 };
-                fileVm.PropertyChanged += (_, args) =>
-                {
-                    if (args.PropertyName == nameof(FileItemViewModel.IsSelected))
-                    {
-                        UpdateSelectionStats();
-                    }
-                };
-                groupVm.Files.Add(fileVm);
-                AllFiles.Add(fileVm);
+                fileVm.PropertyChanged += FileVm_PropertyChanged;
+                files.Add(fileVm);
             }
 
-            DuplicateGroups.Add(groupVm);
+            groupVm.SetFiles(files);
+            tempGroups.Add(groupVm);
             groupIndex++;
         }
 
+        DuplicateGroups = new ObservableCollection<DuplicateGroupViewModel>(tempGroups);
+
+        _suppressSelectionUpdate = false;
+
+        RebuildDisplayItems();
         HasResults = DuplicateGroups.Count > 0;
+        OnPropertyChanged(nameof(TotalFilesCount));
         UpdateSelectionStats();
+    }
+
+    private void FileVm_PropertyChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(FileItemViewModel.IsSelected) && !_suppressSelectionUpdate)
+        {
+            UpdateSelectionStats();
+        }
+    }
+
+    /// <summary>
+    /// DuplicateGroups를 필터 적용 후 플랫 리스트로 변환.
+    /// IsFirstInGroup 플래그로 그룹 구분선 위치 표시.
+    /// </summary>
+    private void RebuildDisplayItems()
+    {
+        var items = new List<FileItemViewModel>();
+        bool hasItems = false;
+
+        foreach (var group in DuplicateGroups)
+        {
+            if (!PassesFilter(group)) continue;
+
+            bool isFirst = true;
+            foreach (var file in group.Files)
+            {
+                file.IsFirstInGroup = isFirst && hasItems;
+                items.Add(file);
+                isFirst = false;
+                hasItems = true;
+            }
+        }
+
+        DisplayItems = new ObservableCollection<FileItemViewModel>(items);
+    }
+
+    private bool PassesFilter(DuplicateGroupViewModel group)
+    {
+        return FilterType switch
+        {
+            "Images" => group.GroupType.Contains("Image", StringComparison.OrdinalIgnoreCase),
+            "Videos" => group.GroupType.Contains("Video", StringComparison.OrdinalIgnoreCase),
+            "Audio" => group.GroupType.Contains("Audio", StringComparison.OrdinalIgnoreCase),
+            _ => true
+        };
     }
 
     [RelayCommand]
@@ -153,70 +217,84 @@ public partial class ResultsViewModel : ObservableObject
     [RelayCommand]
     private void SelectFirst()
     {
+        _suppressSelectionUpdate = true;
         foreach (var group in DuplicateGroups)
         {
             group.SelectFirst();
         }
+        _suppressSelectionUpdate = false;
         UpdateSelectionStats();
     }
 
     [RelayCommand]
     private void SelectNewest()
     {
+        _suppressSelectionUpdate = true;
         foreach (var group in DuplicateGroups)
         {
             group.SelectNewest();
         }
+        _suppressSelectionUpdate = false;
         UpdateSelectionStats();
     }
 
     [RelayCommand]
     private void SelectOldest()
     {
+        _suppressSelectionUpdate = true;
         foreach (var group in DuplicateGroups)
         {
             group.SelectOldest();
         }
+        _suppressSelectionUpdate = false;
         UpdateSelectionStats();
     }
 
     [RelayCommand]
     private void SelectLargest()
     {
+        _suppressSelectionUpdate = true;
         foreach (var group in DuplicateGroups)
         {
             group.SelectLargest();
         }
+        _suppressSelectionUpdate = false;
         UpdateSelectionStats();
     }
 
     [RelayCommand]
     private void SelectSmallest()
     {
+        _suppressSelectionUpdate = true;
         foreach (var group in DuplicateGroups)
         {
             group.SelectSmallest();
         }
+        _suppressSelectionUpdate = false;
         UpdateSelectionStats();
     }
 
     [RelayCommand]
     private void SelectHighestResolution()
     {
+        _suppressSelectionUpdate = true;
         foreach (var group in DuplicateGroups)
         {
             group.SelectHighestResolution();
         }
+        _suppressSelectionUpdate = false;
         UpdateSelectionStats();
     }
 
     [RelayCommand]
     private void SelectLowestResolution()
     {
+        _suppressSelectionUpdate = true;
         foreach (var group in DuplicateGroups)
         {
             group.SelectLowestResolution();
         }
+        _suppressSelectionUpdate = false;
         UpdateSelectionStats();
     }
 
@@ -240,6 +318,7 @@ public partial class ResultsViewModel : ObservableObject
     [RelayCommand]
     private void ClearSelection()
     {
+        _suppressSelectionUpdate = true;
         foreach (var group in DuplicateGroups)
         {
             foreach (var file in group.Files)
@@ -247,6 +326,7 @@ public partial class ResultsViewModel : ObservableObject
                 file.IsSelected = false;
             }
         }
+        _suppressSelectionUpdate = false;
         UpdateSelectionStats();
     }
 
@@ -306,51 +386,25 @@ public partial class ResultsViewModel : ObservableObject
         HasResults = DuplicateGroups.Count > 0;
     }
 
-    private bool FilterGroup(object obj)
-    {
-        if (obj is not DuplicateGroupViewModel group)
-        {
-            return false;
-        }
-
-        return FilterType switch
-        {
-            "Images" => group.GroupType.Contains("Image", StringComparison.OrdinalIgnoreCase),
-            "Videos" => group.GroupType.Contains("Video", StringComparison.OrdinalIgnoreCase),
-            "Audio" => group.GroupType.Contains("Audio", StringComparison.OrdinalIgnoreCase),
-            _ => true
-        };
-    }
-
     partial void OnFilterTypeChanged(string value)
     {
-        DuplicateGroupsView.Refresh();
+        RebuildDisplayItems();
     }
 
     private void RemoveDeletedFiles(IEnumerable<FileItemViewModel> deletedFiles)
     {
-        var deletedList = deletedFiles.ToList();
+        var deletedSet = new HashSet<FileItemViewModel>(deletedFiles);
 
-        // AllFiles에서도 제거
-        foreach (var file in deletedList)
-        {
-            AllFiles.Remove(file);
-        }
-
-        // FocusedFile이 삭제된 경우 해제
-        if (FocusedFile != null && deletedList.Contains(FocusedFile))
+        if (FocusedFile != null && deletedSet.Contains(FocusedFile))
         {
             FocusedFile = null;
         }
 
         foreach (var group in DuplicateGroups.ToList())
         {
-            foreach (var file in deletedList)
+            foreach (var file in deletedSet)
             {
-                if (group.Files.Contains(file))
-                {
-                    group.Files.Remove(file);
-                }
+                group.Files.Remove(file);
             }
 
             if (group.Files.Count < 2)
@@ -359,6 +413,8 @@ public partial class ResultsViewModel : ObservableObject
             }
         }
 
+        RebuildDisplayItems();
+        OnPropertyChanged(nameof(TotalFilesCount));
         UpdateSelectionStats();
     }
 
@@ -424,19 +480,14 @@ public partial class DuplicateGroupViewModel : ObservableObject
     public int FileCount => Files.Count;
     public long TotalSize => Files.Sum(f => f.Size);
 
-    /// <summary>
-    /// 그룹 구분선에 표시할 라벨 (예: "3 files · Similar Image · 96%")
-    /// </summary>
     public string GroupLabel => $"{FileCount} files · {GroupType} · {Similarity:0}%";
 
-    public DuplicateGroupViewModel()
+    /// <summary>
+    /// 파일 목록 일괄 설정 (CollectionChanged 이벤트 최소화)
+    /// </summary>
+    public void SetFiles(IEnumerable<FileItemViewModel> files)
     {
-        Files.CollectionChanged += (_, _) =>
-        {
-            OnPropertyChanged(nameof(FileCount));
-            OnPropertyChanged(nameof(TotalSize));
-            OnPropertyChanged(nameof(GroupLabel));
-        };
+        Files = new ObservableCollection<FileItemViewModel>(files);
     }
 
     public void SelectFirst()
@@ -533,7 +584,6 @@ public partial class DuplicateGroupViewModel : ObservableObject
                           .OrderBy(f => f.Width * f.Height)
                           .FirstOrDefault();
 
-        // 해상도 정보가 없는 경우 첫 번째 파일 선택
         if (lowest == null)
         {
             SelectFirst();
@@ -592,8 +642,16 @@ public partial class FileItemViewModel : ObservableObject
     [ObservableProperty]
     private DuplicateGroupViewModel? _parentGroup;
 
+    /// <summary>
+    /// 그룹의 첫 번째 파일이면서 첫 번째 그룹이 아닌 경우 true.
+    /// ListView에서 그룹 구분선 표시에 사용.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isFirstInGroup;
+
     public string FormattedSize => FormatFileSize(Size);
-    public string Resolution => Width > 0 && Height > 0 ? $"{Width}×{Height}" : "-";
+    public string Resolution => Width > 0 && Height > 0 ? $"{Width}\u00d7{Height}" : "-";
+    public string DirectoryPath => System.IO.Path.GetDirectoryName(FilePath) ?? string.Empty;
 
     private static string FormatFileSize(long bytes)
     {

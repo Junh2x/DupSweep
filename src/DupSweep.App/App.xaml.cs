@@ -26,6 +26,9 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Windows Shell COM interop의 CheckLogLevel/GetHKCURegistryKeyAndValue 트레이스 메시지 억제
+        System.Diagnostics.Trace.Listeners.Clear();
+
         base.OnStartup(e);
 
         var services = new ServiceCollection();
