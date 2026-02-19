@@ -283,30 +283,105 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
-                            <materialDesign:PackIcon Kind="FolderOpen" Width="14" Height="14"
-                                                      VerticalAlignment="Center" Margin="0,0,4,0" Opacity="0.6" />
-                            <TextBlock Text="{DynamicResource FolderTree.FolderFileList}" FontSize="11" FontWeight="Medium" Opacity="0.7" />
-                            <TextBlock Text="{Binding CurrentFolderFileInfo}" FontSize="10"
+                        <Grid Grid.Row="0" Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 전체 선택 CheckBox -->
+                            <CheckBox Grid.Column="0"
+                                      IsChecked="{Binding IsAllChecked, Mode=OneWay}"
+                                      Command="{Binding ToggleSelectAllCommand}"
+                                      VerticalAlignment="Center" Margin="0,0,6,0"
+                                      ToolTip="{DynamicResource FolderTree.SelectAll}"
+                                      Visibility="{Binding CurrentFiles.Count, Converter={StaticResource IntToVisibilityConverter}}">
+                                <CheckBox.LayoutTransform>
+                                    <ScaleTransform ScaleX="0.85" ScaleY="0.85" />
+                                </CheckBox.LayoutTransform>
+                            </CheckBox>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="FolderOpen" Width="14" Height="14"
+                                                          VerticalAlignment="Center" Margin="0,0,4,0" Opacity="0.6" />
+                                <TextBlock Text="{DynamicResource FolderTree.FolderFileList}" FontSize="11" FontWeight="Medium" Opacity="0.7" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding CurrentFolderFileInfo}" FontSize="10"
                                        Margin="8,0,0,0" Opacity="0.5" VerticalAlignment="Center" />
-                        </StackPanel>
+
+                            <!-- 선택 요약 + 삭제 버튼 -->
+                            <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center"
+                                        Visibility="{Binding CheckedCount, Converter={StaticResource IntToVisibilityConverter}}">
+                                <TextBlock VerticalAlignment="Center" FontSize="11" Margin="0,0,8,0" Opacity="0.7">
+                                    <Run Text="{Binding CheckedCount, Mode=OneWay}" />
+                                    <Run Text="{DynamicResource FolderTree.ItemsSelected}" />
+                                    <Run Text=" · " />
+                                    <Run Text="{Binding FormattedCheckedSize, Mode=OneWay}" />
+                                </TextBlock>
+
+                                <Button Command="{Binding MoveToTrashCommand}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        Height="24" Padding="8,0" FontSize="11"
+                                        Margin="0,0,4,0"
+                                        ToolTip="{DynamicResource Delete.ModeTrash}"
+                                        IsEnabled="{Binding IsDeleting, Converter={StaticResource InverseBooleanConverter}}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="DeleteOutline" Width="14" Height="14"
+                                                                  VerticalAlignment="Center" Margin="0,0,4,0" />
+                                        <TextBlock Text="{DynamicResource Results.Trash}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Command="{Binding DeletePermanentlyCommand}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        Height="24" Padding="8,0" FontSize="11"
+                                        Foreground="#E53935"
+                                        ToolTip="{DynamicResource Delete.ModePermanent}"
+                                        IsEnabled="{Binding IsDeleting, Converter={StaticResource InverseBooleanConverter}}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Delete" Width="14" Height="14"
+                                                                  VerticalAlignment="Center" Margin="0,0,4,0" />
+                                        <TextBlock Text="{DynamicResource Results.Delete}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
 
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding CurrentFiles}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border Padding="6,4" Margin="0"
-                                                Background="White"
                                                 BorderBrush="#D0D4D8"
                                                 BorderThickness="0,0,0,1">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="White" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                                            <Setter Property="Background" Value="#E3F2FD" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="70" />
                                                 </Grid.ColumnDefinitions>
 
-                                                <materialDesign:PackIcon Grid.Column="0" Width="16" Height="16"
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked}"
+                                                          VerticalAlignment="Center" Margin="0,0,4,0">
+                                                    <CheckBox.LayoutTransform>
+                                                        <ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+                                                    </CheckBox.LayoutTransform>
+                                                </CheckBox>
+
+                                                <materialDesign:PackIcon Grid.Column="1" Width="16" Height="16"
                                                                           VerticalAlignment="Center" Margin="0,0,6,0">
                                                     <materialDesign:PackIcon.Style>
                                                         <Style TargetType="materialDesign:PackIcon">
@@ -324,11 +399,11 @@
                                                     </materialDesign:PackIcon.Style>
                                                 </materialDesign:PackIcon>
 
-                                                <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                <TextBlock Grid.Column="2" Text="{Binding Name}"
                                                            FontSize="12" TextTrimming="CharacterEllipsis"
                                                            VerticalAlignment="Center"
                                                            ToolTip="{Binding Name}" />
-                                                <TextBlock Grid.Column="2" Text="{Binding FormattedSize}"
+                                                <TextBlock Grid.Column="3" Text="{Binding FormattedSize}"
                                                            FontSize="11" Opacity="0.6"
                                                            VerticalAlignment="Center"
                                                            HorizontalAlignment="Right" />

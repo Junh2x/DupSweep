@@ -162,6 +162,12 @@
     <sys:String x:Key="FolderTree.NoOtherItems">기타 항목 없음</sys:String>
     <sys:String x:Key="FolderTree.OthersSummary">기타: {0}개 폴더, {1}개 파일</sys:String>
     <sys:String x:Key="FolderTree.LoadOthersFailed">기타 목록을 불러올 수 없습니다.</sys:String>
+    <sys:String x:Key="FolderTree.SelectAll">전체 선택</sys:String>
+    <sys:String x:Key="FolderTree.ItemsSelected">개 선택</sys:String>
+    <sys:String x:Key="FolderTree.DeleteSuccess">{0}개 항목이 삭제되었습니다.</sys:String>
+    <sys:String x:Key="FolderTree.DeleteFailed">삭제 중 오류가 발생했습니다: {0}</sys:String>
+    <sys:String x:Key="FolderTree.ConfirmDelete">{0}개 항목을 삭제하시겠습니까?</sys:String>
+    <sys:String x:Key="FolderTree.ConfirmPermanentDelete">{0}개 항목을 영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</sys:String>
 
     <!-- Delete Confirmation Dialog -->
     <sys:String x:Key="Delete.ConfirmTitle">삭제 확인</sys:String>

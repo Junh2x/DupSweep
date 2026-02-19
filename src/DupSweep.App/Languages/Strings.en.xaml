@@ -162,6 +162,12 @@ Do you want to continue?</sys:String>
     <sys:String x:Key="FolderTree.NoOtherItems">No other items</sys:String>
     <sys:String x:Key="FolderTree.OthersSummary">Others: {0} folders, {1} files</sys:String>
     <sys:String x:Key="FolderTree.LoadOthersFailed">Failed to load others list.</sys:String>
+    <sys:String x:Key="FolderTree.SelectAll">Select All</sys:String>
+    <sys:String x:Key="FolderTree.ItemsSelected"> selected</sys:String>
+    <sys:String x:Key="FolderTree.DeleteSuccess">{0} item(s) deleted.</sys:String>
+    <sys:String x:Key="FolderTree.DeleteFailed">Error occurred while deleting: {0}</sys:String>
+    <sys:String x:Key="FolderTree.ConfirmDelete">Delete {0} item(s)?</sys:String>
+    <sys:String x:Key="FolderTree.ConfirmPermanentDelete">Permanently delete {0} item(s)? This cannot be undone.</sys:String>
 
     <!-- Delete Confirmation Dialog -->
     <sys:String x:Key="Delete.ConfirmTitle">Confirm Deletion</sys:String>

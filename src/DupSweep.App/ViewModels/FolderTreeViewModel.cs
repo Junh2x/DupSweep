@@ -1,9 +1,12 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DupSweep.App.Services;
+using DupSweep.Core.Services.Interfaces;
+using VBFileIO = Microsoft.VisualBasic.FileIO;
 
 namespace DupSweep.App.ViewModels;
 
@@ -16,6 +19,9 @@ public partial class FolderTreeViewModel : ObservableObject
     private const int MaxDepth = 5;
     private const double MinPercentThreshold = 1.0;
     private const int ParallelDepthThreshold = 2; // 이 깊이까지 병렬 처리
+
+    private readonly IDeleteService _deleteService;
+    private readonly SettingsViewModel _settingsViewModel;
 
     [ObservableProperty]
     private string _selectedFolderPath = string.Empty;
@@ -55,9 +61,31 @@ public partial class FolderTreeViewModel : ObservableObject
     [ObservableProperty]
     private string _currentFolderFileInfo = string.Empty;
 
+    // 체크/삭제 관련 프로퍼티
+    [ObservableProperty]
+    private int _checkedCount;
+
+    [ObservableProperty]
+    private long _checkedSize;
+
+    [ObservableProperty]
+    private bool _isAllChecked;
+
+    [ObservableProperty]
+    private bool _isDeleting;
+
+    public string FormattedCheckedSize => FormatSize(CheckedSize);
+
     private FolderNode? _rootNode;
     private int _folderCounter;
     private readonly Dictionary<int, FolderBarItem> _selectedItems = new();
+    private FolderBarItem? _currentBarItem;
+
+    public FolderTreeViewModel(IDeleteService deleteService, SettingsViewModel settingsViewModel)
+    {
+        _deleteService = deleteService;
+        _settingsViewModel = settingsViewModel;
+    }
 
     [RelayCommand]
     public async Task SelectFolderAsync()
@@ -83,8 +111,9 @@ public partial class FolderTreeViewModel : ObservableObject
         HasData = false;
         BarLevels.Clear();
         Breadcrumbs.Clear();
-        CurrentFiles.Clear();
+        ClearCurrentFiles();
         _selectedItems.Clear();
+        _currentBarItem = null;
         _folderCounter = 0;
         AnalyzedFolderCount = 0;
 
@@ -406,7 +435,8 @@ public partial class FolderTreeViewModel : ObservableObject
 
     private void UpdateCurrentFiles(FolderBarItem item)
     {
-        CurrentFiles.Clear();
+        ClearCurrentFiles();
+        _currentBarItem = item;
 
         string? folderPath = item.FullPath;
         if (string.IsNullOrEmpty(folderPath) || !Directory.Exists(folderPath))
@@ -464,6 +494,7 @@ public partial class FolderTreeViewModel : ObservableObject
                     items.Add(new FileInfoItem
                     {
                         Name = dirInfo.Name,
+                        FullPath = dir,
                         Size = folderSize,
                         FormattedSize = FormatSize(folderSize),
                         Extension = "",
@@ -482,6 +513,7 @@ public partial class FolderTreeViewModel : ObservableObject
                     items.Add(new FileInfoItem
                     {
                         Name = fileInfo.Name,
+                        FullPath = file,
                         Size = fileInfo.Length,
                         FormattedSize = FormatSize(fileInfo.Length),
                         Extension = fileInfo.Extension.ToUpperInvariant(),
@@ -495,6 +527,7 @@ public partial class FolderTreeViewModel : ObservableObject
             var sortedItems = items.OrderByDescending(i => i.Size).Take(50).ToList();
             foreach (var fileItem in sortedItems)
             {
+                fileItem.PropertyChanged += OnFileItemPropertyChanged;
                 CurrentFiles.Add(fileItem);
             }
 
@@ -512,7 +545,8 @@ public partial class FolderTreeViewModel : ObservableObject
 
     private void UpdateOthersFiles(FolderBarItem item)
     {
-        CurrentFiles.Clear();
+        ClearCurrentFiles();
+        _currentBarItem = item;
 
         if (item.OthersNodes == null && !item.OthersIncludesFiles)
         {
@@ -532,6 +566,7 @@ public partial class FolderTreeViewModel : ObservableObject
                     items.Add(new FileInfoItem
                     {
                         Name = node.Name,
+                        FullPath = node.FullPath,
                         Size = node.Size,
                         FormattedSize = FormatSize(node.Size),
                         Extension = "",
@@ -553,6 +588,7 @@ public partial class FolderTreeViewModel : ObservableObject
                             items.Add(new FileInfoItem
                             {
                                 Name = fileInfo.Name,
+                                FullPath = file,
                                 Size = fileInfo.Length,
                                 FormattedSize = FormatSize(fileInfo.Length),
                                 Extension = fileInfo.Extension.ToUpperInvariant(),
@@ -569,6 +605,7 @@ public partial class FolderTreeViewModel : ObservableObject
             var sortedItems = items.OrderByDescending(i => i.Size).Take(50).ToList();
             foreach (var fileItem in sortedItems)
             {
+                fileItem.PropertyChanged += OnFileItemPropertyChanged;
                 CurrentFiles.Add(fileItem);
             }
 
@@ -600,8 +637,9 @@ public partial class FolderTreeViewModel : ObservableObject
                 BarLevels.RemoveAt(BarLevels.Count - 1);
             }
             _selectedItems.Clear();
+            _currentBarItem = null;
             UpdateBreadcrumbs();
-            CurrentFiles.Clear();
+            ClearCurrentFiles();
             CurrentFolderFileInfo = string.Empty;
         }
         else if (_selectedItems.TryGetValue(crumb.Depth, out var item))
@@ -620,6 +658,248 @@ public partial class FolderTreeViewModel : ObservableObject
             UpdateCurrentFiles(item);
         }
     }
+
+    #region 체크/삭제 기능
+
+    [RelayCommand]
+    private void ToggleSelectAll()
+    {
+        bool newState = !IsAllChecked;
+        foreach (var item in CurrentFiles)
+        {
+            item.IsChecked = newState;
+        }
+        UpdateCheckedStats();
+    }
+
+    [RelayCommand]
+    private async Task MoveToTrashAsync()
+    {
+        await ExecuteDeleteAsync(isPermanent: false);
+    }
+
+    [RelayCommand]
+    private async Task DeletePermanentlyAsync()
+    {
+        await ExecuteDeleteAsync(isPermanent: true);
+    }
+
+    private async Task ExecuteDeleteAsync(bool isPermanent)
+    {
+        var checkedItems = CurrentFiles.Where(f => f.IsChecked).ToList();
+        if (checkedItems.Count == 0) return;
+
+        // 확인 다이얼로그
+        if (_settingsViewModel.ShowConfirmationDialog)
+        {
+            var message = isPermanent
+                ? LanguageService.Instance.GetString("FolderTree.ConfirmPermanentDelete", checkedItems.Count)
+                : LanguageService.Instance.GetString("FolderTree.ConfirmDelete", checkedItems.Count);
+
+            var result = System.Windows.MessageBox.Show(
+                message,
+                LanguageService.Instance.GetString("Delete.ConfirmTitle"),
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Warning);
+
+            if (result != System.Windows.MessageBoxResult.Yes) return;
+        }
+
+        IsDeleting = true;
+        try
+        {
+            var fileItems = checkedItems.Where(f => !f.IsFolder).ToList();
+            var folderItems = checkedItems.Where(f => f.IsFolder).ToList();
+            int deletedCount = 0;
+
+            // 파일 삭제 (IDeleteService 사용)
+            if (fileItems.Count > 0)
+            {
+                var filePaths = fileItems.Select(f => f.FullPath);
+                if (isPermanent)
+                    await _deleteService.DeletePermanentlyAsync(filePaths, CancellationToken.None);
+                else
+                    await _deleteService.MoveToTrashAsync(filePaths, CancellationToken.None);
+                deletedCount += fileItems.Count;
+            }
+
+            // 폴더 삭제
+            foreach (var folderItem in folderItems)
+            {
+                try
+                {
+                    if (isPermanent)
+                    {
+                        Directory.Delete(folderItem.FullPath, recursive: true);
+                    }
+                    else
+                    {
+                        VBFileIO.FileSystem.DeleteDirectory(
+                            folderItem.FullPath,
+                            VBFileIO.UIOption.OnlyErrorDialogs,
+                            VBFileIO.RecycleOption.SendToRecycleBin);
+                    }
+                    deletedCount++;
+                }
+                catch { }
+            }
+
+            // FolderNode 트리 업데이트 + 바 차트 갱신
+            UpdateTreeAfterDeletion(fileItems, folderItems);
+
+            NotificationService.Instance.ShowSuccess(
+                LanguageService.Instance.GetString("FolderTree.DeleteSuccess", deletedCount));
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Instance.ShowError(
+                LanguageService.Instance.GetString("FolderTree.DeleteFailed", ex.Message));
+        }
+        finally
+        {
+            IsDeleting = false;
+        }
+    }
+
+    /// <summary>
+    /// 삭제 후 FolderNode 트리 데이터를 업데이트하고 바 차트를 재구축
+    /// </summary>
+    private void UpdateTreeAfterDeletion(List<FileInfoItem> deletedFiles, List<FileInfoItem> deletedFolders)
+    {
+        var targetNode = _currentBarItem?.Node;
+        if (targetNode == null)
+        {
+            RefreshCurrentFileList();
+            return;
+        }
+
+        // 삭제된 파일의 크기를 노드에서 차감
+        foreach (var file in deletedFiles)
+        {
+            targetNode.FilesSize -= file.Size;
+            targetNode.FileCount--;
+        }
+
+        // 삭제된 폴더를 노드에서 제거
+        foreach (var folder in deletedFolders)
+        {
+            var childNode = targetNode.Children.FirstOrDefault(c =>
+                string.Equals(c.FullPath, folder.FullPath, StringComparison.OrdinalIgnoreCase));
+            if (childNode != null)
+            {
+                targetNode.Children.Remove(childNode);
+                targetNode.FolderCount--;
+            }
+        }
+
+        // 현재 노드부터 루트까지 Size 재계산
+        var current = targetNode;
+        while (current != null)
+        {
+            current.Size = current.FilesSize + current.Children.Sum(c => c.Size);
+            current = current.Parent;
+        }
+
+        // 전체 크기 업데이트
+        if (_rootNode != null)
+        {
+            TotalSize = _rootNode.Size;
+            FormattedTotalSize = FormatSize(TotalSize);
+        }
+
+        // 바 차트 재구축 (현재 선택 경로 복원)
+        RebuildBarLevels();
+    }
+
+    /// <summary>
+    /// 바 레벨을 재구축하고 이전 선택 경로를 복원
+    /// </summary>
+    private void RebuildBarLevels()
+    {
+        // 이전 선택 경로 저장 (FullPath 기준)
+        var selectedPaths = new Dictionary<int, string>();
+        foreach (var kvp in _selectedItems)
+        {
+            if (kvp.Value.FullPath != null)
+                selectedPaths[kvp.Key] = kvp.Value.FullPath;
+        }
+
+        _selectedItems.Clear();
+        BuildLevel0();
+
+        // 이전 선택 경로 복원
+        for (int depth = 0; depth < MaxDepth; depth++)
+        {
+            if (!selectedPaths.TryGetValue(depth, out var path)) break;
+            if (depth >= BarLevels.Count) break;
+
+            var matchItem = BarLevels[depth].Items.FirstOrDefault(i =>
+                string.Equals(i.FullPath, path, StringComparison.OrdinalIgnoreCase));
+
+            if (matchItem != null)
+            {
+                SelectItem(matchItem);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        // 선택 복원이 안 되었으면 파일 목록만 새로고침
+        if (_currentBarItem != null && !_selectedItems.Values.Contains(_currentBarItem))
+        {
+            RefreshCurrentFileList();
+        }
+    }
+
+    private void UpdateCheckedStats()
+    {
+        var checkedItems = CurrentFiles.Where(f => f.IsChecked);
+        CheckedCount = checkedItems.Count();
+        CheckedSize = checkedItems.Sum(f => f.Size);
+        IsAllChecked = CurrentFiles.Count > 0 && CurrentFiles.All(f => f.IsChecked);
+        OnPropertyChanged(nameof(FormattedCheckedSize));
+    }
+
+    private void ClearCurrentFiles()
+    {
+        foreach (var item in CurrentFiles)
+        {
+            item.PropertyChanged -= OnFileItemPropertyChanged;
+        }
+        CurrentFiles.Clear();
+        ResetCheckedStats();
+    }
+
+    private void ResetCheckedStats()
+    {
+        CheckedCount = 0;
+        CheckedSize = 0;
+        IsAllChecked = false;
+        OnPropertyChanged(nameof(FormattedCheckedSize));
+    }
+
+    private void RefreshCurrentFileList()
+    {
+        if (_currentBarItem != null)
+        {
+            if (_currentBarItem.IsOthers)
+                UpdateOthersFiles(_currentBarItem);
+            else
+                UpdateCurrentFiles(_currentBarItem);
+        }
+    }
+
+    private void OnFileItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(FileInfoItem.IsChecked))
+        {
+            UpdateCheckedStats();
+        }
+    }
+
+    #endregion
 
     /// <summary>
     /// 병렬 처리를 사용하여 폴더 크기 계산 (속도 대폭 향상)
@@ -737,6 +1017,7 @@ public partial class FolderTreeViewModel : ObservableObject
 
                         foreach (var childNode in childNodes)
                         {
+                            childNode.Parent = node;
                             node.Children.Add(childNode);
                             node.FolderCount++;
                         }
@@ -755,6 +1036,7 @@ public partial class FolderTreeViewModel : ObservableObject
                                 var childNode = CalculateFolderSizeParallel(dir, depth + 1);
                                 if (childNode != null)
                                 {
+                                    childNode.Parent = node;
                                     node.Children.Add(childNode);
                                     node.FolderCount++;
                                 }
@@ -856,6 +1138,7 @@ public partial class FolderTreeViewModel : ObservableObject
         public int FileCount { get; set; }
         public int FolderCount { get; set; }
         public int Depth { get; set; }
+        public FolderNode? Parent { get; set; }
         public List<FolderNode> Children { get; } = new();
     }
 }
@@ -957,6 +1240,9 @@ public partial class FileInfoItem : ObservableObject
     private string _name = string.Empty;
 
     [ObservableProperty]
+    private string _fullPath = string.Empty;
+
+    [ObservableProperty]
     private long _size;
 
     [ObservableProperty]
@@ -967,4 +1253,7 @@ public partial class FileInfoItem : ObservableObject
 
     [ObservableProperty]
     private bool _isFolder;
+
+    [ObservableProperty]
+    private bool _isChecked;
 }
